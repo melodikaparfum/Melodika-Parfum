@@ -194,29 +194,28 @@
             
             products.forEach(p => {
                 sel.innerHTML += `<option value="${p.id}">[${p.code}] ${p.name}</option>`;
+                let deleteBtn = role === 'ADMIN' ? `<button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-';
                 prodHtml += `<tr class="border-b border-zinc-800">
                     <td class="py-1 font-mono">${p.code}</td>
                     <td class="py-1">${p.name}</td>
                     <td class="py-1">${p.sell_price} AZN</td>
-                    <td class="py-1">${role === 'ADMIN' ? `<button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-'}</td>
+                    <td class="py-1">${deleteBtn}</td>
                 </tr>`;
             });
             document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="4" class="py-1 text-zinc-500">Məhsul yoxdur</td></tr>';
 
-            // Dövriyyə hesablamaları (Günlük, Həftəlik, Aylıq, İllik)
             let now = new Date();
             let todayStr = now.toISOString().split('T')[0];
             let currentYear = now.getFullYear();
             
-            // Həftənin başlanğıcını tapmaq üçün ( bazar ertəsi )
             let firstDayOfWeek = new Date(now);
             let day = now.getDay();
             let diff = now.getDate() - day + (day === 0 ? -6 : 1);
             firstDayOfWeek.setDate(diff);
             let weekStartStr = firstDayOfWeek.toISOString().split('T')[0];
 
-            let currentMonthPrefix = todayStr.substring(0, 7); // YYYY-MM
-            let currentYearPrefix = String(currentYear); // YYYY
+            let currentMonthPrefix = todayStr.substring(0, 7);
+            let currentYearPrefix = String(currentYear);
 
             let dailySum = 0, weeklySum = 0, monthlySum = 0, yearlySum = 0;
 
@@ -251,20 +250,22 @@
                 }
 
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
+                let deleteSaleBtn = role === 'ADMIN' ? `<button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-';
+                let formattedDate = s.date ? s.date.replace('T', ' ').substring(0, 16) : '-';
+                let typeColor = s.type === 'MEXARIC' ? 'text-green-400' : (s.type === 'MEDAXIL' ? 'text-blue-400' : 'text-red-400');
 
                 logHtml += `<tr class="border-b border-zinc-800">
-                    <td class="py-1 text-zinc-400 text-[11px]">${s.date ? s.date.replace('T', ' ').substring(0, 16) : '-'}</td>
-                    <td class="py-1 font-bold ${s.type==='MEXARIC'?'text-green-400':(s.type==='MEDAXIL'?'text-blue-400':'text-red-400')}">${s.type}</td>
+                    <td class="py-1 text-zinc-400 text-[11px]">${formattedDate}</td>
+                    <td class="py-1 font-bold ${typeColor}">${s.type}</td>
                     <td class="py-1">${pName}</td>
                     <td class="py-1">${s.grams_sold}</td>
                     <td class="py-1">${s.total_price} AZN</td>
                     <td class="py-1 text-center">${adBadge}</td>
-                    <td class="py-1">${role === 'ADMIN' ? `<button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-'}</td>
+                    <td class="py-1">${deleteSaleBtn}</td>
                 </tr>`;
             });
             document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="7" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
 
-            // İcmal dəyərlərini yazırıq
             document.getElementById('salesDaily').textContent = dailySum.toFixed(2) + ' AZN';
             document.getElementById('salesWeekly').textContent = weeklySum.toFixed(2) + ' AZN';
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
@@ -344,121 +345,6 @@
             document.getElementById('opPrice').value = '';
             document.getElementById('opDiscount').value = '';
             document.getElementById('fromAd').checked = false;
-            renderUI();
-        }
-    </script>
-</body>
-</html>
-td class="py-1">${p.sell_price} AZN</td>
-                    <td class="py-1">${role === 'ADMIN' ? `<button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-'}</td>
-                </tr>`;
-            });
-            document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="4" class="py-1 text-zinc-500">Məhsul yoxdur</td></tr>';
-
-            let startDateStr = role === 'ADMIN' ? document.getElementById('startDate').value : '';
-            let endDateStr = role === 'ADMIN' ? document.getElementById('endDate').value : '';
-
-            let logHtml = '';
-            let totalSalesSum = 0;
-            let totalProfitSum = 0;
-
-            sales.slice().reverse().forEach((s, index) => {
-                let actualIndex = sales.length - 1 - index;
-                let p = products.find(x => x.id == s.product_id);
-                let pName = p ? p.name : 'Naməlum';
-                let sDate = s.date ? s.date.split('T')[0] : '';
-
-                let inRange = true;
-                if(startDateStr && sDate < startDateStr) inRange = false;
-                if(endDateStr && sDate > endDateStr) inRange = false;
-
-                if(inRange && s.type === 'MEXARIC') {
-                    totalSalesSum += Number(s.total_price || 0);
-                    totalProfitSum += Number(s.profit || 0);
-                }
-
-                logHtml += `<tr class="border-b border-zinc-800">
-                    <td class="py-1 text-zinc-400 text-[11px]">${s.date ? s.date.replace('T', ' ').substring(0, 16) : '-'}</td>
-                    <td class="py-1 font-bold ${s.type==='MEXARIC'?'text-green-400':(s.type==='MEDAXIL'?'text-blue-400':'text-red-400')}">${s.type}</td>
-                    <td class="py-1">${pName}</td>
-                    <td class="py-1">${s.grams_sold}</td>
-                    <td class="py-1">${s.total_price} AZN</td>
-                    <td class="py-1">${role === 'ADMIN' ? `<button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-'}</td>
-                </tr>`;
-            });
-            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="6" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
-
-            if(role === 'ADMIN') {
-                document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
-                document.getElementById('reportNetProfit').textContent = totalProfitSum.toFixed(2) + ' AZN';
-            }
-        }
-
-        function addProd() {
-            let code = document.getElementById('pCode').value;
-            let name = document.getElementById('pName').value;
-            let buy_price = parseFloat(document.getElementById('pBuy').value) || 0;
-            let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
-            if(!code || !name) return alert('Kod və ad yazın!');
-
-            let newP = { id: Date.now(), code, name, buy_price, sell_price };
-            products.push(newP);
-            localStorage.setItem('melodika_products', JSON.stringify(products));
-
-            alert('Uğurla əlavə edildi!');
-            document.getElementById('pCode').value = '';
-            document.getElementById('pName').value = '';
-            document.getElementById('pBuy').value = '';
-            document.getElementById('pSell').value = '';
-            renderUI();
-        }
-
-        function deleteProduct(id) {
-            if(confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')) {
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('melodika_products', JSON.stringify(products));
-                renderUI();
-            }
-        }
-
-        function deleteSale(index) {
-            if(confirm('Bu əməliyyatı jurnaldan silmək istəyirsiniz?')) {
-                sales.splice(index, 1);
-                localStorage.setItem('melodika_sales', JSON.stringify(sales));
-                renderUI();
-            }
-        }
-
-        function calcPrice() {
-            let id = document.getElementById('opProduct').value;
-            let gram = parseFloat(document.getElementById('opGram').value) || 0;
-            let disc = parseFloat(document.getElementById('opDiscount').value) || 0;
-            let p = products.find(x => x.id == id);
-            if(!p) return;
-            let total = gram * (p.sell_price || 0);
-            if(disc > 0) total -= total * (disc / 100);
-            document.getElementById('opPrice').value = total.toFixed(2);
-        }
-
-        function saveOp() {
-            let product_id = document.getElementById('opProduct').value;
-            let type = document.getElementById('opType').value;
-            let grams_sold = parseFloat(document.getElementById('opGram').value);
-            let total_price = parseFloat(document.getElementById('opPrice').value);
-            if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
-
-            let p = products.find(x => x.id == product_id);
-            let total_cost = grams_sold * (p.buy_price || 0);
-            let profit = total_price - total_cost;
-
-            let newOp = { product_id, type, grams_sold, total_price, total_cost, profit, date: new Date().toISOString() };
-            sales.push(newOp);
-            localStorage.setItem('melodika_sales', JSON.stringify(sales));
-
-            alert('Əməliyyat uğurla yadda saxlanıldı!');
-            document.getElementById('opGram').value = '';
-            document.getElementById('opPrice').value = '';
-            document.getElementById('opDiscount').value = '';
             renderUI();
         }
     </script>
