@@ -96,7 +96,7 @@
                 </div>
             </header>
 
-            <!-- YALNIZ ADMİN PANELİNDƏ GÖRÜNƏN MAĞAZA ANALİTİKASI -->
+            <!-- MAĞAZA ANALİTİKASI (Həm Admin, həm də Satıcı üçün aktivdir) -->
             <div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
                     <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
@@ -401,8 +401,8 @@
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('adminReportBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
-                    loadAnalytics('day');
                 }
+                loadAnalytics('day'); 
                 let today = getBakuDateString();
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
                 if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
@@ -450,8 +450,8 @@
                 document.getElementById('adminBox').classList.remove('hidden-screen');
                 document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
-                loadAnalytics('day');
             }
+            loadAnalytics('day'); 
 
             let today = getBakuDateString();
             if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
@@ -485,7 +485,7 @@
 
         // MÜŞTƏRİ EKRANI
         function openCustomerCatalog() {
-            trackVisit(); // Müştəri girəndə baxışı sayırıq
+            trackVisit(); 
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('customerScreen').classList.remove('hidden-screen');
             renderCustomerCatalog();
@@ -866,11 +866,11 @@
                 }
                 await loadDataFromCloud();
                 renderOrdersList();
-                if(role === 'ADMIN') loadAnalytics('day');
+                loadAnalytics('day');
             }
         }
 
-        // ADMİN İŞLƏYƏN ANALİTİKA KODLARI
+        // ANALİTİKA HESABLAYICISI (Həm Admin, həm Satıcı üçün aktivdir)
         async function loadAnalytics(period = 'day') {
             const now = new Date();
             let startDate = new Date();
