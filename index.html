@@ -71,7 +71,7 @@
                         
                         <label class="flex items-center space-x-2 cursor-pointer pt-1">
                             <input type="checkbox" id="custDelivery" onchange="toggleAddressBox()" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
-                            <span>Çatdırılma istəyirəm (Min. 30 AZN)</span>
+                            <span>Çatdırılma istəyirəm</span>
                         </label>
                         
                         <div id="addressBox" class="hidden-screen pt-1">
@@ -283,6 +283,20 @@
             </div>
         </div>
 
+        <!-- ÇATDIRILMA TƏSDİQ MODALI -->
+        <div id="deliveryConfirmModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
+            <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
+                <div class="text-4xl">⚠️</div>
+                <div class="text-sm font-medium text-zinc-200 leading-relaxed">
+                    Minimum 30 AZN sifariş edildikdə, çatdırılma pulsuzdur. Əks halda 7 AZN əlavə ödəniş ediləcək.
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button onclick="rejectDelivery()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2.5 rounded-lg text-xs">İmtina Et</button>
+                    <button onclick="acceptDelivery()" class="w-1/2 gold-bg font-bold py-2.5 rounded-lg text-xs">Razı Ol</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -295,6 +309,7 @@
         let sales = [];
         let orders = [];
         let cart = [];
+        let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
 
         function getBakuDateString(dateInput = new Date()) {
@@ -466,8 +481,10 @@
             let container = document.getElementById('cartItemsList');
             if(cart.length === 0) {
                 container.innerHTML = '<span class="text-zinc-500">Səbətiniz boşdur.</span>';
-                document.getElementById('cartTotalPrice').textContent = 'Cəmi: 0.00 AZN';
-                checkDeliveryLimit(0);
+                deliveryFee = 0;
+                document.getElementById('custDelivery').checked = false;
+                document.getElementById('addressBox').classList.add('hidden-screen');
+                updateCartTotal(0);
                 return;
             }
 
@@ -486,17 +503,22 @@
                 `;
             });
             container.innerHTML = html;
-            document.getElementById('cartTotalPrice').textContent = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
-            checkDeliveryLimit(grandTotal);
+            
+            if (document.getElementById('custDelivery').checked && grandTotal >= 30) {
+                deliveryFee = 0;
+            }
+            updateCartTotal(grandTotal);
         }
 
-        function checkDeliveryLimit(totalAmount) {
-            let deliveryCheckbox = document.getElementById('custDelivery');
-            if (totalAmount < 30 && deliveryCheckbox.checked) {
-                deliveryCheckbox.checked = false;
-                toggleAddressBox();
-                alert('Çatdırılma üçün minimum sifariş məbləği 30 AZN olmalıdır!');
+        function updateCartTotal(grandTotal) {
+            let totalWithDelivery = grandTotal + deliveryFee;
+            let totalText = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
+            if (deliveryFee > 0) {
+                totalText = `Məhsullar: ${grandTotal.toFixed(2)} AZN + Çatdırılma: ${deliveryFee.toFixed(2)} AZN = <span class="gold-text">Yekun: ${totalWithDelivery.toFixed(2)} AZN</span>`;
+            } else {
+                totalText = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
             }
+            document.getElementById('cartTotalPrice').innerHTML = totalText;
         }
 
         function removeFromCart(index) {
@@ -508,19 +530,46 @@
             let isChecked = document.getElementById('custDelivery').checked;
             let box = document.getElementById('addressBox');
             
-            // Səbətin cəmi məbləğini hesablayırıq
             let grandTotal = 0;
             cart.forEach(item => grandTotal += item.total);
 
-            if (isChecked && grandTotal < 30) {
-                document.getElementById('custDelivery').checked = false;
-                alert('Çatdırılma seçmək üçün səbət məbləği ən azı 30 AZN olmalıdır!');
+            if (isChecked) {
+                if (grandTotal < 30) {
+                    document.getElementById('custDelivery').checked = false;
+                    document.getElementById('deliveryConfirmModal').classList.remove('hidden-screen');
+                    box.classList.add('hidden-screen');
+                    return;
+                } else {
+                    deliveryFee = 0;
+                    box.classList.remove('hidden-screen');
+                }
+            } else {
+                deliveryFee = 0;
                 box.classList.add('hidden-screen');
-                return;
             }
+            updateCartTotal(grandTotal);
+        }
 
-            if(isChecked) box.classList.remove('hidden-screen');
-            else box.classList.add('hidden-screen');
+        function acceptDelivery() {
+            deliveryFee = 7;
+            document.getElementById('custDelivery').checked = true;
+            document.getElementById('addressBox').classList.remove('hidden-screen');
+            document.getElementById('deliveryConfirmModal').classList.add('hidden-screen');
+            
+            let grandTotal = 0;
+            cart.forEach(item => grandTotal += item.total);
+            updateCartTotal(grandTotal);
+        }
+
+        function rejectDelivery() {
+            document.getElementById('custDelivery').checked = false;
+            deliveryFee = 0;
+            document.getElementById('addressBox').classList.add('hidden-screen');
+            document.getElementById('deliveryConfirmModal').classList.add('hidden-screen');
+            
+            let grandTotal = 0;
+            cart.forEach(item => grandTotal += item.total);
+            updateCartTotal(grandTotal);
         }
 
         async function submitCustomerOrder() {
@@ -531,6 +580,7 @@
 
             let grandTotal = 0;
             cart.forEach(item => grandTotal += item.total);
+            let finalAmount = grandTotal + deliveryFee;
 
             if(!name || !phone) {
                 alert('Zəhmət olmasa Ad və Əlaqə nömrənizi qeyd edin!');
@@ -538,10 +588,6 @@
             }
             if(cart.length === 0) {
                 alert('Səbətinizdə heç bir məhsul yoxdur!');
-                return;
-            }
-            if(isDelivery && grandTotal < 30) {
-                alert('Çatdırılma üçün minimum məbləğ 30 AZN olmalıdır!');
                 return;
             }
             if(isDelivery && !address) {
@@ -553,6 +599,8 @@
                 customer_name: name,
                 customer_phone: phone,
                 is_delivery: isDelivery,
+                delivery_fee: deliveryFee,
+                total_amount: finalAmount,
                 address: isDelivery ? address : 'Yerindən götürmə',
                 items: cart,
                 status: 'Gözləmədə',
@@ -568,6 +616,7 @@
             alert(`Təşəkkür edirik, ${name}! Sifarişiniz qeydə alındı, sizinlə gün ərzində əlaqə saxlanılacaq.`);
             
             cart = [];
+            deliveryFee = 0;
             document.getElementById('custName').value = '';
             document.getElementById('custPhone').value = '';
             document.getElementById('custDelivery').checked = false;
@@ -688,6 +737,7 @@
                 }
 
                 let statusColor = o.status === 'Qəbul edildi' ? 'text-green-400' : (o.status === 'Ləğv edildi' ? 'text-red-400' : 'text-amber-400');
+                let deliveryInfoStr = o.is_delivery ? ` | Çatdırılma: ${o.delivery_fee ? o.delivery_fee + ' AZN' : 'Pulsuz'}` : '';
 
                 html += `
                     <div class="bg-zinc-800/50 p-3 rounded-lg border border-zinc-700 space-y-2 text-xs">
@@ -695,7 +745,7 @@
                             <span class="font-bold gold-text">${o.customer_name} (${o.customer_phone})</span>
                             <span class="font-bold ${statusColor}">${o.status}</span>
                         </div>
-                        <div><strong>Ünvan:</strong> ${o.address}</div>
+                        <div><strong>Ünvan:</strong> ${o.address}${deliveryInfoStr}</div>
                         <div><strong>Sifarişlər:</strong><div class="pl-2 text-zinc-300">${itemsStr}</div></div>
                         <div class="text-zinc-400 text-[11px]">Tarix: ${formattedDate}</div>
                         <div class="flex space-x-2 pt-2 border-t border-zinc-700/50">
@@ -1032,3 +1082,7 @@
 
             await loadDataFromCloud();
             renderUI();
+        }
+    </script>
+</body>
+</html>
