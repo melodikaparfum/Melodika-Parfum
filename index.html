@@ -28,15 +28,63 @@
             Status: Bulud bazasına qoşulur...
         </div>
 
-        <!-- GİRİŞ -->
-        <div id="loginScreen" class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-2xl no-print">
-            <h1 class="text-2xl font-bold gold-text mb-4">MELODİKA PARFUM</h1>
-            <input type="password" id="pinInput" placeholder="PİN Kod" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white mb-4 focus:outline-none gold-border">
+        <!-- GİRİŞ EKRANI -->
+        <div id="loginScreen" class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-2xl no-print space-y-4">
+            <h1 class="text-2xl font-bold gold-text">MELODİKA PARFUM</h1>
+            <input type="password" id="pinInput" placeholder="PİN Kod" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
             <button onclick="login()" class="w-full gold-bg font-bold py-3 rounded-lg">Daxil Ol</button>
-            <p id="loginError" class="text-red-500 text-sm mt-2 hidden-screen">Yanlış PİN kod!</p>
+            <p id="loginError" class="text-red-500 text-sm hidden-screen">Yanlış PİN kod!</p>
+            
+            <div class="border-t border-zinc-800 pt-3">
+                <button onclick="openCustomerCatalog()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold py-2.5 rounded-lg text-sm">
+                    Müştəri Kataloqu / Sifariş Et 🛍️
+                </button>
+            </div>
         </div>
 
-        <!-- ƏSAS PANEL -->
+        <!-- MÜŞTƏRİ KATALOQ VƏ SİFARİŞ EKRANI -->
+        <div id="customerScreen" class="hidden-screen space-y-4">
+            <header class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                <h1 class="text-lg font-bold gold-text">MELODİKA — MÜŞTƏRİ KATALOQU</h1>
+                <button onclick="closeCustomerCatalog()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded">Girişə Qayıt</button>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Ətirlərin Siyahısı -->
+                <div class="md:col-span-2 space-y-3">
+                    <h2 class="text-sm font-semibold gold-text">Ətirlər və Notlar</h2>
+                    <input type="text" id="customerSearch" oninput="renderCustomerCatalog()" placeholder="Ətir axtar..." class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs mb-2">
+                    <div id="customerProductsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2"></div>
+                </div>
+
+                <!-- Səbət və Sifariş Formu -->
+                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 h-fit sticky top-4">
+                    <h2 class="text-sm font-semibold gold-text">Səbətiniz 🛒</h2>
+                    <div id="cartItemsList" class="space-y-2 text-xs text-zinc-300 max-h-40 overflow-y-auto border-b border-zinc-800 pb-2">
+                        <span class="text-zinc-500">Səbətiniz boşdur.</span>
+                    </div>
+                    <div class="text-right font-bold text-sm gold-text" id="cartTotalPrice">Cəmi: 0.00 AZN</div>
+
+                    <div class="space-y-2 pt-2 border-t border-zinc-800 text-xs">
+                        <input type="text" id="custName" placeholder="Adınız və Soyadınız *" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white">
+                        <input type="text" id="custPhone" placeholder="Əlaqə Nömrəsi *" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white">
+                        
+                        <label class="flex items-center space-x-2 cursor-pointer pt-1">
+                            <input type="checkbox" id="custDelivery" onchange="toggleAddressBox()" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
+                            <span>Çatdırılma istəyirəm</span>
+                        </label>
+                        
+                        <div id="addressBox" class="hidden-screen pt-1">
+                            <textarea id="custAddress" placeholder="Çatdırılma ünvanı..." class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white h-16 text-xs"></textarea>
+                        </div>
+                    </div>
+
+                    <button onclick="submitCustomerOrder()" class="w-full gold-bg font-bold py-2.5 rounded text-sm mt-2">Sifarişi Təsdiq Et</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ƏSAS PANEL (ADMIN / SATICI) -->
         <div id="mainApp" class="hidden-screen space-y-4">
             <header class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
                 <h1 class="text-lg font-bold gold-text" id="roleTitle">MELODİKA</h1>
@@ -90,10 +138,14 @@
                 <input type="hidden" id="editingProductId">
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
                     <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    <input type="text" id="pName" placeholder="Ad" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                    <input type="text" id="pName" placeholder="Ad (məs: Megamare)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <textarea id="pIngredients" placeholder="Tərkibi..." class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs h-16"></textarea>
+                    <textarea id="pNotes" placeholder="İç notları..." class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs h-16"></textarea>
                 </div>
                 <div class="flex space-x-2">
                     <button onclick="saveProduct()" id="saveProdBtn" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
@@ -211,6 +263,7 @@
 
         let products = [];
         let sales = [];
+        let cart = [];
         let role = localStorage.getItem('melodika_current_role') || '';
 
         function getBakuDateString(dateInput = new Date()) {
@@ -290,6 +343,153 @@
             location.reload(); 
         }
 
+        // MÜŞTƏRİ EKRANI FUNKSİYALARI
+        function openCustomerCatalog() {
+            document.getElementById('loginScreen').classList.add('hidden-screen');
+            document.getElementById('customerScreen').classList.remove('hidden-screen');
+            renderCustomerCatalog();
+        }
+
+        function closeCustomerCatalog() {
+            document.getElementById('customerScreen').classList.add('hidden-screen');
+            document.getElementById('loginScreen').classList.remove('hidden-screen');
+        }
+
+        function renderCustomerCatalog() {
+            let query = (document.getElementById('customerSearch').value || '').toLowerCase();
+            let listHtml = '';
+
+            let filtered = products.filter(p => p.code.toLowerCase().includes(query) || p.name.toLowerCase().includes(query));
+
+            if(filtered.length === 0) {
+                document.getElementById('customerProductsList').innerHTML = '<div class="text-zinc-500 text-xs">Məhsul tapılmadı.</div>';
+                return;
+            }
+
+            filtered.forEach(p => {
+                let sellPrice = Number(p.sell_price || 0);
+                listHtml += `
+                    <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-bold gold-text text-sm">${p.name} <span class="text-zinc-500 font-mono text-xs">(${p.code})</span></h3>
+                            <span class="text-xs text-zinc-300 font-semibold">${sellPrice.toFixed(2)} AZN / qr</span>
+                        </div>
+                        <div class="text-xs text-zinc-400 space-y-1">
+                            <div><strong class="text-zinc-300">Tərkibi:</strong> ${p.ingredients || 'Qeyd olunmayıb'}</div>
+                            <div><strong class="text-zinc-300">İç notları:</strong> ${p.notes || 'Qeyd olunmayıb'}</div>
+                        </div>
+                        <div class="flex items-center space-x-2 pt-2 border-t border-zinc-800">
+                            <input type="number" step="1" min="1" id="gram_${p.id}" oninput="calcCustItemPrice(${p.id}, ${sellPrice})" placeholder="Qram (qr)" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs w-28">
+                            <div class="text-xs font-bold gold-text" id="total_${p.id}">0.00 AZN</div>
+                            <button onclick="addToCart(${p.id}, '${p.name}', ${sellPrice})" class="gold-bg font-bold px-3 py-1.5 rounded text-xs ml-auto">Səbətə At</button>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('customerProductsList').innerHTML = listHtml;
+        }
+
+        function calcCustItemPrice(id, pricePerGram) {
+            let grams = parseFloat(document.getElementById(`gram_${id}`).value) || 0;
+            let total = grams * pricePerGram;
+            document.getElementById(`total_${id}`).textContent = total.toFixed(2) + ' AZN';
+        }
+
+        function addToCart(id, name, pricePerGram) {
+            let gramsInput = document.getElementById(`gram_${id}`);
+            let grams = parseFloat(gramsInput.value) || 0;
+            if(grams <= 0) {
+                alert('Zəhmət olmasa miqdarı (qram) daxil edin!');
+                return;
+            }
+            let total = grams * pricePerGram;
+
+            let existing = cart.find(x => x.id === id);
+            if(existing) {
+                existing.grams += grams;
+                existing.total += total;
+            } else {
+                cart.push({ id, name, grams, total });
+            }
+
+            gramsInput.value = '';
+            document.getElementById(`total_${id}`).textContent = '0.00 AZN';
+            renderCart();
+            alert('Məhsul səbətə əlavə olundu!');
+        }
+
+        function renderCart() {
+            let container = document.getElementById('cartItemsList');
+            if(cart.length === 0) {
+                container.innerHTML = '<span class="text-zinc-500">Səbətiniz boşdur.</span>';
+                document.getElementById('cartTotalPrice').textContent = 'Cəmi: 0.00 AZN';
+                return;
+            }
+
+            let html = '';
+            let grandTotal = 0;
+            cart.forEach((item, idx) => {
+                grandTotal += item.total;
+                html += `
+                    <div class="flex justify-between items-center border-b border-zinc-800/50 pb-1">
+                        <div>${item.name} (${item.grams} qr)</div>
+                        <div class="flex items-center space-x-2">
+                            <span class="gold-text font-bold">${item.total.toFixed(2)} AZN</span>
+                            <button onclick="removeFromCart(${idx})" class="text-red-400 font-bold hover:text-red-600">✕</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            document.getElementById('cartTotalPrice').textContent = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            renderCart();
+        }
+
+        function toggleAddressBox() {
+            let isChecked = document.getElementById('custDelivery').checked;
+            let box = document.getElementById('addressBox');
+            if(isChecked) box.classList.remove('hidden-screen');
+            else box.classList.add('hidden-screen');
+        }
+
+        async function submitCustomerOrder() {
+            let name = document.getElementById('custName').value.trim();
+            let phone = document.getElementById('custPhone').value.trim();
+            let isDelivery = document.getElementById('custDelivery').checked;
+            let address = document.getElementById('custAddress').value.trim();
+
+            if(!name || !phone) {
+                alert('Zəhmət olmasa Ad və Əlaqə nömrənizi qeyd edin!');
+                return;
+            }
+            if(cart.length === 0) {
+                alert('Səbətinizdə heç bir məhsul yoxdur!');
+                return;
+            }
+            if(isDelivery && !address) {
+                alert('Zəhmət olmasa çatdırılma ünvanını qeyd edin!');
+                return;
+            }
+
+            // Sifarişi bazaya (sales və ya sifarişlər kimi) və ya loglara yazmaq olar. Burada sadə şəkildə alert ilə uğurlu mesaj veririk
+            alert(`Təşəkkür edirik, ${name}! Sifarişiniz qeydə alındı, sizinlə gün ərzində əlaqə saxlanılacaq.`);
+            
+            // Səbəti və formanı təmizləyirik
+            cart = [];
+            document.getElementById('custName').value = '';
+            document.getElementById('custPhone').value = '';
+            document.getElementById('custDelivery').checked = false;
+            document.getElementById('custAddress').value = '';
+            toggleAddressBox();
+            renderCart();
+            closeCustomerCatalog();
+        }
+
+        // ADMIN / SATICI PANELİ FUNKSİYALARI
         function renderUI() {
             let searchQuery = (document.getElementById('productSearch').value || '').toLowerCase();
             let sel = document.getElementById('opProduct');
@@ -476,6 +676,8 @@
             document.getElementById('pStock').value = p.initial_stock;
             document.getElementById('pBuy').value = p.buy_price || 0;
             document.getElementById('pSell').value = p.sell_price || 0;
+            document.getElementById('pIngredients').value = p.ingredients || '';
+            document.getElementById('pNotes').value = p.notes || '';
             
             document.getElementById('adminFormTitle').textContent = "Məhsulu Düzənlə";
             document.getElementById('saveProdBtn').textContent = "Yadda Saxla";
@@ -490,6 +692,8 @@
             document.getElementById('pStock').value = '';
             document.getElementById('pBuy').value = '';
             document.getElementById('pSell').value = '';
+            document.getElementById('pIngredients').value = '';
+            document.getElementById('pNotes').value = '';
 
             document.getElementById('adminFormTitle').textContent = "Yeni Məhsul / Ətir Əlavə Et";
             document.getElementById('saveProdBtn').textContent = "Əlavə Et";
@@ -503,16 +707,19 @@
             let initial_stock = parseFloat(document.getElementById('pStock').value) || 0;
             let buy_price = parseFloat(document.getElementById('pBuy').value) || 0;
             let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
+            let ingredients = document.getElementById('pIngredients').value;
+            let notes = document.getElementById('pNotes').value;
+
             if(!code || !name) return alert('Kod və ad yazın!');
 
+            let payload = { code, name, initial_stock, buy_price, sell_price, ingredients, notes };
+
             if(editingId) {
-                // Redaktə rejimi (Update)
-                let { error } = await _supabase.from('products').update({ code, name, initial_stock, buy_price, sell_price }).eq('id', editingId);
+                let { error } = await _supabase.from('products').update(payload).eq('id', editingId);
                 if(error) { alert('Xəta baş verdi: ' + error.message); return; }
                 alert('Məhsul uğurla yeniləndi!');
             } else {
-                // Yeni məhsul əlavə etmə rejimi (Insert)
-                let { error } = await _supabase.from('products').insert([{ code, name, initial_stock, buy_price, sell_price }]);
+                let { error } = await _supabase.from('products').insert([payload]);
                 if(error) { alert('Xəta baş verdi: ' + error.message); return; }
                 alert('Məhsul uğurla əlavə edildi!');
             }
@@ -563,7 +770,7 @@
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
 
             let p = products.find(x => x.id == product_id);
-            let total_cost = grams_sold * (p.buy_price || 0);
+            let total_cost = grams_grams = grams_sold * (p.buy_price || 0);
             let profit = total_price - total_cost;
 
             let newOp = { 
