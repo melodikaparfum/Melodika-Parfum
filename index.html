@@ -468,14 +468,18 @@
 
         // BAXIŞ SAYI İZLƏMƏ FUNKSİYASI
         async function trackVisit() {
-            if (!sessionStorage.getItem('visited')) {
-                const { error } = await _supabase
-                    .from('site_visits')
-                    .insert([{}]);
-                
-                if (!error) {
-                    sessionStorage.setItem('visited', 'true');
+            try {
+                if (!sessionStorage.getItem('visited')) {
+                    const { error } = await _supabase
+                        .from('site_visits')
+                        .insert([{}]);
+                    
+                    if (!error) {
+                        sessionStorage.setItem('visited', 'true');
+                    }
                 }
+            } catch(e) {
+                console.error("Visit tracking error:", e);
             }
         }
 
@@ -835,6 +839,7 @@
                         <div class="flex space-x-2 pt-2 border-t border-zinc-700/50">
                             <button onclick="updateOrderStatus(${o.id}, 'Qəbul edildi')" class="bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded font-bold">Qəbul Et</button>
                             <button onclick="updateOrderStatus(${o.id}, 'Ləğv edildi')" class="bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded font-bold">Ləğv Et (Otmenit)</button>
+                            <button onclick="deleteOrder(${o.id})" class="bg-zinc-700 hover:bg-red-900 text-white px-3 py-1 rounded font-bold ml-auto">Sil 🗑️</button>
                         </div>
                     </div>
                 `;
@@ -850,6 +855,19 @@
             }
             await loadDataFromCloud();
             renderOrdersList();
+        }
+
+        async function deleteOrder(orderId) {
+            if(confirm('Bu sifarişi bazadan tamamilə silmək istədiyinizə əminsiniz?')) {
+                let { error } = await _supabase.from('orders').delete().eq('id', orderId);
+                if(error) {
+                    alert('Silinərkən xəta baş verdi: ' + error.message);
+                    return;
+                }
+                await loadDataFromCloud();
+                renderOrdersList();
+                if(role === 'ADMIN') loadAnalytics('day');
+            }
         }
 
         // ADMİN İŞLƏYƏN ANALİTİKA KODLARI
@@ -1027,7 +1045,7 @@
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
 
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
-            document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
+            document.getElementById('payPos').textContent = payPos.toFixed(2) + ' AZN';
             document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
 
             if(role === 'ADMIN') {
