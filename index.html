@@ -258,7 +258,7 @@
                     <h2 class="text-lg font-bold gold-text">MÜŞTƏRİ KATALOQU MƏLUMATLARI (Tərkib, Notlar və Şəkil)</h2>
                     <button onclick="closeCatalogDetailsModal()" class="no-print text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
-                <div class="text-xs text-zinc-400">Hər bir ətir üçün müştəri səhifəsində görünəcək tərkibi, notları və şəkil URL-ni burdan yazıb yadda saxlayın.</div>
+                <div class="text-xs text-zinc-400">Hər bir ətir üçün müştəri səhifəsində görünəcək tərkibi, notları və şəkli buradan seçib yadda saxlayın.</div>
                 
                 <div id="catalogDetailsList" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
             </div>
@@ -547,13 +547,27 @@
         function openCatalogDetailsModal() {
             let listHtml = '';
             products.forEach(p => {
+                let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-700">` : '<div class="w-12 h-12 bg-zinc-800 rounded border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
+                
                 listHtml += `
                     <div class="bg-zinc-800/50 p-3 rounded-lg space-y-2 border border-zinc-700">
                         <div class="font-bold gold-text text-sm">${p.name} (${p.code})</div>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-                            <input type="text" id="det_img_${p.id}" value="${p.image_url || ''}" placeholder="Şəkil URL-i" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
-                            <input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" placeholder="Tərkibi" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
-                            <input type="text" id="det_note_${p.id}" value="${p.notes || ''}" placeholder="İç notları" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
+                        <div class="flex items-center space-x-3">
+                            ${imgPreview}
+                            <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <div class="flex flex-col">
+                                    <label class="text-[10px] text-zinc-400 mb-0.5">Şəkil Seçin</label>
+                                    <input type="file" id="det_img_${p.id}" accept="image/*" class="bg-zinc-800 border border-zinc-700 p-1 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black hover:file:bg-amber-600">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-[10px] text-zinc-400 mb-0.5">Tərkibi</label>
+                                    <input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" placeholder="Tərkibi" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
+                                </div>
+                                <div class="flex flex-col">
+                                    <label class="text-[10px] text-zinc-400 mb-0.5">İç notları</label>
+                                    <input type="text" id="det_note_${p.id}" value="${p.notes || ''}" placeholder="İç notları" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
+                                </div>
+                            </div>
                         </div>
                         <button onclick="saveCatalogDetails(${p.id})" class="gold-bg font-bold px-3 py-1 rounded text-xs">Yadda Saxla</button>
                     </div>
@@ -568,17 +582,48 @@
         }
 
         async function saveCatalogDetails(id) {
-            let image_url = document.getElementById(`det_img_${id}`).value;
+            let fileInput = document.getElementById(`det_img_${id}`);
             let ingredients = document.getElementById(`det_ing_${id}`).value;
             let notes = document.getElementById(`det_note_${id}`).value;
+            let p = products.find(x => x.id == id);
 
-            let { error } = await _supabase.from('products').update({ image_url, ingredients, notes }).eq('id', id);
+            let imageUrl = p ? p.image_url : '';
+
+            // Əgər yeni şəkil faylı seçilibsə, əvvəlcə onu Supabase Storage-ə yükləyirik
+            if (fileInput && fileInput.files.length > 0) {
+                let file = fileInput.files[0];
+                let fileName = `${Date.now()}_${file.name}`;
+
+                let { data: uploadData, error: uploadError } = await _supabase.storage
+                    .from('perfume-images')
+                    .upload(fileName, file);
+
+                if (uploadError) {
+                    alert('Şəkil yüklənərkən xəta baş verdi: ' + uploadError.message);
+                    return;
+                }
+
+                let { data: publicURLData } = _supabase.storage
+                    .from('perfume-images')
+                    .getPublicUrl(fileName);
+
+                imageUrl = publicURLData.publicUrl;
+            }
+
+            let { error } = await _supabase.from('products').update({ 
+                image_url: imageUrl, 
+                ingredients, 
+                notes 
+            }).eq('id', id);
+
             if(error) {
                 alert('Xəta: ' + error.message);
                 return;
             }
-            alert('Məlumat yeniləndi!');
+
+            alert('Məlumat və şəkil uğurla yeniləndi!');
             await loadDataFromCloud();
+            openCatalogDetailsModal(); // modalı yeniləyirik
         }
 
         // SİFARİŞLƏR SHEET
