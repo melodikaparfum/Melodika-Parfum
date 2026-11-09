@@ -1139,3 +1139,73 @@ async function trackVisit() {
 
 // Səhifə açılan kimi ziyarəti qeyd edirik
 trackVisit();
+// Seçilən dövrə görə statistikaları hesablayan funksiya
+async function loadAnalytics(period = 'day') {
+    const now = new Date();
+    let startDate = new Date();
+
+    if (period === 'day') {
+        startDate.setHours(0, 0, 0, 0);
+    } else if (period === 'week') {
+        const dayOfWeek = now.getDay() || 7;
+        startDate.setDate(now.getDate() - dayOfWeek + 1);
+        startDate.setHours(0, 0, 0, 0);
+    } else if (period === 'month') {
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+    } else if (period === 'year') {
+        startDate = new Date(now.getFullYear(), 0, 1);
+    }
+
+    const isoStartDate = startDate.toISOString();
+
+    // 1. Ziyarətçi sayını oxuyuruq
+    const { count: visitsCount, error: vErr } = await supabaseClient
+        .from('site_visits')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', isoStartDate);
+
+    // 2. Sifariş sayını oxuyuruq
+    const { count: ordersCount, error: oErr } = await supabaseClient
+        .from('orders')
+        .select('*', { count: 'exact', head: true })
+        .gte('created_at', isoStartDate);
+
+    if (!vErr && !oErr) {
+        document.getElementById('stat-visits').innerText = visitsCount || 0;
+        document.getElementById('stat-orders').innerText = ordersCount || 0;
+        
+        const conversion = visitsCount > 0 ? ((ordersCount / visitsCount) * 100).toFixed(1) : 0;
+        document.getElementById('stat-conversion').innerText = conversion + '%';
+    }
+}
+<!-- MAĞAZA ANALİTİKASI BLOKU -->
+<div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
+        <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
+        
+        <!-- Günlük / Həftəlik / Aylıq / İllik Düymələri -->
+        <div class="flex bg-zinc-800 p-1 rounded-lg text-xs space-x-1">
+            <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
+            <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
+            <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
+            <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
+        </div>
+    </div>
+
+    <!-- Statistik Kartlar -->
+    <div class="grid grid-cols-3 gap-3 text-center">
+        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+            <div class="text-xs text-zinc-400">👀 Baxış Sayı</div>
+            <div id="stat-visits" class="text-lg font-bold text-white mt-1">0</div>
+        </div>
+        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+            <div class="text-xs text-zinc-400">🛒 Sifarişlər</div>
+            <div id="stat-orders" class="text-lg font-bold text-amber-400 mt-1">0</div>
+        </div>
+        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+            <div class="text-xs text-zinc-400">🎯 Sifariş %-i</div>
+            <div id="stat-conversion" class="text-lg font-bold text-green-400 mt-1">0%</div>
+        </div>
+    </div>
+</div>
+loadAnalytics('day');
