@@ -204,13 +204,32 @@
         ];
 
         let sales = JSON.parse(localStorage.getItem('melodika_sales')) || [];
-        let role = '';
+        let role = localStorage.getItem('melodika_current_role') || '';
+
+        // Səhifə açılan kimi əgər əvvəlcədən giriş edilibsə panel birbaşa açılsın
+        window.onload = function() {
+            if(role) {
+                document.getElementById('loginScreen').classList.add('hidden-screen');
+                document.getElementById('mainApp').classList.remove('hidden-screen');
+                if(role === 'ADMIN') {
+                    document.getElementById('adminBox').classList.remove('hidden-screen');
+                    document.getElementById('adminReportBox').classList.remove('hidden-screen');
+                }
+                let today = new Date().toISOString().split('T')[0];
+                if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
+                if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
+                document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
+                renderUI();
+            }
+        };
 
         function login() {
             let pin = document.getElementById('pinInput').value;
             if(pin === '08102000') role = 'ADMIN';
             else if(pin === '112233') role = 'SATICI';
             else { document.getElementById('loginError').classList.remove('hidden-screen'); return; }
+
+            localStorage.setItem('melodika_current_role', role);
 
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
@@ -228,7 +247,10 @@
             renderUI();
         }
 
-        function logout() { location.reload(); }
+        function logout() { 
+            localStorage.removeItem('melodika_current_role');
+            location.reload(); 
+        }
 
         function renderUI() {
             let searchQuery = (document.getElementById('productSearch').value || '').toLowerCase();
@@ -439,6 +461,8 @@
             let payType = document.getElementById('payType').value;
             let fromAd = document.getElementById('fromAd').checked;
             let toCashRegister = document.getElementById('toCashRegister').checked;
+            
+            // Cari rola əsasən müəyyən edilir
             let author = role === 'ADMIN' ? 'Admin' : 'Satıcı';
 
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
