@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melodika Parfum - İdarəetmə</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f0f0f; color: #f3f4f6; }
+        .gold-border { border-color: #d4af37; }
+        .gold-text { color: #d4af37; }
+        .gold-bg { background-color: #d4af37; }
+        .gold-bg:hover { background-color: #b9972a; }
+    </style>
+</head>
+<body class="p-6">
+    <div class="max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-8 border-b border-zinc-800 pb-4">
+            <h1 class="text-2xl font-bold gold-text">MELODİKA PARFUM</h1>
+            <span class="text-xs bg-zinc-800 gold-text px-3 py-1 rounded-full border gold-border">v0.1 Online</span>
+        </header>
+
+        <!-- Məhsul Əlavə Bölməsi -->
+        <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl mb-6">
+            <h2 class="text-lg font-semibold mb-4 gold-text">Yeni Məhsul Əlavə Et</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input type="text" id="prodCode" placeholder="Məhsul Kodu (məs: A01)" class="bg-zinc-800 border border-zinc-700 p-3 rounded-lg focus:outline-none gold-border text-white">
+                <input type="text" id="prodName" placeholder="Parfümün Adı" class="bg-zinc-800 border border-zinc-700 p-3 rounded-lg focus:outline-none gold-border text-white">
+            </div>
+            <button onclick="addProduct()" class="mt-4 gold-bg text-black font-bold px-6 py-2 rounded-lg transition">Məhsul Yarat</button>
+        </div>
+
+        <!-- Partiya (Mədaxil) Bölməsi -->
+        <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl mb-6">
+            <h2 class="text-lg font-semibold mb-4 gold-text">Mədaxil (Partiya və Qram)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <select id="batchProductSelect" class="bg-zinc-800 border border-zinc-700 p-3 rounded-lg focus:outline-none gold-border text-white">
+                    <option value="">Məhsul seçin...</option>
+                </select>
+                <input type="number" id="batchGrams" placeholder="Ümumi Qram" class="bg-zinc-800 border border-zinc-700 p-3 rounded-lg focus:outline-none gold-border text-white">
+                <input type="number" id="batchCost" placeholder="Ümumi Maya Dəyəri (AZN)" class="bg-zinc-800 border border-zinc-700 p-3 rounded-lg focus:outline-none gold-border text-white">
+            </div>
+            <button onclick="addBatch()" class="mt-4 gold-bg text-black font-bold px-6 py-2 rounded-lg transition">Mədaxil Et</button>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://jauzzzwwqxsxyuopapvl.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXp6endxcXhzeHl1b3BhcHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxODEwMDQsImV4cCI6MjEwOTc1NzAwNH0.gOjs41EGeGVqrwlaoIGpB0qwpeV4jpP44_9HEfgqYnk';
+        const _supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        async function loadProducts() {
+            const select = document.getElementById('batchProductSelect');
+            select.innerHTML = '<option value="">Məhsul seçin...</option>';
+            
+            const { data } = await _supabase.from('products').select('*');
+            if (data) {
+                data.forEach(p => {
+                    let opt = document.createElement('option');
+                    opt.value = p.id;
+                    opt.textContent = `${p.code} - ${p.name}`;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        async function addProduct() {
+            const code = document.getElementById('prodCode').value;
+            const name = document.getElementById('prodName').value;
+            
+            if(!code || !name) {
+                alert('Bütün xanaları doldurun!');
+                return;
+            }
+
+            const { error } = await _supabase.from('products').insert([{ code, name }]);
+            if(error) {
+                alert('Xəta baş verdi: ' + error.message);
+            } else {
+                alert('Məhsul uğurla əlavə edildi!');
+                document.getElementById('prodCode').value = '';
+                document.getElementById('prodName').value = '';
+                loadProducts();
+            }
+        }
+
+        async function addBatch() {
+            const product_id = document.getElementById('batchProductSelect').value;
+            const initial_grams = parseFloat(document.getElementById('batchGrams').value);
+            const total_cost = parseFloat(document.getElementById('batchCost').value);
+
+            if(!product_id || !initial_grams || !total_cost) {
+                alert('
