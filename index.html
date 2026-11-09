@@ -96,6 +96,35 @@
                 </div>
             </header>
 
+            <!-- YALNIZ ADMİN PANELİNDƏ GÖRÜNƏN MAĞAZA ANALİTİKASI -->
+            <div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
+                    <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
+                    
+                    <div class="flex bg-zinc-800 p-1 rounded-lg text-xs space-x-1">
+                        <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
+                        <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
+                        <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
+                        <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 text-center">
+                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+                        <div class="text-xs text-zinc-400">👀 Baxış Sayı</div>
+                        <div id="stat-visits" class="text-lg font-bold text-white mt-1">0</div>
+                    </div>
+                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+                        <div class="text-xs text-zinc-400">🛒 Sifarişlər</div>
+                        <div id="stat-orders" class="text-lg font-bold text-amber-400 mt-1">0</div>
+                    </div>
+                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+                        <div class="text-xs text-zinc-400">🎯 Sifariş %-i</div>
+                        <div id="stat-conversion" class="text-lg font-bold text-green-400 mt-1">0%</div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Əməliyyat Forması -->
             <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
                 <h2 class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
@@ -297,6 +326,45 @@
             </div>
         </div>
 
+        <!-- MAĞAZA ŞƏKİLİ VƏ HAQQINDA BLOKU -->
+        <div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-3 text-center no-print">
+            <div class="flex justify-center">
+                <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" alt="Melodika Parfum" class="w-24 h-24 object-cover rounded-full border-2 border-amber-500/50 shadow-md">
+            </div>
+            <div class="space-y-1">
+                <h2 class="text-sm font-bold gold-text uppercase tracking-wide">Melodika Parfum</h2>
+                <p class="text-xs text-zinc-300 leading-relaxed">
+                    <strong>02.11.2025</strong>-ci il tarixindən fəaliyyətdədir. Amalımız, hər qoxunun melodiya ilə yansılanmasıdır!
+                </p>
+            </div>
+            <div class="pt-2 text-xs text-amber-400/90 font-medium flex items-center justify-center space-x-1 border-t border-zinc-800/80">
+                <span>📍</span>
+                <span><strong>Ünvanımız:</strong> Xırdalan dairəsi, Araz marketin yanı.</span>
+            </div>
+        </div>
+
+        <!-- WHATSAPP ƏLAQƏ BLOKU -->
+        <div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print">
+            <div class="text-xs text-zinc-300 font-medium">Suallarınız və ya əlavə sifarişlər üçün:</div>
+            <a href="https://wa.me/994559703829" target="_blank" class="inline-flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition-all w-full">
+                <span>💬 Bizə WhatsApp ilə yazın</span>
+            </a>
+            <div class="text-xs font-mono gold-text font-bold pt-1">+994 55 970 38 29</div>
+        </div>
+
+        <!-- SOSİAL ŞƏBƏKƏLƏRƏ KEÇİD BLOKU -->
+        <div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl text-center space-y-3 no-print">
+            <div class="text-xs text-zinc-300 font-medium">Bizi sosial şəbəkələrdə izləyin:</div>
+            <div class="grid grid-cols-2 gap-2">
+                <a href="https://www.instagram.com/melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-90 text-white font-bold py-2 px-3 rounded-lg text-xs transition-all">
+                  <span>📷 Instagram</span>
+                </a>
+                <a href="https://www.tiktok.com/@melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-bold py-2 px-3 rounded-lg text-xs transition-all">
+                  <span>🎵 TikTok</span>
+                </a>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -333,6 +401,7 @@
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('adminReportBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
+                    loadAnalytics('day');
                 }
                 let today = getBakuDateString();
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
@@ -381,6 +450,7 @@
                 document.getElementById('adminBox').classList.remove('hidden-screen');
                 document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
+                loadAnalytics('day');
             }
 
             let today = getBakuDateString();
@@ -396,8 +466,22 @@
             location.reload(); 
         }
 
+        // BAXIŞ SAYI İZLƏMƏ FUNKSİYASI
+        async function trackVisit() {
+            if (!sessionStorage.getItem('visited')) {
+                const { error } = await _supabase
+                    .from('site_visits')
+                    .insert([{}]);
+                
+                if (!error) {
+                    sessionStorage.setItem('visited', 'true');
+                }
+            }
+        }
+
         // MÜŞTƏRİ EKRANI
         function openCustomerCatalog() {
+            trackVisit(); // Müştəri girəndə baxışı sayırıq
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('customerScreen').classList.remove('hidden-screen');
             renderCustomerCatalog();
@@ -604,7 +688,7 @@
                 address: isDelivery ? address : 'Yerindən götürmə',
                 items: cart,
                 status: 'Gözləmədə',
-                date: new Date().toISOString()
+                created_at: new Date().toISOString()
             };
 
             let { error } = await _supabase.from('orders').insert([orderData]);
@@ -728,7 +812,7 @@
 
             let html = '';
             orders.slice().reverse().forEach(o => {
-                let formattedDate = o.date ? getBakuDateTimeString(o.date) : '';
+                let formattedDate = o.created_at ? getBakuDateTimeString(o.created_at) : (o.date ? getBakuDateTimeString(o.date) : '');
                 let itemsStr = '';
                 if(Array.isArray(o.items)) {
                     o.items.forEach(i => {
@@ -766,6 +850,44 @@
             }
             await loadDataFromCloud();
             renderOrdersList();
+        }
+
+        // ADMİN İŞLƏYƏN ANALİTİKA KODLARI
+        async function loadAnalytics(period = 'day') {
+            const now = new Date();
+            let startDate = new Date();
+
+            if (period === 'day') {
+                startDate.setHours(0, 0, 0, 0);
+            } else if (period === 'week') {
+                const dayOfWeek = now.getDay() || 7;
+                startDate.setDate(now.getDate() - dayOfWeek + 1);
+                startDate.setHours(0, 0, 0, 0);
+            } else if (period === 'month') {
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            } else if (period === 'year') {
+                startDate = new Date(now.getFullYear(), 0, 1);
+            }
+
+            const isoStartDate = startDate.toISOString();
+
+            const { count: visitsCount, error: vErr } = await _supabase
+                .from('site_visits')
+                .select('*', { count: 'exact', head: true })
+                .gte('created_at', isoStartDate);
+
+            const { count: ordersCount, error: oErr } = await _supabase
+                .from('orders')
+                .select('*', { count: 'exact', head: true })
+                .gte('created_at', isoStartDate);
+
+            if (!vErr && !oErr) {
+                document.getElementById('stat-visits').innerText = visitsCount || 0;
+                document.getElementById('stat-orders').innerText = ordersCount || 0;
+                
+                const conversion = visitsCount > 0 ? ((ordersCount / visitsCount) * 100).toFixed(1) : 0;
+                document.getElementById('stat-conversion').innerText = conversion + '%';
+            }
         }
 
         // ADMIN / SATICI PANELİ
@@ -1086,129 +1208,3 @@
     </script>
 </body>
 </html>
-<!-- MAĞAZA ŞƏKİLİ VƏ HAQQINDA BLOKU -->
-<div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-3 text-center no-print">
-    <div class="flex justify-center">
-        <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" alt="Melodika Parfum" class="w-24 h-24 object-cover rounded-full border-2 border-amber-500/50 shadow-md">
-    </div>
-    <div class="space-y-1">
-        <h2 class="text-sm font-bold gold-text uppercase tracking-wide">Melodika Parfum</h2>
-        <p class="text-xs text-zinc-300 leading-relaxed">
-            <strong>02.11.2025</strong>-ci il tarixindən fəaliyyətdədir. Amalımız, hər qoxunun melodiya ilə yansılanmasıdır!
-        </p>
-    </div>
-    <div class="pt-2 text-xs text-amber-400/90 font-medium flex items-center justify-center space-x-1 border-t border-zinc-800/80">
-        <span>📍</span>
-        <span><strong>Ünvanımız:</strong> Xırdalan dairəsi, Araz marketin yanı.</span>
-    </div>
-</div>
-<!-- WHATSAPP ƏLAQƏ BLOKU -->
-<div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print">
-    <div class="text-xs text-zinc-300 font-medium">Suallarınız və ya əlavə sifarişlər üçün:</div>
-    <a href="https://wa.me/994559703829" target="_blank" class="inline-flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition-all w-full">
-        <span>💬 Bizə WhatsApp ilə yazın</span>
-    </a>
-    <div class="text-xs font-mono gold-text font-bold pt-1">+994 55 970 38 29</div>
-</div>
-<!-- SOSİAL ŞƏBƏKƏLƏRƏ KEÇİD BLOKU -->
-<div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl text-center space-y-3 no-print">
-    <div class="text-xs text-zinc-300 font-medium">Bizi sosial şəbəkələrdə izləyin:</div>
-    <div class="grid grid-cols-2 gap-2">
-        <!-- Instagram Düyməsi -->
-        <a href="https://www.instagram.com/melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-90 text-white font-bold py-2 px-3 rounded-lg text-xs transition-all">
-          <span>📷 Instagram</span>
-        </a>
-        <!-- TikTok Düyməsi -->
-        <a href="https://www.tiktok.com/@melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-zinc-800 hover:bg-zinc-700 text-white border border-zinc-700 font-bold py-2 px-3 rounded-lg text-xs transition-all">
-          <span>🎵 TikTok</span>
-        </a>
-    </div>
-</div>
-<script>
-    // 1. ÜMUMİ ZİYARƏTÇİ SAYĞACI (Hər kəs sayta girəndə arxa fonda işləyir)
-    async function trackVisit() {
-        if (!sessionStorage.getItem('visited')) {
-            const { error } = await supabaseClient
-                .from('site_visits')
-                .insert([{}]);
-            
-            if (!error) {
-                sessionStorage.setItem('visited', 'true');
-            }
-        }
-    }
-    trackVisit();
-</script>
-
-
-<!-- 2. YALNIZ ADMİN PANELİNİN İÇİNƏ ƏLAVƏ OLUNACAQ BLOK -->
-<!-- Bu HTML və JavaScript kodunu yalnız öz admin panelinin içərisinə yerləşdirirsən -->
-<div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
-        <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
-        
-        <!-- Günlük / Həftəlik / Aylıq / İllik Düymələri -->
-        <div class="flex bg-zinc-800 p-1 rounded-lg text-xs space-x-1">
-            <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
-            <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
-            <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
-            <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
-        </div>
-    </div>
-
-    <!-- Statistik Kartlar -->
-    <div class="grid grid-cols-3 gap-3 text-center">
-        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
-            <div class="text-xs text-zinc-400">👀 Baxış Sayı</div>
-            <div id="stat-visits" class="text-lg font-bold text-white mt-1">0</div>
-        </div>
-        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
-            <div class="text-xs text-zinc-400">🛒 Sifarişlər</div>
-            <div id="stat-orders" class="text-lg font-bold text-amber-400 mt-1">0</div>
-        </div>
-        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
-            <div class="text-xs text-zinc-400">🎯 Sifariş %-i</div>
-            <div id="stat-conversion" class="text-lg font-bold text-green-400 mt-1">0%</div>
-        </div>
-    </div>
-</div>
-
-<script>
-    // YALNIZ ADMİN ÜÇÜN STATİSTİKA HESABLAYICISI
-    async function loadAnalytics(period = 'day') {
-        const now = new Date();
-        let startDate = new Date();
-
-        if (period === 'day') {
-            startDate.setHours(0, 0, 0, 0);
-        } else if (period === 'week') {
-            const dayOfWeek = now.getDay() || 7;
-            startDate.setDate(now.getDate() - dayOfWeek + 1);
-            startDate.setHours(0, 0, 0, 0);
-        } else if (period === 'month') {
-            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-        } else if (period === 'year') {
-            startDate = new Date(now.getFullYear(), 0, 1);
-        }
-
-        const isoStartDate = startDate.toISOString();
-
-        const { count: visitsCount, error: vErr } = await supabaseClient
-            .from('site_visits')
-            .select('*', { count: 'exact', head: true })
-            .gte('created_at', isoStartDate);
-
-        const { count: ordersCount, error: oErr } = await supabaseClient
-            .from('orders')
-            .select('*', { count: 'exact', head: true })
-            .gte('created_at', isoStartDate);
-
-        if (!vErr && !oErr) {
-            document.getElementById('stat-visits').innerText = visitsCount || 0;
-            document.getElementById('stat-orders').innerText = ordersCount || 0;
-            
-            const conversion = visitsCount > 0 ? ((ordersCount / visitsCount) * 100).toFixed(1) : 0;
-            document.getElementById('stat-conversion').innerText = conversion + '%';
-        }
-    }
-</script>
