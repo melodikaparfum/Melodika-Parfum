@@ -18,9 +18,8 @@
     <div class="max-w-4xl mx-auto space-y-4">
         
         <!-- STATUS QUTUSU -->
-        <div id="debugBox" class="bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono flex justify-between items-center">
-            <span>Status: Sistem aktivdir (Lokal Rejim)</span>
-            <button onclick="resetData()" class="bg-red-950 text-red-300 border border-red-800 px-2 py-1 rounded text-[10px]">Test Məlumatlarını Sıfırla</button>
+        <div id="debugBox" class="bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono">
+            Status: Sistem aktivdir (Lokal Rejim)
         </div>
 
         <!-- GİRİŞ -->
@@ -71,7 +70,7 @@
                 <button onclick="addProd()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
             </div>
 
-            <!-- Cədvəl -->
+            <!-- Cədvəllər -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
                     <h3 class="text-sm font-semibold gold-text mb-2">Məhsul Kataloqu</h3>
@@ -90,10 +89,35 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Məbləğ</th><th>Sil</th></tr>
+                                <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Məbləğ</th><th>Sil</th></tr>
                             </thead>
                             <tbody id="logTable"></tbody>
                         </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hesabat / Tarix Aralığı Hesablaması -->
+            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3">
+                <h2 class="text-sm font-semibold gold-text">Dövriyyə və Xalis Gəlir Hesabatı</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[11px] text-zinc-400">Başlanğıc Tarix</label>
+                        <input type="date" id="startDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-zinc-400">Son Tarix</label>
+                        <input type="date" id="endDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-800 text-center">
+                    <div class="bg-zinc-800/50 p-3 rounded-lg">
+                        <div class="text-xs text-zinc-400">Ümumi Satış (Dövriyyə)</div>
+                        <div id="reportTotalSales" class="text-lg font-bold gold-text">0.00 AZN</div>
+                    </div>
+                    <div class="bg-zinc-800/50 p-3 rounded-lg">
+                        <div class="text-xs text-zinc-400">Xalis Gəlir</div>
+                        <div id="reportNetProfit" class="text-lg font-bold text-green-400">0.00 AZN</div>
                     </div>
                 </div>
             </div>
@@ -119,6 +143,12 @@
             document.getElementById('mainApp').classList.remove('hidden-screen');
             if(role === 'ADMIN') document.getElementById('adminBox').classList.remove('hidden-screen');
             document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
+            
+            // Tarix seçiciləri üçün cari günü default təyin edək
+            let today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+            document.getElementById('endDate').value = today;
+
             renderUI();
         }
 
@@ -140,12 +170,31 @@
             });
             document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="4" class="py-1 text-zinc-500">Məhsul yoxdur</td></tr>';
 
+            let startDateStr = document.getElementById('startDate').value;
+            let endDateStr = document.getElementById('endDate').value;
+
             let logHtml = '';
+            let totalSalesSum = 0;
+            let totalProfitSum = 0;
+
             sales.slice().reverse().forEach((s, index) => {
                 let actualIndex = sales.length - 1 - index;
                 let p = products.find(x => x.id == s.product_id);
                 let pName = p ? p.name : 'Naməlum';
+                let sDate = s.date ? s.date.split('T')[0] : '';
+
+                // Tarix filtri yoxlaması
+                let inRange = true;
+                if(startDateStr && sDate < startDateStr) inRange = false;
+                if(endDateStr && sDate > endDateStr) inRange = false;
+
+                if(inRange && s.type === 'MEXARIC') {
+                    totalSalesSum += Number(s.total_price || 0);
+                    totalProfitSum += Number(s.profit || 0);
+                }
+
                 logHtml += `<tr class="border-b border-zinc-800">
+                    <td class="py-1 text-zinc-400 text-[11px]">${s.date ? s.date.replace('T', ' ').substring(0, 16) : '-'}</td>
                     <td class="py-1 font-bold ${s.type==='MEXARIC'?'text-green-400':(s.type==='MEDAXIL'?'text-blue-400':'text-red-400')}">${s.type}</td>
                     <td class="py-1">${pName}</td>
                     <td class="py-1">${s.grams_sold}</td>
@@ -153,7 +202,10 @@
                     <td class="py-1"><button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button></td>
                 </tr>`;
             });
-            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="5" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
+            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="6" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
+
+            document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
+            document.getElementById('reportNetProfit').textContent = totalProfitSum.toFixed(2) + ' AZN';
         }
 
         function addProd() {
@@ -188,15 +240,6 @@
                 sales.splice(index, 1);
                 localStorage.setItem('melodika_sales', JSON.stringify(sales));
                 renderUI();
-            }
-        }
-
-        function resetData() {
-            if(confirm('Bütün test məlumatları və jurnal sıfırlanacaq. Əminsinizmi?')) {
-                localStorage.removeItem('melodika_sales');
-                sales = [];
-                renderUI();
-                alert('Jurnal təmizləndi!');
             }
         }
 
