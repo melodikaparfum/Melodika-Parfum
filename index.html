@@ -45,7 +45,7 @@
         <!-- MÜŞTƏRİ KATALOQ VƏ SİFARİŞ EKRANI -->
         <div id="customerScreen" class="hidden-screen space-y-4">
             <header class="flex justify-between items-center border-b border-zinc-800 pb-3">
-                <h1 class="text-lg font-bold gold-text">MELODİKA — MÜŞTƏRİ KATALOQU</h1>
+                <h1 class="text-base font-bold gold-text">MELODİKA — MÜŞTƏRİ KATALOQU</h1>
                 <button onclick="closeCustomerCatalog()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded">Girişə Qayıt</button>
             </header>
 
@@ -86,13 +86,13 @@
 
         <!-- ƏSAS PANEL (ADMIN / SATICI) -->
         <div id="mainApp" class="hidden-screen space-y-4">
-            <header class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
-                <h1 class="text-lg font-bold gold-text" id="roleTitle">MELODİKA</h1>
-                <div class="flex items-center space-x-2">
-                    <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-3 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
-                    <button onclick="openOrdersModal()" id="ordersBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-3 py-1.5 rounded text-xs">Sifarişlər</button>
-                    <button onclick="openDayEndModal()" class="gold-bg font-bold px-3 py-1.5 rounded text-xs">Gün Sonu</button>
-                    <button onclick="logout()" class="text-xs bg-red-900 text-white px-3 py-1.5 rounded">Çıxış</button>
+            <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
+                <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
+                    <button onclick="openOrdersModal()" id="ordersBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
+                    <button onclick="openDayEndModal()" class="gold-bg font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu</button>
+                    <button onclick="logout()" class="text-xs bg-red-900 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
                 </div>
             </header>
 
@@ -134,7 +134,7 @@
                 <button onclick="saveOp()" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
             </div>
 
-            <!-- Məhsul Əlavə / Düzənlə (Admin) - Tərkib və notlar burdan silindi -->
+            <!-- Məhsul Əlavə / Düzənlə (Admin) -->
             <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
                 <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
                 <input type="hidden" id="editingProductId">
