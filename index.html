@@ -18,9 +18,9 @@
 <body class="p-4">
     <div class="max-w-4xl mx-auto space-y-4">
         
-        <!-- DİAQNOSTİKA QUTUSU (Xətanı görmək üçün) -->
+        <!-- STATUS QUTUSU -->
         <div id="debugBox" class="bg-zinc-900 border border-yellow-600 p-3 rounded-xl text-xs text-yellow-400 font-mono">
-            Status: Sistem başladılır...
+            Status: Qoşulma yoxlanılır...
         </div>
 
         <!-- GİRİŞ -->
@@ -92,10 +92,14 @@
         
         let _supabase;
         try {
-            _supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
-            document.getElementById('debugBox').textContent = "Status: Supabase klientı uğurla yaradıldı.";
+            // Şəbəkə xətalarının qarşısını almaq üçün əlavə fetch parametrləri
+            _supabase = supabase.createClient(supabaseUrl, supabaseAnonKey, {
+                auth: { persistSession: false },
+                global: { headers: { 'x-client-info': 'melodika-parfum' } }
+            });
+            document.getElementById('debugBoxtextContent'] = "Status: Klient hazırdır.";
         } catch(e) {
-            document.getElementById('debugBox').textContent = "Kritik Xəta: " + e.message;
+            document.getElementById('debugBox').textContent = "Yaradılma xətası: " + e.message;
         }
 
         let products = [];
@@ -117,15 +121,15 @@
         function logout() { location.reload(); }
 
         async function loadData() {
-            document.getElementById('debugBox').textContent = "Status: Bazadan məlumatlar çəkilir...";
+            document.getElementById('debugBox').textContent = "Status: Bazaya sorğu göndərilir...";
             try {
                 let { data, error } = await _supabase.from('products').select('*');
                 if(error) {
-                    document.getElementById('debugBox').textContent = "Baza Xətası: " + error.message;
+                    document.getElementById('debugBox').textContent = "Baza xətası: " + error.message;
                     return;
                 }
                 products = data || [];
-                document.getElementById('debugBox').textContent = `Status: Məlumat uğurla gəldi (${products.length} məhsul).`;
+                document.getElementById('debugBox').textContent = `Uğurlu! ${products.length} məhsul yükləndi.`;
                 
                 let sel = document.getElementById('opProduct');
                 sel.innerHTML = '<option value="">Məhsul seçin...</option>';
@@ -136,7 +140,7 @@
                 });
                 document.getElementById('prodTable').innerHTML = html || '<tr><td colspan="3" class="py-1 text-zinc-500">Məhsul yoxdur</td></tr>';
             } catch(err) {
-                document.getElementById('debugBox').textContent = "Şəbəkə Xətası (Fetch Failed): " + err.message;
+                document.getElementById('debugBox').textContent = "Fetch Exception: " + err.message;
             }
         }
 
