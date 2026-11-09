@@ -97,9 +97,9 @@
                 </div>
             </div>
 
-            <!-- Hesabat / Tarix Aralığı Hesablaması -->
-            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3">
-                <h2 class="text-sm font-semibold gold-text">Dövriyyə və Xalis Gəlir Hesabatı</h2>
+            <!-- Hesabat / Tarix Aralığı Hesablaması (Yalnız Admin) -->
+            <div id="adminReportBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen">
+                <h2 class="text-sm font-semibold gold-text">Dövriyyə və Xalis Gəlir Hesabatı (Admin)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div>
                         <label class="text-[11px] text-zinc-400">Başlanğıc Tarix</label>
@@ -141,14 +141,17 @@
 
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
-            if(role === 'ADMIN') document.getElementById('adminBox').classList.remove('hidden-screen');
-            document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
             
-            // Tarix seçiciləri üçün cari günü default təyin edək
-            let today = new Date().toISOString().split('T')[0];
-            document.getElementById('startDate').value = today;
-            document.getElementById('endDate').value = today;
+            if(role === 'ADMIN') {
+                document.getElementById('adminBox').classList.remove('hidden-screen');
+                document.getElementById('adminReportBox').classList.remove('hidden-screen');
+                
+                let today = new Date().toISOString().split('T')[0];
+                document.getElementById('startDate').value = today;
+                document.getElementById('endDate').value = today;
+            }
 
+            document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
             renderUI();
         }
 
@@ -165,13 +168,13 @@
                     <td class="py-1 font-mono">${p.code}</td>
                     <td class="py-1">${p.name}</td>
                     <td class="py-1">${p.sell_price} AZN</td>
-                    <td class="py-1"><button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button></td>
+                    <td class="py-1">${role === 'ADMIN' ? `<button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-'}</td>
                 </tr>`;
             });
             document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="4" class="py-1 text-zinc-500">Məhsul yoxdur</td></tr>';
 
-            let startDateStr = document.getElementById('startDate').value;
-            let endDateStr = document.getElementById('endDate').value;
+            let startDateStr = role === 'ADMIN' ? document.getElementById('startDate').value : '';
+            let endDateStr = role === 'ADMIN' ? document.getElementById('endDate').value : '';
 
             let logHtml = '';
             let totalSalesSum = 0;
@@ -183,7 +186,6 @@
                 let pName = p ? p.name : 'Naməlum';
                 let sDate = s.date ? s.date.split('T')[0] : '';
 
-                // Tarix filtri yoxlaması
                 let inRange = true;
                 if(startDateStr && sDate < startDateStr) inRange = false;
                 if(endDateStr && sDate > endDateStr) inRange = false;
@@ -199,13 +201,15 @@
                     <td class="py-1">${pName}</td>
                     <td class="py-1">${s.grams_sold}</td>
                     <td class="py-1">${s.total_price} AZN</td>
-                    <td class="py-1"><button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button></td>
+                    <td class="py-1">${role === 'ADMIN' ? `<button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-'}</td>
                 </tr>`;
             });
             document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="6" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
 
-            document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
-            document.getElementById('reportNetProfit').textContent = totalProfitSum.toFixed(2) + ' AZN';
+            if(role === 'ADMIN') {
+                document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
+                document.getElementById('reportNetProfit').textContent = totalProfitSum.toFixed(2) + ' AZN';
+            }
         }
 
         function addProd() {
