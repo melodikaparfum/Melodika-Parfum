@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melodika Parfum</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { background-color: #0f0f0f; color: #f3f4f6; font-family: sans-serif; }
         .gold-border { border-color: #d4af37; }
@@ -23,8 +24,8 @@
     <div class="max-w-4xl mx-auto space-y-4">
         
         <!-- STATUS QUTUSU -->
-        <div id="debugBox" class="bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print">
-            Status: Sistem aktivdir (Lokal Rejim)
+        <div id="debugBox" class="bg-zinc-900 border border-amber-600 p-3 rounded-xl text-xs text-amber-400 font-mono no-print">
+            Status: Bulud bazasına qoşulur...
         </div>
 
         <!-- GİRİŞ -->
@@ -199,15 +200,17 @@
     </div>
 
     <script>
-        let products = JSON.parse(localStorage.getItem('melodika_products')) || [
-            { id: 1, code: 'A001', name: 'Baccarat Rouge 540', initial_stock: 100, buy_price: 0.15, sell_price: 1.00 },
-            { id: 2, code: 'A002', name: 'Lost Cherry', initial_stock: 100, buy_price: 0.12, sell_price: 0.90 }
-        ];
+        const SUPABASE_URL = "https://jauzzzwqqxsxyuopapvl.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXp6endxcXhzeHl1b3BhcHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxODEwMDQsImV4cCI6MjEwOTc1NzAwNH0.gOjs41EGeGVqrwlaoIGpB0qwpeV4jpP44_9HEfgqYnk";
+        
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        let sales = JSON.parse(localStorage.getItem('melodika_sales')) || [];
+        let products = [];
+        let sales = [];
         let role = localStorage.getItem('melodika_current_role') || '';
 
-        window.onload = function() {
+        window.onload = async function() {
+            await loadDataFromCloud();
             if(role) {
                 document.getElementById('loginScreen').classList.add('hidden-screen');
                 document.getElementById('mainApp').classList.remove('hidden-screen');
@@ -222,6 +225,25 @@
                 renderUI();
             }
         };
+
+        async function loadDataFromCloud() {
+            try {
+                let pRes = await _supabase.from('products').select('*');
+                if(pRes.error) throw pRes.error;
+                products = pRes.data || [];
+
+                let sRes = await _supabase.from('sales').select('*');
+                if(sRes.error) throw sRes.error;
+                sales = sRes.data || [];
+
+                document.getElementById('debugBox').textContent = "Status: Bulud bazasına uğurla qoşuldu (Canlı Sinxronizasiya)";
+                document.getElementById('debugBox').className = "bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print";
+            } catch (err) {
+                console.error(err);
+                document.getElementById('debugBox').textContent = "Status Xətası: " + err.message;
+                document.getElementById('debugBox').className = "bg-zinc-900 border border-red-600 p-3 rounded-xl text-xs text-red-400 font-mono no-print";
+            }
+        }
 
         function login() {
             let pin = document.getElementById('pinInput').value;
@@ -257,7 +279,6 @@
             let sel = document.getElementById('opProduct');
             sel.innerHTML = '<option value="">Məhsul seçin...</option>';
             
-            // Hər məhsulun qalan qramını hesablayaq
             let stockMap = {};
             products.forEach(p => { stockMap[p.id] = Number(p.initial_stock || 0); });
 
@@ -314,8 +335,7 @@
             let totalSalesSum = 0;
             let totalProfitSum = 0;
 
-            sales.slice().reverse().forEach((s, index) => {
-                let actualIndex = sales.length - 1 - index;
+            sales.slice().reverse().forEach((s) => {
                 let p = products.find(x => x.id == s.product_id);
                 let pName = p ? p.name : 'Naməlum';
                 let sDate = s.date ? s.date.split('T')[0] : '';
@@ -344,7 +364,7 @@
 
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
                 let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
-                let deleteSaleBtn = `<button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button>`;
+                let deleteSaleBtn = `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>`;
                 
                 let formattedDate = s.date ? s.date.replace('T', ' ').substring(0, 16) : '-';
                 let typeColor = s.type === 'MEXARIC' ? 'text-green-400' : (s.type === 'MEDAXIL' ? 'text-blue-400' : 'text-red-400');
@@ -421,7 +441,7 @@
             document.getElementById('dayEndModal').classList.add('hidden-screen');
         }
 
-        function addProd() {
+        async function addProd() {
             let code = document.getElementById('pCode').value;
             let name = document.getElementById('pName').value;
             let initial_stock = parseFloat(document.getElementById('pStock').value) || 0;
@@ -429,9 +449,8 @@
             let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
             if(!code || !name) return alert('Kod və ad yazın!');
 
-            let newP = { id: Date.now(), code, name, initial_stock, buy_price, sell_price };
-            products.push(newP);
-            localStorage.setItem('melodika_products', JSON.stringify(products));
+            let { data, error } = await _supabase.from('products').insert([{ code, name, initial_stock, buy_price, sell_price }]).select();
+            if(error) { alert('Xəta baş verdi: ' + error.message); return; }
 
             alert('Uğurla əlavə edildi!');
             document.getElementById('pCode').value = '';
@@ -439,21 +458,25 @@
             document.getElementById('pStock').value = '';
             document.getElementById('pBuy').value = '';
             document.getElementById('pSell').value = '';
+            
+            await loadDataFromCloud();
             renderUI();
         }
 
-        function deleteProduct(id) {
+        async function deleteProduct(id) {
             if(confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')) {
-                products = products.filter(p => p.id !== id);
-                localStorage.setItem('melodika_products', JSON.stringify(products));
+                let { error } = await _supabase.from('products').delete().eq('id', id);
+                if(error) { alert('Xəta: ' + error.message); return; }
+                await loadDataFromCloud();
                 renderUI();
             }
         }
 
-        function deleteSale(index) {
+        async function deleteSale(id) {
             if(confirm('Bu əməliyyatı jurnaldan silmək istəyirsiniz?')) {
-                sales.splice(index, 1);
-                localStorage.setItem('melodika_sales', JSON.stringify(sales));
+                let { error } = await _supabase.from('sales').delete().eq('id', id);
+                if(error) { alert('Xəta: ' + error.message); return; }
+                await loadDataFromCloud();
                 renderUI();
             }
         }
@@ -469,7 +492,7 @@
             document.getElementById('opPrice').value = total.toFixed(2);
         }
 
-        function saveOp() {
+        async function saveOp() {
             let product_id = document.getElementById('opProduct').value;
             let type = document.getElementById('opType').value;
             let grams_sold = parseFloat(document.getElementById('opGram').value);
@@ -484,9 +507,21 @@
             let total_cost = grams_sold * (p.buy_price || 0);
             let profit = total_price - total_cost;
 
-            let newOp = { product_id, type, grams_sold, total_price, total_cost, profit, payType, fromAd, toCashRegister, date: new Date().toISOString() };
-            sales.push(newOp);
-            localStorage.setItem('melodika_sales', JSON.stringify(sales));
+            let newOp = { 
+                product_id: Number(product_id), 
+                type, 
+                grams_sold, 
+                total_price, 
+                total_cost, 
+                profit, 
+                payType, 
+                fromAd, 
+                toCashRegister, 
+                date: new Date().toISOString() 
+            };
+
+            let { error } = await _supabase.from('sales').insert([newOp]);
+            if(error) { alert('Xəta: ' + error.message); return; }
 
             alert('Əməliyyat uğurla yadda saxlanıldı!');
             document.getElementById('opGram').value = '';
@@ -494,6 +529,8 @@
             document.getElementById('opDiscount').value = '';
             document.getElementById('fromAd').checked = false;
             document.getElementById('toCashRegister').checked = false;
+
+            await loadDataFromCloud();
             renderUI();
         }
     </script>
