@@ -71,7 +71,7 @@
                         
                         <label class="flex items-center space-x-2 cursor-pointer pt-1">
                             <input type="checkbox" id="custDelivery" onchange="toggleAddressBox()" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
-                            <span>Çatdırılma istəyirəm</span>
+                            <span>Çatdırılma istəyirəm (Min. 30 AZN)</span>
                         </label>
                         
                         <div id="addressBox" class="hidden-screen pt-1">
@@ -90,7 +90,7 @@
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
-                    <button onclick="openOrdersModal()" id="ordersBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
+                    <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
                     <button onclick="openDayEndModal()" class="gold-bg font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu</button>
                     <button onclick="logout()" class="text-xs bg-red-900 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
                 </div>
@@ -161,7 +161,14 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Kod</th><th>Ad</th><th>Qalıq</th><th>Alış</th><th>Satış</th><th>Əməliyyat</th></tr>
+                                <tr>
+                                    <th>Kod</th>
+                                    <th>Ad</th>
+                                    <th>Qalıq</th>
+                                    <th id="thBuyPrice">Alış</th>
+                                    <th>Satış</th>
+                                    <th>Əməliyyat</th>
+                                </tr>
                             </thead>
                             <tbody id="prodTable"></tbody>
                         </table>
@@ -311,7 +318,6 @@
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('adminReportBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
-                    document.getElementById('ordersBtn').classList.remove('hidden-screen');
                 }
                 let today = getBakuDateString();
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
@@ -360,7 +366,6 @@
                 document.getElementById('adminBox').classList.remove('hidden-screen');
                 document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
-                document.getElementById('ordersBtn').classList.remove('hidden-screen');
             }
 
             let today = getBakuDateString();
@@ -462,6 +467,7 @@
             if(cart.length === 0) {
                 container.innerHTML = '<span class="text-zinc-500">Səbətiniz boşdur.</span>';
                 document.getElementById('cartTotalPrice').textContent = 'Cəmi: 0.00 AZN';
+                checkDeliveryLimit(0);
                 return;
             }
 
@@ -481,6 +487,16 @@
             });
             container.innerHTML = html;
             document.getElementById('cartTotalPrice').textContent = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
+            checkDeliveryLimit(grandTotal);
+        }
+
+        function checkDeliveryLimit(totalAmount) {
+            let deliveryCheckbox = document.getElementById('custDelivery');
+            if (totalAmount < 30 && deliveryCheckbox.checked) {
+                deliveryCheckbox.checked = false;
+                toggleAddressBox();
+                alert('Çatdırılma üçün minimum sifariş məbləği 30 AZN olmalıdır!');
+            }
         }
 
         function removeFromCart(index) {
@@ -491,6 +507,18 @@
         function toggleAddressBox() {
             let isChecked = document.getElementById('custDelivery').checked;
             let box = document.getElementById('addressBox');
+            
+            // Səbətin cəmi məbləğini hesablayırıq
+            let grandTotal = 0;
+            cart.forEach(item => grandTotal += item.total);
+
+            if (isChecked && grandTotal < 30) {
+                document.getElementById('custDelivery').checked = false;
+                alert('Çatdırılma seçmək üçün səbət məbləği ən azı 30 AZN olmalıdır!');
+                box.classList.add('hidden-screen');
+                return;
+            }
+
             if(isChecked) box.classList.remove('hidden-screen');
             else box.classList.add('hidden-screen');
         }
@@ -501,12 +529,19 @@
             let isDelivery = document.getElementById('custDelivery').checked;
             let address = document.getElementById('custAddress').value.trim();
 
+            let grandTotal = 0;
+            cart.forEach(item => grandTotal += item.total);
+
             if(!name || !phone) {
                 alert('Zəhmət olmasa Ad və Əlaqə nömrənizi qeyd edin!');
                 return;
             }
             if(cart.length === 0) {
                 alert('Səbətinizdə heç bir məhsul yoxdur!');
+                return;
+            }
+            if(isDelivery && grandTotal < 30) {
+                alert('Çatdırılma üçün minimum məbləğ 30 AZN olmalıdır!');
                 return;
             }
             if(isDelivery && !address) {
@@ -589,7 +624,6 @@
 
             let imageUrl = p ? p.image_url : '';
 
-            // Əgər yeni şəkil faylı seçilibsə, əvvəlcə onu Supabase Storage-ə yükləyirik
             if (fileInput && fileInput.files.length > 0) {
                 let file = fileInput.files[0];
                 let fileName = `${Date.now()}_${file.name}`;
@@ -623,7 +657,7 @@
 
             alert('Məlumat və şəkil uğurla yeniləndi!');
             await loadDataFromCloud();
-            openCatalogDetailsModal(); // modalı yeniləyirik
+            openCatalogDetailsModal();
         }
 
         // SİFARİŞLƏR SHEET
@@ -704,6 +738,13 @@
                 }
             });
 
+            let thBuy = document.getElementById('thBuyPrice');
+            if(role === 'SATICI') {
+                if(thBuy) thBuy.style.display = 'none';
+            } else {
+                if(thBuy) thBuy.style.display = '';
+            }
+
             let prodHtml = '';
             products.forEach(p => {
                 let currentStock = stockMap[p.id] !== undefined ? stockMap[p.id] : p.initial_stock;
@@ -720,17 +761,21 @@
                             </div>
                         `;
                     }
+
+                    let buyPriceTd = role === 'ADMIN' ? `<td class="py-1 text-zinc-400">${p.buy_price || 0} AZN</td>` : '';
+
                     prodHtml += `<tr class="border-b border-zinc-800">
                         <td class="py-1 font-mono">${p.code}</td>
                         <td class="py-1">${p.name}</td>
                         <td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>
-                        <td class="py-1 text-zinc-400">${p.buy_price || 0} AZN</td>
+                        ${buyPriceTd}
                         <td class="py-1 font-semibold gold-text">${p.sell_price || 0} AZN</td>
                         <td class="py-1">${actionBtns}</td>
                     </tr>`;
                 }
             });
-            document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="6" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>';
+            let colSpanCount = role === 'ADMIN' ? 6 : 5;
+            document.getElementById('prodTable').innerHTML = prodHtml || `<tr><td colspan="${colSpanCount}" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>`;
 
             let now = new Date();
             let todayStr = getBakuDateString(now);
@@ -987,7 +1032,3 @@
 
             await loadDataFromCloud();
             renderUI();
-        }
-    </script>
-</body>
-</html>
