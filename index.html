@@ -45,7 +45,7 @@
                 </div>
             </header>
 
-            <!-- Əməliyyat Forması (Həm Admin, həm Satıcı) -->
+            <!-- Əməliyyat Forması -->
             <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
                 <h2 class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
@@ -83,7 +83,7 @@
                 <button onclick="saveOp()" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
             </div>
 
-            <!-- Məhsul Əlavə (Yalnız Admin) -->
+            <!-- Məhsul Əlavə (Admin) -->
             <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
                 <h2 class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -125,7 +125,7 @@
                 </div>
             </div>
 
-            <!-- Satış İcmalı (Günlük / Həftəlik / Aylıq / İllik + Ödəniş Növləri) -->
+            <!-- Satış İcmalı -->
             <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
                 <h2 class="text-sm font-semibold gold-text">Satış İcmalı (Dövriyyə)</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
@@ -153,7 +153,7 @@
                 </div>
             </div>
 
-            <!-- Hesabat / Tarix Aralığı və Xalis Gəlir (Yalnız Admin) -->
+            <!-- Xalis Gəlir (Admin) -->
             <div id="adminReportBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
                 <h2 class="text-sm font-semibold gold-text">Xalis Gəlir Hesabatı (Admin)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -187,9 +187,7 @@
                     <button onclick="closeDayEndModal()" class="no-print text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <div id="dayEndContent" class="space-y-4 text-xs font-mono">
-                    <!-- Gün Sonu Məlumatları -->
-                </div>
+                <div id="dayEndContent" class="space-y-4 text-xs font-mono"></div>
 
                 <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
                     <button onclick="window.print()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Çap Et / Kopyala</button>
@@ -307,8 +305,6 @@
 
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
                 let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
-                
-                // Həm Admin, həm Satıcı üçün jurnal sətirlərini silməyə icazə veririk
                 let deleteSaleBtn = `<button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button>`;
                 
                 let formattedDate = s.date ? s.date.replace('T', ' ').substring(0, 16) : '-';
