@@ -107,7 +107,7 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Kod</th><th>Ad</th><th>Qalıq (qr)</th><th>Qiymət</th><th>Sil</th></tr>
+                                <tr><th>Kod</th><th>Ad</th><th>Qalıq</th><th>Alış</th><th>Satış</th><th>Sil</th></tr>
                             </thead>
                             <tbody id="prodTable"></tbody>
                         </table>
@@ -209,6 +209,20 @@
         let sales = [];
         let role = localStorage.getItem('melodika_current_role') || '';
 
+        // Bakı vaxtını düzgün almaq üçün köməkçi funksiya (UTC+4)
+        function getBakuDateString(dateInput = new Date()) {
+            let d = new Date(dateInput);
+            // Bakı saatına uyğunlaşdırma (UTC üstə gəl 4 saat)
+            d.setHours(d.getHours() + 4);
+            return d.toISOString().split('T')[0];
+        }
+
+        function getBakuDateTimeString(dateInput = new Date()) {
+            let d = new Date(dateInput);
+            d.setHours(d.getHours() + 4);
+            return d.toISOString().replace('T', ' ').substring(0, 16);
+        }
+
         window.onload = async function() {
             await loadDataFromCloud();
             if(role) {
@@ -218,7 +232,7 @@
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 }
-                let today = new Date().toISOString().split('T')[0];
+                let today = getBakuDateString();
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
                 if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
                 document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
@@ -261,7 +275,7 @@
                 document.getElementById('adminReportBox').classList.remove('hidden-screen');
             }
 
-            let today = new Date().toISOString().split('T')[0];
+            let today = getBakuDateString();
             if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
             if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
 
@@ -305,22 +319,23 @@
                         <td class="py-1 font-mono">${p.code}</td>
                         <td class="py-1">${p.name}</td>
                         <td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>
-                        <td class="py-1">${p.sell_price} AZN</td>
+                        <td class="py-1 text-zinc-400">${p.buy_price || 0} AZN</td>
+                        <td class="py-1 font-semibold gold-text">${p.sell_price || 0} AZN</td>
                         <td class="py-1">${deleteBtn}</td>
                     </tr>`;
                 }
             });
-            document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="5" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>';
+            document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="6" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>';
 
             let now = new Date();
-            let todayStr = now.toISOString().split('T')[0];
+            let todayStr = getBakuDateString(now);
             let currentYear = now.getFullYear();
             
             let firstDayOfWeek = new Date(now);
             let day = now.getDay();
             let diff = now.getDate() - day + (day === 0 ? -6 : 1);
             firstDayOfWeek.setDate(diff);
-            let weekStartStr = firstDayOfWeek.toISOString().split('T')[0];
+            let weekStartStr = getBakuDateString(firstDayOfWeek);
 
             let currentMonthPrefix = todayStr.substring(0, 7);
             let currentYearPrefix = String(currentYear);
@@ -338,7 +353,9 @@
             sales.slice().reverse().forEach((s) => {
                 let p = products.find(x => x.id == s.product_id);
                 let pName = p ? p.name : 'Naməlum';
-                let sDate = s.date ? s.date.split('T')[0] : '';
+                
+                // Tarixi Bakı saatına uyğunlaşdırıb yoxlayırıq
+                let sDate = s.date ? getBakuDateString(s.date) : '';
                 let price = Number(s.total_price || 0);
 
                 if(s.type === 'MEXARIC') {
@@ -366,7 +383,7 @@
                 let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
                 let deleteSaleBtn = `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>`;
                 
-                let formattedDate = s.date ? s.date.replace('T', ' ').substring(0, 16) : '-';
+                let formattedDate = s.date ? getBakuDateTimeString(s.date) : '-';
                 let typeColor = s.type === 'MEXARIC' ? 'text-green-400' : (s.type === 'MEDAXIL' ? 'text-blue-400' : 'text-red-400');
 
                 logHtml += `<tr class="border-b border-zinc-800">
@@ -399,14 +416,14 @@
         }
 
         function openDayEndModal() {
-            let nowStr = new Date().toISOString().split('T')[0];
-            let todaySales = sales.filter(s => s.date && s.date.startsWith(nowStr) && s.type === 'MEXARIC');
+            let nowStr = getBakuDateString(new Date());
+            let todaySales = sales.filter(s => s.date && getBakuDateString(s.date) === nowStr && s.type === 'MEXARIC');
             
             let totalAmount = 0;
             let adAmount = 0;
             let cashRegisterAmount = 0;
 
-            let listHtml = `<div class="font-bold text-amber-400 mb-2">Başda tarix: ${nowStr}</div>`;
+            let listHtml = `<div class="font-bold text-amber-400 mb-2">Tarix (Bakı vaxtı): ${nowStr}</div>`;
             if(todaySales.length === 0) {
                 listHtml += `<div class="text-zinc-500">Bugünkü tarixə aid satış qeydə alınmayıb.</div>`;
             } else {
