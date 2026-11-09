@@ -12,18 +12,23 @@
         .gold-bg { background-color: #d4af37; color: #000; }
         .gold-bg:hover { background-color: #b9972a; }
         .hidden-screen { display: none !important; }
+        @media print {
+            body { background-color: #fff !important; color: #000 !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+        }
     </style>
 </head>
 <body class="p-4">
     <div class="max-w-4xl mx-auto space-y-4">
         
         <!-- STATUS QUTUSU -->
-        <div id="debugBox" class="bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono">
+        <div id="debugBox" class="bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print">
             Status: Sistem aktivdir (Lokal Rejim)
         </div>
 
         <!-- GİRİŞ -->
-        <div id="loginScreen" class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-2xl">
+        <div id="loginScreen" class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-2xl no-print">
             <h1 class="text-2xl font-bold gold-text mb-4">MELODİKA PARFUM</h1>
             <input type="password" id="pinInput" placeholder="PİN Kod" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white mb-4 focus:outline-none gold-border">
             <button onclick="login()" class="w-full gold-bg font-bold py-3 rounded-lg">Daxil Ol</button>
@@ -32,15 +37,18 @@
 
         <!-- ƏSAS PANEL -->
         <div id="mainApp" class="hidden-screen space-y-4">
-            <header class="flex justify-between items-center border-b border-zinc-800 pb-3">
+            <header class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
                 <h1 class="text-lg font-bold gold-text" id="roleTitle">MELODİKA</h1>
-                <button onclick="logout()" class="text-xs bg-red-900 text-white px-3 py-1 rounded">Çıxış</button>
+                <div class="flex items-center space-x-2">
+                    <button onclick="openDayEndModal()" class="gold-bg font-bold px-3 py-1.5 rounded text-xs">Gün Sonu</button>
+                    <button onclick="logout()" class="text-xs bg-red-900 text-white px-3 py-1.5 rounded">Çıxış</button>
+                </div>
             </header>
 
             <!-- Əməliyyat Forması -->
-            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3">
+            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
                 <h2 class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                     <select id="opType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                         <option value="MEXARIC">Məxaric (Satış)</option>
                         <option value="MEDAXIL">Mədaxil</option>
@@ -50,23 +58,33 @@
                         <option value="">Məhsul seçin...</option>
                     </select>
                     <input type="number" id="opGram" oninput="calcPrice()" placeholder="Miqdar (qr/ədəd)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                    <select id="payType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                        <option value="Nəğd">Nəğd</option>
+                        <option value="POS Terminal">POS Terminal</option>
+                        <option value="Karta göndərmə">Karta göndərmə</option>
+                    </select>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
                     <input type="number" step="0.01" id="opPrice" placeholder="Yekun Qiymət (AZN)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                     <input type="number" id="opDiscount" oninput="calcPrice()" placeholder="Endirim %" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                 </div>
                 
-                <!-- Reklamdan Gəldi Checkbox -->
-                <div class="flex items-center space-x-2 pt-1">
-                    <input type="checkbox" id="fromAd" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
-                    <label for="fromAd" class="text-xs text-zinc-300 cursor-pointer">Reklamdan gəldi (flaşur / qapı önü)</label>
+                <div class="flex flex-wrap gap-4 pt-1 text-xs text-zinc-300">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="fromAd" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
+                        <span>Reklamdan gəldi (flaşur / qapı önü)</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="checkbox" id="toCashRegister" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
+                        <span>Kassa aparatına vuruldu</span>
+                    </label>
                 </div>
 
                 <button onclick="saveOp()" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
             </div>
 
             <!-- Məhsul Əlavə (Admin) -->
-            <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen">
+            <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
                 <h2 class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
                     <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
@@ -78,7 +96,7 @@
             </div>
 
             <!-- Cədvəllər -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
                 <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
                     <h3 class="text-sm font-semibold gold-text mb-2">Məhsul Kataloqu</h3>
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
@@ -96,7 +114,7 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Məbləğ</th><th>Reklam</th><th>Sil</th></tr>
+                                <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Sil</th></tr>
                             </thead>
                             <tbody id="logTable"></tbody>
                         </table>
@@ -104,8 +122,8 @@
                 </div>
             </div>
 
-            <!-- Satış İcmalı (Günlük / Həftəlik / Aylıq / İllik) - Hər iki rol görür -->
-            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3">
+            <!-- Satış İcmalı (Günlük / Həftəlik / Aylıq / İllik + Ödəniş Növləri) -->
+            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
                 <h2 class="text-sm font-semibold gold-text">Satış İcmalı (Dövriyyə)</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
                     <div class="bg-zinc-800/50 p-3 rounded-lg">
@@ -125,10 +143,15 @@
                         <div id="salesYearly" class="text-sm font-bold gold-text">0.00 AZN</div>
                     </div>
                 </div>
+                <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
+                    <div class="bg-zinc-800/30 p-2 rounded">Nəğd: <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
+                    <div class="bg-zinc-800/30 p-2 rounded">POS: <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
+                    <div class="bg-zinc-800/30 p-2 rounded">Karta: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
+                </div>
             </div>
 
             <!-- Hesabat / Tarix Aralığı və Xalis Gəlir (Yalnız Admin) -->
-            <div id="adminReportBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen">
+            <div id="adminReportBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
                 <h2 class="text-sm font-semibold gold-text">Xalis Gəlir Hesabatı (Admin)</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
                     <div>
@@ -152,6 +175,25 @@
                 </div>
             </div>
         </div>
+
+        <!-- GÜN SONU HESABAT EKRANI (Modal / Yeni görünüş) -->
+        <div id="dayEndModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
+            <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                    <h2 class="text-lg font-bold gold-text">GÜN SONU HESABATI</h2>
+                    <button onclick="closeDayEndModal()" class="no-print text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
+                </div>
+
+                <div id="dayEndContent" class="space-y-4 text-xs font-mono">
+                    <!-- Dinamik Gün Sonu Məlumatları -->
+                </div>
+
+                <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
+                    <button onclick="window.print()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Çap Et / Kopyala</button>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script>
@@ -218,6 +260,7 @@
             let currentYearPrefix = String(currentYear);
 
             let dailySum = 0, weeklySum = 0, monthlySum = 0, yearlySum = 0;
+            let nagdSum = 0, posSum = 0, cardSum = 0;
 
             let startDateStr = role === 'ADMIN' ? document.getElementById('startDate').value : '';
             let endDateStr = role === 'ADMIN' ? document.getElementById('endDate').value : '';
@@ -234,7 +277,12 @@
                 let price = Number(s.total_price || 0);
 
                 if(s.type === 'MEXARIC') {
-                    if(sDate === todayStr) dailySum += price;
+                    if(sDate === todayStr) {
+                        dailySum += price;
+                        if(s.payType === 'Nəğd') nagdSum += price;
+                        if(s.payType === 'POS Terminal') posSum += price;
+                        if(s.payType === 'Karta göndərmə') cardSum += price;
+                    }
                     if(sDate >= weekStartStr && sDate <= todayStr) weeklySum += price;
                     if(sDate.startsWith(currentMonthPrefix)) monthlySum += price;
                     if(sDate.startsWith(currentYearPrefix)) yearlySum += price;
@@ -250,6 +298,7 @@
                 }
 
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
+                let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
                 let deleteSaleBtn = role === 'ADMIN' ? `<button onclick="deleteSale(${actualIndex})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-';
                 let formattedDate = s.date ? s.date.replace('T', ' ').substring(0, 16) : '-';
                 let typeColor = s.type === 'MEXARIC' ? 'text-green-400' : (s.type === 'MEDAXIL' ? 'text-blue-400' : 'text-red-400');
@@ -259,22 +308,71 @@
                     <td class="py-1 font-bold ${typeColor}">${s.type}</td>
                     <td class="py-1">${pName}</td>
                     <td class="py-1">${s.grams_sold}</td>
+                    <td class="py-1 text-zinc-300">${s.payType || 'Nəğd'}</td>
                     <td class="py-1">${s.total_price} AZN</td>
                     <td class="py-1 text-center">${adBadge}</td>
+                    <td class="py-1 text-center">${cashBadge}</td>
                     <td class="py-1">${deleteSaleBtn}</td>
                 </tr>`;
             });
-            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="7" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
+            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="9" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
 
             document.getElementById('salesDaily').textContent = dailySum.toFixed(2) + ' AZN';
             document.getElementById('salesWeekly').textContent = weeklySum.toFixed(2) + ' AZN';
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
 
+            document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
+            document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
+            document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
+
             if(role === 'ADMIN') {
                 document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
                 document.getElementById('reportNetProfit').textContent = totalProfitSum.toFixed(2) + ' AZN';
             }
+        }
+
+        function openDayEndModal() {
+            let nowStr = new Date().toISOString().split('T')[0];
+            let todaySales = sales.filter(s => s.date && s.date.startsWith(nowStr) && s.type === 'MEXARIC');
+            
+            let totalAmount = 0;
+            let adAmount = 0;
+            let cashRegisterAmount = 0;
+
+            let listHtml = `<div class="font-bold text-amber-400 mb-2">Tarix: ${nowStr}</div>`;
+            if(todaySales.length === 0) {
+                listHtml += `<div class="text-zinc-500">Bugünkü tarixə aid satış qeydə alınmayıb.</div>`;
+            } else {
+                todaySales.forEach((s, idx) => {
+                    let p = products.find(x => x.id == s.product_id);
+                    let pName = p ? p.name : 'Naməlum';
+                    let price = Number(s.total_price || 0);
+                    totalAmount += price;
+                    if(s.fromAd) adAmount += price;
+                    if(s.toCashRegister) cashRegisterAmount += price;
+
+                    let adText = s.fromAd ? 'Bəli' : 'Xeyr';
+                    let cashText = s.toCashRegister ? 'Bəli' : 'Xeyr';
+
+                    listHtml += `<div class="border-b border-zinc-800 py-1">
+                        ${idx + 1}. ${pName} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) | Reklam: ${adText} | Kassaya vuruldu: ${cashText}
+                    </div>`;
+                });
+            }
+
+            let summaryHtml = `<div class="mt-4 pt-3 border-t border-zinc-700 space-y-1 font-bold">
+                <div>Ümumi satış: ${totalAmount.toFixed(2)} AZN</div>
+                <div>Reklam: ${adAmount.toFixed(2)} AZN</div>
+                <div>Kassa aparatına vurulan: ${cashRegisterAmount.toFixed(2)} AZN</div>
+            </div>`;
+
+            document.getElementById('dayEndContent').innerHTML = listHtml + summaryHtml;
+            document.getElementById('dayEndModal').classList.remove('hidden-screen');
+        }
+
+        function closeDayEndModal() {
+            document.getElementById('dayEndModal').classList.add('hidden-screen');
         }
 
         function addProd() {
@@ -328,7 +426,9 @@
             let type = document.getElementById('opType').value;
             let grams_sold = parseFloat(document.getElementById('opGram').value);
             let total_price = parseFloat(document.getElementById('opPrice').value);
+            let payType = document.getElementById('payType').value;
             let fromAd = document.getElementById('fromAd').checked;
+            let toCashRegister = document.getElementById('toCashRegister').checked;
 
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
 
@@ -336,7 +436,7 @@
             let total_cost = grams_sold * (p.buy_price || 0);
             let profit = total_price - total_cost;
 
-            let newOp = { product_id, type, grams_sold, total_price, total_cost, profit, fromAd, date: new Date().toISOString() };
+            let newOp = { product_id, type, grams_sold, total_price, total_cost, profit, payType, fromAd, toCashRegister, date: new Date().toISOString() };
             sales.push(newOp);
             localStorage.setItem('melodika_sales', JSON.stringify(sales));
 
@@ -345,6 +445,7 @@
             document.getElementById('opPrice').value = '';
             document.getElementById('opDiscount').value = '';
             document.getElementById('fromAd').checked = false;
+            document.getElementById('toCashRegister').checked = false;
             renderUI();
         }
     </script>
