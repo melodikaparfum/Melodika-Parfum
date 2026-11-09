@@ -1124,8 +1124,26 @@
         </a>
     </div>
 </div>
-<!-- MAĞAZA ANALİTİKASI VƏ STATİSTİKA BLOKU -->
-<div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
+<script>
+    // 1. ÜMUMİ ZİYARƏTÇİ SAYĞACI (Hər kəs sayta girəndə arxa fonda işləyir)
+    async function trackVisit() {
+        if (!sessionStorage.getItem('visited')) {
+            const { error } = await supabaseClient
+                .from('site_visits')
+                .insert([{}]);
+            
+            if (!error) {
+                sessionStorage.setItem('visited', 'true');
+            }
+        }
+    }
+    trackVisit();
+</script>
+
+
+<!-- 2. YALNIZ ADMİN PANELİNİN İÇİNƏ ƏLAVƏ OLUNACAQ BLOK -->
+<!-- Bu HTML və JavaScript kodunu yalnız öz admin panelinin içərisinə yerləşdirirsən -->
+<div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
         <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
         
@@ -1155,24 +1173,8 @@
     </div>
 </div>
 
-<!-- JavaScript Kodları (Mütləq <script> teqinin içində olmalıdır) -->
-<script>// 1. Ziyarətçi sayını qeyd edən funksiya
-    async function trackVisit() {
-        if (!sessionStorage.getItem('visited')) {
-            const { error } = await supabaseClient
-                .from('site_visits')
-                .insert([{}]);
-            
-            if (!error) {
-                sessionStorage.setItem('visited', 'true');
-            }
-        }
-    }
-
-    // Səhifə açılan kimi ziyarəti qeyd edirik
-    trackVisit();
-
-    // 2. Seçilən dövrə görə statistikaları hesablayan funksiya
+<script>
+    // YALNIZ ADMİN ÜÇÜN STATİSTİKA HESABLAYICISI
     async function loadAnalytics(period = 'day') {
         const now = new Date();
         let startDate = new Date();
@@ -1191,13 +1193,11 @@
 
         const isoStartDate = startDate.toISOString();
 
-        // Ziyarətçi sayını oxuyuruq
         const { count: visitsCount, error: vErr } = await supabaseClient
             .from('site_visits')
             .select('*', { count: 'exact', head: true })
             .gte('created_at', isoStartDate);
 
-        // Sifariş sayını oxuyuruq
         const { count: ordersCount, error: oErr } = await supabaseClient
             .from('orders')
             .select('*', { count: 'exact', head: true })
@@ -1211,6 +1211,4 @@
             document.getElementById('stat-conversion').innerText = conversion + '%';
         }
     }
-
-    // Səhifə açılan kimi avtomatik günlük statistikaları yüklə
-    loadAnalytics('day'); </script>
+</script>
