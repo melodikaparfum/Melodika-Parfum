@@ -1124,61 +1124,7 @@
         </a>
     </div>
 </div>
-// Ziyarətçi sayını qeyd edən funksiya
-async function trackVisit() {
-    if (!sessionStorage.getItem('visited')) {
-        const { error } = await supabaseClient
-            .from('site_visits')
-            .insert([{}]);
-        
-        if (!error) {
-            sessionStorage.setItem('visited', 'true');
-        }
-    }
-}
-
-// Səhifə açılan kimi ziyarəti qeyd edirik
-trackVisit();
-// Seçilən dövrə görə statistikaları hesablayan funksiya
-async function loadAnalytics(period = 'day') {
-    const now = new Date();
-    let startDate = new Date();
-
-    if (period === 'day') {
-        startDate.setHours(0, 0, 0, 0);
-    } else if (period === 'week') {
-        const dayOfWeek = now.getDay() || 7;
-        startDate.setDate(now.getDate() - dayOfWeek + 1);
-        startDate.setHours(0, 0, 0, 0);
-    } else if (period === 'month') {
-        startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-    } else if (period === 'year') {
-        startDate = new Date(now.getFullYear(), 0, 1);
-    }
-
-    const isoStartDate = startDate.toISOString();
-
-    // 1. Ziyarətçi sayını oxuyuruq
-    const { count: visitsCount, error: vErr } = await supabaseClient
-        .from('site_visits')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', isoStartDate);
-
-    // 2. Sifariş sayını oxuyuruq
-    const { count: ordersCount, error: oErr } = await supabaseClient
-        .from('orders')
-        .select('*', { count: 'exact', head: true })
-        .gte('created_at', isoStartDate);
-
-    if (!vErr && !oErr) {
-        document.getElementById('stat-visits').innerText = visitsCount || 0;
-        document.getElementById('stat-orders').innerText = ordersCount || 0;
-        
-        const conversion = visitsCount > 0 ? ((ordersCount / visitsCount) * 100).toFixed(1) : 0;
-        document.getElementById('stat-conversion').innerText = conversion + '%';
-    }
-}
-<!-- MAĞAZA ANALİTİKASI BLOKU -->
+<!-- MAĞAZA ANALİTİKASI VƏ STATİSTİKA BLOKU -->
 <div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
         <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
@@ -1208,4 +1154,65 @@ async function loadAnalytics(period = 'day') {
         </div>
     </div>
 </div>
-loadAnalytics('day');
+
+<!-- JavaScript Kodları (Mütləq <script> teqinin içində olmalıdır) -->
+<script>
+    // 1. Ziyarətçi sayını qeyd edən funksiya
+    async function trackVisit() {
+        if (!sessionStorage.getItem('visited')) {
+            const { error } = await supabaseClient
+                .from('site_visits')
+                .insert([{}]);
+            
+            if (!error) {
+                sessionStorage.setItem('visited', 'true');
+            }
+        }
+    }
+
+    // Səhifə açılan kimi ziyarəti qeyd edirik
+    trackVisit();
+
+    // 2. Seçilən dövrə görə statistikaları hesablayan funksiya
+    async function loadAnalytics(period = 'day') {
+        const now = new Date();
+        let startDate = new Date();
+
+        if (period === 'day') {
+            startDate.setHours(0, 0, 0, 0);
+        } else if (period === 'week') {
+            const dayOfWeek = now.getDay() || 7;
+            startDate.setDate(now.getDate() - dayOfWeek + 1);
+            startDate.setHours(0, 0, 0, 0);
+        } else if (period === 'month') {
+            startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+        } else if (period === 'year') {
+            startDate = new Date(now.getFullYear(), 0, 1);
+        }
+
+        const isoStartDate = startDate.toISOString();
+
+        // Ziyarətçi sayını oxuyuruq
+        const { count: visitsCount, error: vErr } = await supabaseClient
+            .from('site_visits')
+            .select('*', { count: 'exact', head: true })
+            .gte('created_at', isoStartDate);
+
+        // Sifariş sayını oxuyuruq
+        const { count: ordersCount, error: oErr } = await supabaseClient
+            .from('orders')
+            .select('*', { count: 'exact', head: true })
+            .gte('created_at', isoStartDate);
+
+        if (!vErr && !oErr) {
+            document.getElementById('stat-visits').innerText = visitsCount || 0;
+            document.getElementById('stat-orders').innerText = ordersCount || 0;
+            
+            const conversion = visitsCount > 0 ? ((ordersCount / visitsCount) * 100).toFixed(1) : 0;
+            document.getElementById('stat-conversion').innerText = conversion + '%';
+        }
+    }
+
+    // Səhifə açılan kimi avtomatik günlük statistikaları yüklə
+    loadAnalytics('day');
+</script>
