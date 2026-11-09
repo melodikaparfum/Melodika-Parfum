@@ -84,9 +84,10 @@
                 <button onclick="saveOp()" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
             </div>
 
-            <!-- Məhsul Əlavə (Admin) -->
+            <!-- Məhsul Əlavə / Düzənlə (Admin) -->
             <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
-                <h2 class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
+                <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
+                <input type="hidden" id="editingProductId">
                 <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
                     <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="text" id="pName" placeholder="Ad" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
@@ -94,7 +95,10 @@
                     <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                 </div>
-                <button onclick="addProd()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
+                <div class="flex space-x-2">
+                    <button onclick="saveProduct()" id="saveProdBtn" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
+                    <button onclick="cancelEdit()" id="cancelEditBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2 rounded text-xs">Ləğv Et</button>
+                </div>
             </div>
 
             <!-- Cədvəllər -->
@@ -107,7 +111,7 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Kod</th><th>Ad</th><th>Qalıq</th><th>Alış</th><th>Satış</th><th>Sil</th></tr>
+                                <tr><th>Kod</th><th>Ad</th><th>Qalıq</th><th>Alış</th><th>Satış</th><th>Əməliyyat</th></tr>
                             </thead>
                             <tbody id="prodTable"></tbody>
                         </table>
@@ -209,10 +213,8 @@
         let sales = [];
         let role = localStorage.getItem('melodika_current_role') || '';
 
-        // Bakı vaxtını düzgün almaq üçün köməkçi funksiya (UTC+4)
         function getBakuDateString(dateInput = new Date()) {
             let d = new Date(dateInput);
-            // Bakı saatına uyğunlaşdırma (UTC üstə gəl 4 saat)
             d.setHours(d.getHours() + 4);
             return d.toISOString().split('T')[0];
         }
@@ -314,14 +316,22 @@
                 
                 let matchesSearch = p.code.toLowerCase().includes(searchQuery) || p.name.toLowerCase().includes(searchQuery);
                 if(matchesSearch) {
-                    let deleteBtn = role === 'ADMIN' ? `<button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>` : '-';
+                    let actionBtns = '-';
+                    if(role === 'ADMIN') {
+                        actionBtns = `
+                            <div class="flex space-x-2">
+                                <button onclick="editProduct(${p.id})" class="text-amber-400 hover:text-amber-300 font-bold">Düzənlə</button>
+                                <button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>
+                            </div>
+                        `;
+                    }
                     prodHtml += `<tr class="border-b border-zinc-800">
                         <td class="py-1 font-mono">${p.code}</td>
                         <td class="py-1">${p.name}</td>
                         <td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>
                         <td class="py-1 text-zinc-400">${p.buy_price || 0} AZN</td>
                         <td class="py-1 font-semibold gold-text">${p.sell_price || 0} AZN</td>
-                        <td class="py-1">${deleteBtn}</td>
+                        <td class="py-1">${actionBtns}</td>
                     </tr>`;
                 }
             });
@@ -354,7 +364,6 @@
                 let p = products.find(x => x.id == s.product_id);
                 let pName = p ? p.name : 'Naməlum';
                 
-                // Tarixi Bakı saatına uyğunlaşdırıb yoxlayırıq
                 let sDate = s.date ? getBakuDateString(s.date) : '';
                 let price = Number(s.total_price || 0);
 
@@ -458,7 +467,37 @@
             document.getElementById('dayEndModal').classList.add('hidden-screen');
         }
 
-        async function addProd() {
+        function editProduct(id) {
+            let p = products.find(x => x.id == id);
+            if(!p) return;
+            document.getElementById('editingProductId').value = p.id;
+            document.getElementById('pCode').value = p.code;
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pStock').value = p.initial_stock;
+            document.getElementById('pBuy').value = p.buy_price || 0;
+            document.getElementById('pSell').value = p.sell_price || 0;
+            
+            document.getElementById('adminFormTitle').textContent = "Məhsulu Düzənlə";
+            document.getElementById('saveProdBtn').textContent = "Yadda Saxla";
+            document.getElementById('cancelEditBtn').classList.remove('hidden-screen');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEdit() {
+            document.getElementById('editingProductId').value = '';
+            document.getElementById('pCode').value = '';
+            document.getElementById('pName').value = '';
+            document.getElementById('pStock').value = '';
+            document.getElementById('pBuy').value = '';
+            document.getElementById('pSell').value = '';
+
+            document.getElementById('adminFormTitle').textContent = "Yeni Məhsul / Ətir Əlavə Et";
+            document.getElementById('saveProdBtn').textContent = "Əlavə Et";
+            document.getElementById('cancelEditBtn').classList.add('hidden-screen');
+        }
+
+        async function saveProduct() {
+            let editingId = document.getElementById('editingProductId').value;
             let code = document.getElementById('pCode').value;
             let name = document.getElementById('pName').value;
             let initial_stock = parseFloat(document.getElementById('pStock').value) || 0;
@@ -466,16 +505,19 @@
             let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
             if(!code || !name) return alert('Kod və ad yazın!');
 
-            let { data, error } = await _supabase.from('products').insert([{ code, name, initial_stock, buy_price, sell_price }]).select();
-            if(error) { alert('Xəta baş verdi: ' + error.message); return; }
+            if(editingId) {
+                // Redaktə rejimi (Update)
+                let { error } = await _supabase.from('products').update({ code, name, initial_stock, buy_price, sell_price }).eq('id', editingId);
+                if(error) { alert('Xəta baş verdi: ' + error.message); return; }
+                alert('Məhsul uğurla yeniləndi!');
+            } else {
+                // Yeni məhsul əlavə etmə rejimi (Insert)
+                let { error } = await _supabase.from('products').insert([{ code, name, initial_stock, buy_price, sell_price }]);
+                if(error) { alert('Xəta baş verdi: ' + error.message); return; }
+                alert('Məhsul uğurla əlavə edildi!');
+            }
 
-            alert('Uğurla əlavə edildi!');
-            document.getElementById('pCode').value = '';
-            document.getElementById('pName').value = '';
-            document.getElementById('pStock').value = '';
-            document.getElementById('pBuy').value = '';
-            document.getElementById('pSell').value = '';
-            
+            cancelEdit();
             await loadDataFromCloud();
             renderUI();
         }
