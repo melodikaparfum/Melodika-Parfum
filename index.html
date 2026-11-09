@@ -96,7 +96,7 @@
                 </div>
             </header>
 
-            <!-- MAĞAZA ANALİTİKASI (Həm Admin, həm də Satıcı üçün aktivdir) -->
+            <!-- MAĞAZA ANALİTİKASI -->
             <div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
                     <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
@@ -466,18 +466,10 @@
             location.reload(); 
         }
 
-        // BAXIŞ SAYI İZLƏMƏ FUNKSİYASI
+        // BAXIŞ SAYI İZLƏMƏ FUNKSİYASI (Hər daxil olanda artır)
         async function trackVisit() {
             try {
-                if (!sessionStorage.getItem('visited')) {
-                    const { error } = await _supabase
-                        .from('site_visits')
-                        .insert([{}]);
-                    
-                    if (!error) {
-                        sessionStorage.setItem('visited', 'true');
-                    }
-                }
+                await _supabase.from('site_visits').insert([{}]);
             } catch(e) {
                 console.error("Visit tracking error:", e);
             }
@@ -870,7 +862,7 @@
             }
         }
 
-        // ANALİTİKA HESABLAYICISI (Həm Admin, həm Satıcı üçün aktivdir)
+        // ANALİTİKA HESABLAYICISI
         async function loadAnalytics(period = 'day') {
             const now = new Date();
             let startDate = new Date();
