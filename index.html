@@ -51,7 +51,7 @@
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                     <select id="opType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                         <option value="MEXARIC">Məxaric (Satış)</option>
-                        <option value="MEDAXIL">Mədaxil</option>
+                        <option value="MEDAXIL">Mədaxil (Artırma)</option>
                         <option value="ITKI">İtki</option>
                     </select>
                     <select id="opProduct" onchange="calcPrice()" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
@@ -86,9 +86,10 @@
             <!-- Məhsul Əlavə (Admin) -->
             <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
                 <h2 class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
                     <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="text" id="pName" placeholder="Ad" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                    <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                 </div>
@@ -105,7 +106,7 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Kod</th><th>Ad</th><th>Qiymət</th><th>Sil</th></tr>
+                                <tr><th>Kod</th><th>Ad</th><th>Qalıq (qr)</th><th>Qiymət</th><th>Sil</th></tr>
                             </thead>
                             <tbody id="prodTable"></tbody>
                         </table>
@@ -117,7 +118,7 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Tarix</th><th>Profil</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Sil</th></tr>
+                                <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Sil</th></tr>
                             </thead>
                             <tbody id="logTable"></tbody>
                         </table>
@@ -199,14 +200,13 @@
 
     <script>
         let products = JSON.parse(localStorage.getItem('melodika_products')) || [
-            { id: 1, code: 'A001', name: 'Baccarat Rouge 540', buy_price: 0.15, sell_price: 1.00 },
-            { id: 2, code: 'A002', name: 'Lost Cherry', buy_price: 0.12, sell_price: 0.90 }
+            { id: 1, code: 'A001', name: 'Baccarat Rouge 540', initial_stock: 100, buy_price: 0.15, sell_price: 1.00 },
+            { id: 2, code: 'A002', name: 'Lost Cherry', initial_stock: 100, buy_price: 0.12, sell_price: 0.90 }
         ];
 
         let sales = JSON.parse(localStorage.getItem('melodika_sales')) || [];
         let role = localStorage.getItem('melodika_current_role') || '';
 
-        // Səhifə açılan kimi əgər əvvəlcədən giriş edilibsə panel birbaşa açılsın
         window.onload = function() {
             if(role) {
                 document.getElementById('loginScreen').classList.add('hidden-screen');
@@ -256,10 +256,26 @@
             let searchQuery = (document.getElementById('productSearch').value || '').toLowerCase();
             let sel = document.getElementById('opProduct');
             sel.innerHTML = '<option value="">Məhsul seçin...</option>';
-            let prodHtml = '';
             
+            // Hər məhsulun qalan qramını hesablayaq
+            let stockMap = {};
+            products.forEach(p => { stockMap[p.id] = Number(p.initial_stock || 0); });
+
+            sales.forEach(s => {
+                let g = Number(s.grams_sold || 0);
+                if(stockMap[s.product_id] !== undefined) {
+                    if(s.type === 'MEXARIC' || s.type === 'ITKI') {
+                        stockMap[s.product_id] -= g;
+                    } else if(s.type === 'MEDAXIL') {
+                        stockMap[s.product_id] += g;
+                    }
+                }
+            });
+
+            let prodHtml = '';
             products.forEach(p => {
-                sel.innerHTML += `<option value="${p.id}">[${p.code}] ${p.name}</option>`;
+                let currentStock = stockMap[p.id] !== undefined ? stockMap[p.id] : p.initial_stock;
+                sel.innerHTML += `<option value="${p.id}">[${p.code}] ${p.name} (Qalıq: ${currentStock} qr)</option>`;
                 
                 let matchesSearch = p.code.toLowerCase().includes(searchQuery) || p.name.toLowerCase().includes(searchQuery);
                 if(matchesSearch) {
@@ -267,12 +283,13 @@
                     prodHtml += `<tr class="border-b border-zinc-800">
                         <td class="py-1 font-mono">${p.code}</td>
                         <td class="py-1">${p.name}</td>
+                        <td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>
                         <td class="py-1">${p.sell_price} AZN</td>
                         <td class="py-1">${deleteBtn}</td>
                     </tr>`;
                 }
             });
-            document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="4" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>';
+            document.getElementById('prodTable').innerHTML = prodHtml || '<tr><td colspan="5" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>';
 
             let now = new Date();
             let todayStr = now.toISOString().split('T')[0];
@@ -331,11 +348,9 @@
                 
                 let formattedDate = s.date ? s.date.replace('T', ' ').substring(0, 16) : '-';
                 let typeColor = s.type === 'MEXARIC' ? 'text-green-400' : (s.type === 'MEDAXIL' ? 'text-blue-400' : 'text-red-400');
-                let authorBadge = s.author || 'Admin';
 
                 logHtml += `<tr class="border-b border-zinc-800">
                     <td class="py-1 text-zinc-400 text-[11px]">${formattedDate}</td>
-                    <td class="py-1 text-amber-300 font-semibold text-[11px]">${authorBadge}</td>
                     <td class="py-1 font-bold ${typeColor}">${s.type}</td>
                     <td class="py-1">${pName}</td>
                     <td class="py-1">${s.grams_sold}</td>
@@ -346,7 +361,7 @@
                     <td class="py-1">${deleteSaleBtn}</td>
                 </tr>`;
             });
-            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="10" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
+            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="9" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
 
             document.getElementById('salesDaily').textContent = dailySum.toFixed(2) + ' AZN';
             document.getElementById('salesWeekly').textContent = weeklySum.toFixed(2) + ' AZN';
@@ -385,10 +400,9 @@
 
                     let adText = s.fromAd ? 'Bəli' : 'Xeyr';
                     let cashText = s.toCashRegister ? 'Bəli' : 'Xeyr';
-                    let authorText = s.author || 'Admin';
 
                     listHtml += `<div class="border-b border-zinc-800 py-1">
-                        ${idx + 1}. [${authorText}] ${pName} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) | Reklam: ${adText} | Kassaya vuruldu: ${cashText}
+                        ${idx + 1}. ${pName} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) | Reklam: ${adText} | Kassaya vuruldu: ${cashText}
                     </div>`;
                 });
             }
@@ -410,17 +424,19 @@
         function addProd() {
             let code = document.getElementById('pCode').value;
             let name = document.getElementById('pName').value;
+            let initial_stock = parseFloat(document.getElementById('pStock').value) || 0;
             let buy_price = parseFloat(document.getElementById('pBuy').value) || 0;
             let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
             if(!code || !name) return alert('Kod və ad yazın!');
 
-            let newP = { id: Date.now(), code, name, buy_price, sell_price };
+            let newP = { id: Date.now(), code, name, initial_stock, buy_price, sell_price };
             products.push(newP);
             localStorage.setItem('melodika_products', JSON.stringify(products));
 
             alert('Uğurla əlavə edildi!');
             document.getElementById('pCode').value = '';
             document.getElementById('pName').value = '';
+            document.getElementById('pStock').value = '';
             document.getElementById('pBuy').value = '';
             document.getElementById('pSell').value = '';
             renderUI();
@@ -461,9 +477,6 @@
             let payType = document.getElementById('payType').value;
             let fromAd = document.getElementById('fromAd').checked;
             let toCashRegister = document.getElementById('toCashRegister').checked;
-            
-            // Cari rola əsasən müəyyən edilir
-            let author = role === 'ADMIN' ? 'Admin' : 'Satıcı';
 
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
 
@@ -471,7 +484,7 @@
             let total_cost = grams_sold * (p.buy_price || 0);
             let profit = total_price - total_cost;
 
-            let newOp = { product_id, type, grams_sold, total_price, total_cost, profit, payType, fromAd, toCashRegister, author, date: new Date().toISOString() };
+            let newOp = { product_id, type, grams_sold, total_price, total_cost, profit, payType, fromAd, toCashRegister, date: new Date().toISOString() };
             sales.push(newOp);
             localStorage.setItem('melodika_sales', JSON.stringify(sales));
 
