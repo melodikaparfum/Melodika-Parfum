@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Melodika Parfum</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #0f0f0f; color: #f3f4f6; font-family: sans-serif; }
@@ -19,8 +18,8 @@
     <div class="max-w-4xl mx-auto space-y-4">
         
         <!-- STATUS QUTUSU -->
-        <div id="debugBox" class="bg-zinc-900 border border-yellow-600 p-3 rounded-xl text-xs text-yellow-400 font-mono">
-            Status: Qoşulma yoxlanılır...
+        <div id="debugBox" class="bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono">
+            Status: Sistem hazırdır. Giriş gözlənilir...
         </div>
 
         <!-- GİRİŞ -->
@@ -75,4 +74,143 @@
             <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
                 <h3 class="text-sm font-semibold gold-text mb-2">Anbar və Jurnal</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left
+                    <table class="w-full text-left text-xs text-zinc-300">
+                        <thead class="border-b border-zinc-800 gold-text">
+                            <tr><th>Kod</th><th>Ad</th><th>Satış Qiyməti</th></tr>
+                        </thead>
+                        <tbody id="prodTable"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const supabaseUrl = 'https://jauzzzwwqxsxyuopapvl.supabase.co';
+        const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXp6endxcXhzeHl1b3BhcHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxODEwMDQsImV4cCI6MjEwOTc1NzAwNH0.gOjs41EGeGVqrwlaoIGpB0qwpeV4jpP44_9HEfgqYnk';
+
+        let products = [];
+        let role = '';
+
+        function login() {
+            let pin = document.getElementById('pinInput').value;
+            if(pin === '08102000') role = 'ADMIN';
+            else if(pin === '112233') role = 'SATICI';
+            else { document.getElementById('loginError').classList.remove('hidden-screen'); return; }
+
+            document.getElementById('loginScreen').classList.add('hidden-screen');
+            document.getElementById('mainApp').classList.remove('hidden-screen');
+            if(role === 'ADMIN') document.getElementById('adminBox').classList.remove('hidden-screen');
+            document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
+            loadData();
+        }
+
+        function logout() { location.reload(); }
+
+        async function loadData() {
+            document.getElementById('debugBox').textContent = "Status: Məlumatlar yüklənir...";
+            try {
+                let res = await fetch(`${supabaseUrl}/rest/v1/products?select=*`, {
+                    headers: {
+                        'apikey': supabaseAnonKey,
+                        'Authorization': `Bearer ${supabaseAnonKey}`
+                    }
+                });
+                let data = await res.json();
+                if(!res.ok) {
+                    document.getElementById('debugBox').textContent = "Xəta: " + (data.message || JSON.stringify(data));
+                    return;
+                }
+                products = data || [];
+                document.getElementById('debugBox').textContent = `Uğurlu! ${products.length} məhsul yükləndi.`;
+                
+                let sel = document.getElementById('opProduct');
+                sel.innerHTML = '<option value="">Məhsul seçin...</option>';
+                let html = '';
+                products.forEach(p => {
+                    sel.innerHTML += `<option value="${p.id}">[${p.code}] ${p.name}</option>`;
+                    html += `<tr class="border-b border-zinc-800"><td class="py-1">${p.code}</td><td class="py-1">${p.name}</td><td class="py-1">${p.sell_price} AZN</td></tr>`;
+                });
+                document.getElementById('prodTable').innerHTML = html || '<tr><td colspan="3" class="py-1 text-zinc-500">Məhsul yoxdur</td></tr>';
+            } catch(err) {
+                document.getElementById('debugBox').textContent = "Sorğu xətası: " + err.message;
+            }
+        }
+
+        async function addProd() {
+            let code = document.getElementById('pCode').value;
+            let name = document.getElementById('pName').value;
+            let buy_price = parseFloat(document.getElementById('pBuy').value) || 0;
+            let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
+            if(!code || !name) return alert('Kod və ad yazın!');
+
+            let res = await fetch(`${supabaseUrl}/rest/v1/products`, {
+                method: 'POST',
+                headers: {
+                    'apikey': supabaseAnonKey,
+                    'Authorization': `Bearer ${supabaseAnonKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ code, name, buy_price, sell_price })
+            });
+
+            if(!res.ok) {
+                let err = await res.json();
+                alert('Xəta: ' + (err.message || 'Əlavə olunmadı'));
+            } else {
+                alert('Uğurla əlavə edildi!');
+                document.getElementById('pCode').value = '';
+                document.getElementById('pName').value = '';
+                document.getElementById('pBuy').value = '';
+                document.getElementById('pSell').value = '';
+                loadData();
+            }
+        }
+
+        function calcPrice() {
+            let id = document.getElementById('opProduct').value;
+            let gram = parseFloat(document.getElementById('opGram').value) || 0;
+            let disc = parseFloat(document.getElementById('opDiscount').value) || 0;
+            let p = products.find(x => x.id == id);
+            if(!p) return;
+            let total = gram * (p.sell_price || 0);
+            if(disc > 0) total -= total * (disc / 100);
+            document.getElementById('opPrice').value = total.toFixed(2);
+        }
+
+        async function saveOp() {
+            let product_id = document.getElementById('opProduct').value;
+            let type = document.getElementById('opType').value;
+            let grams_sold = parseFloat(document.getElementById('opGram').value);
+            let total_price = parseFloat(document.getElementById('opPrice').value);
+            if(!product_id || !grams_sold) return alert('Məlumatları doldurun!');
+
+            let p = products.find(x => x.id == product_id);
+            let total_cost = grams_sold * (p.buy_price || 0);
+            let profit = total_price - total_cost;
+
+            let res = await fetch(`${supabaseUrl}/rest/v1/sales`, {
+                method: 'POST',
+                headers: {
+                    'apikey': supabaseAnonKey,
+                    'Authorization': `Bearer ${supabaseAnonKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ product_id, type, grams_sold, total_price, total_cost, profit })
+            });
+
+            if(!res.ok) {
+                let err = await res.json();
+                alert('Xəta: ' + (err.message || 'Saxlanılmadı'));
+            } else {
+                alert('Əməliyyat yadda saxlanıldı!');
+                document.getElementById('opGram').value = '';
+                document.getElementById('opPrice').value = '';
+                document.getElementById('opDiscount').value = '';
+            }
+        }
+    </script>
+</body>
+</html>
