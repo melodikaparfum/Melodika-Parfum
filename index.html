@@ -1156,8 +1156,7 @@
 </div>
 
 <!-- JavaScript Kodları (Mütləq <script> teqinin içində olmalıdır) -->
-<script>
-    // 1. Ziyarətçi sayını qeyd edən funksiya
+<script>// 1. Ziyarətçi sayını qeyd edən funksiya
     async function trackVisit() {
         if (!sessionStorage.getItem('visited')) {
             const { error } = await supabaseClient
@@ -1214,5 +1213,4 @@
     }
 
     // Səhifə açılan kimi avtomatik günlük statistikaları yüklə
-    loadAnalytics('day');
-</script>
+    loadAnalytics('day'); </script>
