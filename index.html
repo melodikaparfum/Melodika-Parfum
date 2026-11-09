@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Melodika Parfum - İdarəetmə Sistemi</title>
+    <title>Melodika Parfum</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -15,158 +15,69 @@
         .hidden-screen { display: none !important; }
     </style>
 </head>
-<body class="p-4 md:p-6">
+<body class="p-4">
     <div class="max-w-4xl mx-auto">
-        
-        <!-- 1. GİRİŞ EKRANI -->
-        <div id="loginScreen" class="bg-zinc-900 border border-zinc-800 p-8 rounded-2xl max-w-md mx-auto my-12 text-center shadow-2xl">
-            <h1 class="text-3xl font-extrabold gold-text mb-2">MELODİKA PARFUM</h1>
-            <p class="text-zinc-400 text-sm mb-6">Sistemə daxil olmaq üçün PİN kodu qeyd edin</p>
-            
-            <input type="password" id="pinInput" maxlength="8" placeholder="PİN Kod" class="w-full text-center text-2xl tracking-widest bg-zinc-800 border border-zinc-700 p-4 rounded-xl text-white mb-6 focus:outline-none gold-border">
-            
-            <button onclick="login()" class="w-full gold-bg font-bold py-3.5 rounded-xl text-lg transition duration-200">Daxil Ol</button>
-            <p id="loginError" class="text-red-500 text-sm mt-3 hidden-screen">Daxil edilən PİN kod yanlışdır!</p>
+        <!-- GİRİŞ -->
+        <div id="loginScreen" class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl max-w-sm mx-auto mt-10 text-center">
+            <h1 class="text-2xl font-bold gold-text mb-4">MELODİKA PARFUM</h1>
+            <input type="password" id="pinInput" placeholder="PİN Kod" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white mb-4 focus:outline-none gold-border">
+            <button onclick="login()" class="w-full gold-bg font-bold py-3 rounded-lg">Daxil Ol</button>
+            <p id="loginError" class="text-red-500 text-sm mt-2 hidden-screen">Yanlış PİN kod!</p>
         </div>
 
-        <!-- 2. ƏSAS İŞÇİ PANELİ -->
-        <div id="mainApp" class="hidden-screen space-y-6">
-            
-            <!-- Başlıq və Rol Göstəricisi -->
-            <header class="flex justify-between items-center border-b border-zinc-800 pb-4">
-                <div>
-                    <h1 class="text-xl md:text-2xl font-bold gold-text">MELODİKA PARFUM</h1>
-                    <span id="userRoleBadge" class="text-xs bg-zinc-800 gold-text px-3 py-1 rounded-full border gold-border">Rol: -</span>
-                </div>
-                <button onclick="logout()" class="text-xs bg-red-950 text-red-300 border border-red-800 px-3 py-1.5 rounded-lg hover:bg-red-900">Çıxış</button>
+        <!-- ƏSAS PANEL -->
+        <div id="mainApp" class="hidden-screen space-y-4">
+            <header class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                <h1 class="text-lg font-bold gold-text" id="roleTitle">MELODİKA</h1>
+                <button onclick="logout()" class="text-xs bg-red-900 text-white px-3 py-1 rounded">Çıxış</button>
             </header>
 
-            <!-- Statistik Kartlar (Admin & Əsas İcmal) -->
-            <div id="statsSection" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
-                    <p class="text-xs text-zinc-400 uppercase font-semibold">Günlük Xalis Mənfəət</p>
-                    <p id="statDailyProfit" class="text-2xl font-bold gold-text mt-1">0.00 AZN</p>
+            <!-- Əməliyyat Forması -->
+            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3">
+                <h2 class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+                    <select id="opType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                        <option value="MEXARIC">Məxaric (Satış)</option>
+                        <option value="MEDAXIL">Mədaxil</option>
+                        <option value="ITKI">İtki</option>
+                    </select>
+                    <select id="opProduct" onchange="calcPrice()" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                        <option value="">Məhsul seçin...</option>
+                    </select>
+                    <input type="number" id="opGram" oninput="calcPrice()" placeholder="Miqdar (qr/ədəd)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                 </div>
-                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
-                    <p class="text-xs text-zinc-400 uppercase font-semibold">Həftəlik Xalis Mənfəət</p>
-                    <p id="statWeeklyProfit" class="text-2xl font-bold gold-text mt-1">0.00 AZN</p>
+                <div class="grid grid-cols-2 gap-2">
+                    <input type="number" step="0.01" id="opPrice" placeholder="Yekun Qiymət (AZN)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                    <input type="number" id="opDiscount" oninput="calcPrice()" placeholder="Endirim %" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                 </div>
-                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
-                    <p class="text-xs text-zinc-400 uppercase font-semibold">Aylıq Xalis Mənfəət</p>
-                    <p id="statMonthlyProfit" class="text-2xl font-bold gold-text mt-1">0.00 AZN</p>
-                </div>
+                <button onclick="saveOp()" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
             </div>
 
-            <!-- ƏMƏLİYYAT FORMASI (Mədaxil / Məxaric / İtki) -->
-            <div class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl space-y-4">
-                <h2 class="text-lg font-semibold gold-text border-b border-zinc-800 pb-2">Əməliyyat Paneli</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <!-- Əməliyyat Növü -->
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Əməliyyat Növü</label>
-                        <select id="opType" onchange="handleOpTypeChange()" class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-white focus:outline-none gold-border">
-                            <option value="MEXARIC">Məxaric (Satış)</option>
-                            <option value="MEDAXIL" id="optMedaxil">Mədaxil (Stok)</option>
-                            <option value="ITKI" id="optItki">İtki / Qüsurlu</option>
-                        </select>
-                    </div>
-
-                    <!-- Məhsul Seçimi -->
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Məhsul (Çeşid / Qab / Qutu)</label>
-                        <select id="opProduct" onchange="calculatePrices()" class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-white focus:outline-none gold-border">
-                            <option value="">Seçin...</option>
-                        </select>
-                    </div>
-
-                    <!-- Tarix -->
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Tarix</label>
-                        <input type="date" id="opDate" class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-white focus:outline-none gold-border">
-                    </div>
+            <!-- Məhsul Əlavə (Admin) -->
+            <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen">
+                <h2 class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                    <input type="text" id="pCode" placeholder="Kod" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                    <input type="text" id="pName" placeholder="Ad" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                    <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                    <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                 </div>
-
-                <!-- Miqdar və Qiymət Hesablaması -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Miqdar (Qram/Ədəd)</label>
-                        <input type="number" id="opGram" oninput="calculatePrices()" placeholder="0" class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-white focus:outline-none gold-border font-bold">
-                    </div>
-                    
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Hesablanmış Qiymət (AZN)</label>
-                        <input type="number" step="0.01" id="opCalcPrice" placeholder="0.00" class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-white focus:outline-none gold-border">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Endirim (%)</label>
-                        <input type="number" id="opDiscount" oninput="calculatePrices()" placeholder="0" class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-white focus:outline-none gold-border">
-                    </div>
-
-                    <div>
-                        <label class="block text-xs text-zinc-400 mb-1">Yekun Yekun (AZN)</label>
-                        <input type="number" step="0.01" id="opFinalPrice" placeholder="0.00" class="w-full bg-zinc-800 border border-zinc-700 p-3 rounded-xl text-white focus:outline-none gold-border font-bold text-yellow-400">
-                    </div>
-                </div>
-
-                <button onclick="submitTransaction()" class="w-full gold-bg font-bold py-3 rounded-xl text-md transition">Əməliyyatı İcra Et</button>
+                <button onclick="addProd()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
             </div>
 
-            <!-- ADMIN İDARƏETMƏ PANELSİ (Yalnız Admin Görməlidir) -->
-            <div id="adminPanel" class="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl space-y-4">
-                <h2 class="text-lg font-semibold gold-text border-b border-zinc-800 pb-2">Admin: Çeşid & Qiymət İdarəetməsi</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                    <input type="text" id="newProdCode" placeholder="Kod (məs: A102)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded-lg text-white text-sm">
-                    <input type="text" id="newProdName" placeholder="Ad (məs: Baccarat Rouge)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded-lg text-white text-sm">
-                    <input type="number" step="0.01" id="newProdBuyPrice" placeholder="Alış Qiyməti (1 qr)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded-lg text-white text-sm">
-                    <input type="number" step="0.01" id="newProdSellPrice" placeholder="Satış Qiyməti (1 qr)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded-lg text-white text-sm">
-                </div>
-                <button onclick="addNewProduct()" class="gold-bg text-black font-bold px-4 py-2 rounded-lg text-sm">Çeşid Əlavə Et</button>
-            </div>
-
-            <!-- STOK VƏ SATIŞ TARİXÇƏSİ CƏDVƏLİ -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Stok -->
-                <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                    <h3 class="text-md font-semibold gold-text mb-3">Anbar Stoku</h3>
-                    <div class="overflow-y-auto max-h-60">
-                        <table class="w-full text-left text-xs text-zinc-300">
-                            <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr>
-                                    <th class="py-2">Kod</th>
-                                    <th class="py-2">Ad</th>
-                                    <th class="py-2">Qalan (Qr/Ədəd)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="stockTbody"></tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Əməliyyat Jurnalı (Admin Ətraflı Görür) -->
-                <div class="bg-zinc-900 border border-zinc-800 p-5 rounded-2xl">
-                    <h3 class="text-md font-semibold gold-text mb-3">Əməliyyat Jurnalı (Canlı)</h3>
-                    <div class="overflow-y-auto max-h-60">
-                        <table class="w-full text-left text-xs text-zinc-300">
-                            <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr>
-                                    <th class="py-2">Tarix</th>
-                                    <th class="py-2">Növ</th>
-                                    <th class="py-2">Məhsul</th>
-                                    <th class="py-2">Miqdar</th>
-                                    <th class="py-2">Məbləğ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="logTbody"></tbody>
-                        </table>
-                    </div>
+            <!-- Cədvəl -->
+            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
+                <h3 class="text-sm font-semibold gold-text mb-2">Anbar və Jurnal</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-zinc-300">
+                        <thead class="border-b border-zinc-800 gold-text">
+                            <tr><th>Kod</th><th>Ad</th><th>Satış Qiyməti</th></tr>
+                        </thead>
+                        <tbody id="prodTable"></tbody>
+                    </table>
                 </div>
             </div>
-
         </div>
-
     </div>
 
     <script>
@@ -174,228 +85,76 @@
         const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphdXp6endxcXhzeHl1b3BhcHZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQxODEwMDQsImV4cCI6MjEwOTc1NzAwNH0.gOjs41EGeGVqrwlaoIGpB0qwpeV4jpP44_9HEfgqYnk';
         const _supabase = supabase.createClient(supabaseUrl, supabaseAnonKey);
 
-        let currentUserRole = null; // 'ADMIN' or 'SATICI'
-        let productCatalog = [];
-
-        // Bugünkü tarixi təyin et
-        document.getElementById('opDate').valueAsDate = new Date();
+        let products = [];
+        let role = '';
 
         function login() {
-            const pin = document.getElementById('pinInput').value;
-            const errorEl = document.getElementById('loginError');
+            let pin = document.getElementById('pinInput').value;
+            if(pin === '08102000') role = 'ADMIN';
+            else if(pin === '112233') role = 'SATICI';
+            else { document.getElementById('loginError').classList.remove('hidden-screen'); return; }
 
-            if (pin === "08102000") {
-                currentUserRole = 'ADMIN';
-            } else if (pin === "112233") {
-                currentUserRole = 'SATICI';
-            } else {
-                errorEl.classList.remove('hidden-screen');
-                return;
-            }
-
-            errorEl.classList.add('hidden-screen');
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
+            if(role === 'ADMIN') document.getElementById('adminBox').classList.remove('hidden-screen');
+            document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
+            loadData();
+        }
+
+        function logout() { location.reload(); }
+
+        async function loadData() {
+            let { data, error } = await _supabase.from('products').select('*');
+            if(error) { alert("Bazadan oxuma xətası: " + error.message); return; }
+            products = data || [];
             
-            applyRolePermissions();
-            loadAllData();
-        }
-
-        function logout() {
-            currentUserRole = null;
-            document.getElementById('pinInput').value = '';
-            document.getElementById('mainApp').classList.add('hidden-screen');
-            document.getElementById('loginScreen').classList.remove('hidden-screen');
-        }
-
-        function applyRolePermissions() {
-            const badge = document.getElementById('userRoleBadge');
-            const optMedaxil = document.getElementById('optMedaxil');
-            const optItki = document.getElementById('optItki');
-            const adminPanel = document.getElementById('adminPanel');
-            const statsSection = document.getElementById('statsSection');
-
-            badge.textContent = `Rol: ${currentUserRole}`;
-
-            if (currentUserRole === 'SATICI') {
-                // Satıcı yalnız Məxaric edə bilsin
-                optMedaxil.disabled = true;
-                optItki.disabled = true;
-                document.getElementById('opType').value = "MEXARIC";
-                adminPanel.classList.add('hidden-screen');
-                statsSection.classList.add('hidden-screen'); // Hesabatları gizlət
-            } else {
-                optMedaxil.disabled = false;
-                optItki.disabled = false;
-                adminPanel.classList.remove('hidden-screen');
-                statsSection.classList.remove('hidden-screen');
-            }
-        }
-
-        async function loadAllData() {
-            // Məhsulları yüklə
-            const { data: prods } = await _supabase.from('products').select('*');
-            productCatalog = prods || [];
-            
-            const selectEl = document.getElementById('opProduct');
-            selectEl.innerHTML = '<option value="">Seçin...</option>';
-            productCatalog.forEach(p => {
-                let opt = document.createElement('option');
-                opt.value = p.id;
-                opt.textContent = `[${p.code}] ${p.name}`;
-                selectEl.appendChild(opt);
+            let sel = document.getElementById('opProduct');
+            sel.innerHTML = '<option value="">Məhsul seçin...</option>';
+            let html = '';
+            products.forEach(p => {
+                sel.innerHTML += `<option value="${p.id}">[${p.code}] ${p.name}</option>`;
+                html += `<tr class="border-b border-zinc-800"><td class="py-1">${p.code}</td><td class="py-1">${p.name}</td><td class="py-1">${p.sell_price} AZN</td></tr>`;
             });
-
-            refreshTablesAndReports();
+            document.getElementById('prodTable').innerHTML = html;
         }
 
-        function calculatePrices() {
-            const prodId = document.getElementById('opProduct').value;
-            const gram = parseFloat(document.getElementById('opGram').value) || 0;
-            const discountPercent = parseFloat(document.getElementById('opDiscount').value) || 0;
-            
-            const product = productCatalog.find(p => p.id == prodId);
-            if (!product || gram <= 0) return;
+        async function addProd() {
+            let code = document.getElementById('pCode').value;
+            let name = document.getElementById('pName').value;
+            let buy_price = parseFloat(document.getElementById('pBuy').value) || 0;
+            let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
+            if(!code || !name) return alert('Kod və ad yazın!');
 
-            // Bazis qiymət hesablanması
-            const unitSellPrice = product.sell_price || 0;
-            let calcTotal = gram * unitSellPrice;
-
-            document.getElementById('opCalcPrice').value = calcTotal.toFixed(2);
-
-            // Endirim tətbiqi
-            if (discountPercent > 0) {
-                calcTotal = calcTotal - (calcTotal * (discountPercent / 100));
-            }
-
-            document.getElementById('opFinalPrice').value = calcTotal.toFixed(2);
+            let { error } = await _supabase.from('products').insert([{ code, name, buy_price, sell_price }]);
+            if(error) alert(error.message);
+            else { alert('Uğurla əlavə edildi!'); loadData(); }
         }
 
-        async function submitTransaction() {
-            const type = document.getElementById('opType').value;
-            const prodId = document.getElementById('opProduct').value;
-            const date = document.getElementById('opDate').value;
-            const gram = parseFloat(document.getElementById('opGram').value);
-            const finalPrice = parseFloat(document.getElementById('opFinalPrice').value);
-
-            if (!prodId || !gram || isNaN(finalPrice)) {
-                alert("Lütfən məhsul, miqdar və qiymət xanalarını düzgün doldurun!");
-                return;
-            }
-
-            const product = productCatalog.find(p => p.id == prodId);
-            const unitCost = product ? (product.buy_price || 0) : 0;
-            const totalCost = gram * unitCost;
-            const profit = (type === 'MEXARIC') ? (finalPrice - totalCost) : 0;
-
-            // Transaksiyanı qeyd et
-            const { error } = await _supabase.from('sales').insert([{
-                product_id: prodId,
-                type: type,
-                grams_sold: gram,
-                total_price: finalPrice,
-                total_cost: totalCost,
-                profit: profit,
-                created_at: date
-            }]);
-
-            if (error) {
-                alert("Xəta baş verdi: " + error.message);
-            } else {
-                alert("Əməliyyat uğurla tamamlandı!");
-                document.getElementById('opGram').value = '';
-                document.getElementById('opCalcPrice').value = '';
-                document.getElementById('opFinalPrice').value = '';
-                document.getElementById('opDiscount').value = '';
-                refreshTablesAndReports();
-            }
+        function calcPrice() {
+            let id = document.getElementById('opProduct').value;
+            let gram = parseFloat(document.getElementById('opGram').value) || 0;
+            let disc = parseFloat(document.getElementById('opDiscount').value) || 0;
+            let p = products.find(x => x.id == id);
+            if(!p) return;
+            let total = gram * (p.sell_price || 0);
+            if(disc > 0) total -= total * (disc / 100);
+            document.getElementById('opPrice').value = total.toFixed(2);
         }
 
-        async function addNewProduct() {
-            const code = document.getElementById('newProdCode').value;
-            const name = document.getElementById('newProdName').value;
-            const buy_price = parseFloat(document.getElementById('newProdBuyPrice').value) || 0;
-            const sell_price = parseFloat(document.getElementById('newProdSellPrice').value) || 0;
+        async function saveOp() {
+            let product_id = document.getElementById('opProduct').value;
+            let type = document.getElementById('opType').value;
+            let grams_sold = parseFloat(document.getElementById('opGram').value);
+            let total_price = parseFloat(document.getElementById('opPrice').value);
+            if(!product_id || !grams_sold) return alert('Məlumatları doldurun!');
 
-            if (!code || !name) return alert("Kod və ad qeyd olunmalıdır!");
+            let p = products.find(x => x.id == product_id);
+            let total_cost = grams_sold * (p.buy_price || 0);
+            let profit = total_price - total_cost;
 
-            const { error } = await _supabase.from('products').insert([{ code, name, buy_price, sell_price }]);
-            if (error) alert(error.message);
-            else {
-                alert("Çeşid əlavə olundu!");
-                document.getElementById('newProdCode').value = '';
-                document.getElementById('newProdName').value = '';
-                loadAllData();
-            }
-        }
-
-        async function refreshTablesAndReports() {
-            const { data: sales } = await _supabase.from('sales').select('*, products(code, name)');
-            
-            // Log cədvəlini yenilə
-            let logHtml = '';
-            let totalProfitToday = 0;
-            let totalProfitWeek = 0;
-            let totalProfitMonth = 0;
-
-            const now = new Date();
-
-            if (sales) {
-                sales.reverse().forEach(s => {
-                    logHtml += `<tr class="border-b border-zinc-800">
-                        <td class="py-1.5">${s.created_at ? s.created_at.substring(0,10) : ''}</td>
-                        <td class="py-1.5 font-bold ${s.type==='MEXARIC'?'text-green-400':(s.type==='MEDAXIL'?'text-blue-400':'text-red-400')}">${s.type}</td>
-                        <td class="py-1.5">${s.products ? s.products.name : '-'}</td>
-                        <td class="py-1.5 font-mono">${s.grams_sold}</td>
-                        <td class="py-1.5">${s.total_price} AZN</td>
-                    </tr>`;
-
-                    // Hesabat Hesablamaları (Mənfəət üzrə)
-                    if (currentUserRole === 'ADMIN' && s.type === 'MEXARIC') {
-                        const sDate = new Date(s.created_at);
-                        const diffDays = (now - sDate) / (1000 * 60 * 60 * 24);
-
-                        if (diffDays <= 1) totalProfitToday += (s.profit || 0);
-                        if (diffDays <= 7) totalProfitWeek += (s.profit || 0);
-                        if (diffDays <= 30) totalProfitMonth += (s.profit || 0);
-                    }
-                });
-            }
-            document.getElementById('logTbody').innerHTML = logHtml || '<tr><td colspan="5" class="py-2 text-center text-zinc-500">Kayıt bulunamadı</td></tr>';
-
-            // Hesabat Statistikalarını Yaz
-            if (currentUserRole === 'ADMIN') {
-                document.getElementById('statDailyProfit').textContent = totalProfitToday.toFixed(2) + " AZN";
-                document.getElementById('statWeeklyProfit').textContent = totalProfitWeek.toFixed(2) + " AZN";
-                document.getElementById('statMonthlyProfit').textContent = totalProfitMonth.toFixed(2) + " AZN";
-            }
-
-            // Stok Hesabla (Mədaxil - Məxaric - İtki)
-            let stockMap = {};
-            if (sales) {
-                sales.forEach(s => {
-                    if (!stockMap[s.product_id]) stockMap[s.product_id] = 0;
-                    if (s.type === 'MEDAXIL') stockMap[s.product_id] += s.grams_sold;
-                    else stockMap[s.product_id] -= s.grams_sold;
-                });
-            }
-
-            let stockHtml = '';
-            productCatalog.forEach(p => {
-                let rem = stockMap[p.id] || 0;
-                stockHtml += `<tr class="border-b border-zinc-800">
-                    <td class="py-1.5 font-mono">${p.code}</td>
-                    <td class="py-1.5">${p.name}</td>
-                    <td class="py-1.5 font-bold gold-text">${rem}</td>
-                </tr>`;
-            });
-            document.getElementById('stockTbody').innerHTML = stockHtml;
-        }
-
-        function handleOpTypeChange() {
-            // Əgər Mədaxildirsə endirimi deaktiv et
-            const type = document.getElementById('opType').value;
-            document.getElementById('opDiscount').disabled = (type !== 'MEXARIC');
+            let { error } = await _supabase.from('sales').insert([{ product_id, type, grams_sold, total_price, total_cost, profit }]);
+            if(error) alert(error.message);
+            else { alert('Əməliyyat yadda saxlanıldı!'); document.getElementById('opGram').value=''; document.getElementById('opPrice').value=''; }
         }
     </script>
 </body>
