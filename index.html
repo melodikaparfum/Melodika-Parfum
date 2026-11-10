@@ -1090,10 +1090,11 @@
             document.getElementById('masterArchivePinModal').classList.add('hidden-screen');
         }
 
-        function verifyMasterArchivePin() {
+        async function verifyMasterArchivePin() {
             let pin = document.getElementById('masterArchivePinInput').value;
             if(pin === '000') {
                 closeMasterArchivePinModal();
+                await loadDataFromCloud();
                 renderGlobalMasterArchiveLists();
                 document.getElementById('globalMasterArchiveModal').classList.remove('hidden-screen');
             } else {
@@ -1118,7 +1119,7 @@
                                 <span>Tarix: ${item.report_date}</span>
                                 <button onclick="deleteDayEndArchive(${item.id})" class="text-red-400 hover:text-red-600 font-bold text-[10px] bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-700">Sil</button>
                             </div>
-                            <div class="text-zinc-300 text-[11px] leading-relaxed">${item.content_summary}</div>
+                            <div class="text-zinc-300 text-[11px] leading-relaxed bg-white p-2 rounded text-black">${item.content_summary}</div>
                         </div>
                     `;
                 });
@@ -2568,13 +2569,12 @@
 
         async function saveDayEndToArchive(dateStr, contentHtml) {
             try {
-                let existing = dayEndArchive.find(d => d.report_date === dateStr);
-                if (existing) {
-                    await _supabase.from('day_end_archive').update({ content_summary: contentHtml }).eq('id', existing.id);
+                let { error } = await _supabase.from('day_end_archive').upsert([{ report_date: dateStr, content_summary: contentHtml }], { onConflict: 'report_date' });
+                if (error) {
+                    console.error("Arxiv yazma xətası:", error.message);
                 } else {
-                    await _supabase.from('day_end_archive').insert([{ report_date: dateStr, content_summary: contentHtml }]);
+                    await loadDataFromCloud();
                 }
-                await loadDataFromCloud();
             } catch(e) { console.error(e); }
         }
 
