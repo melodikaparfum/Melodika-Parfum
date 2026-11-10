@@ -652,13 +652,14 @@
         function replaceAzCharsForPDF(text) {
             if (!text) return '';
             return text
-                .replace(/ə/g, 'e').replace(/Ə/g, 'E')
-                .replace(/ş/g, 's').replace(/Ş/g, 'S')
-                .replace(/ç/g, 'c').replace(/Ç/g, 'C')
-                .replace(/ı/g, 'i').replace(/İ/g, 'I')
-                .replace(/ü/g, 'u').replace(/Ü/g, 'U')
-                .replace(/ö/g, 'o').replace(/Ö/g, 'O')
-                .replace(/ğ/g, 'g').replace(/Ğ/g, 'G');
+                .replace(/Ə/g, 'E').replace(/ə/g, 'e')
+                .replace(/Ü/g, 'U').replace(/ü/g, 'u')
+                .replace(/Ö/g, 'O').replace(/ö/g, 'o')
+                .replace(/Ğ/g, 'G').replace(/ğ/g, 'g')
+                .replace(/I/g, 'I').replace(/ı/g, 'i')
+                .replace(/İ/g, 'I').replace(/i/g, 'i')
+                .replace(/Ç/g, 'C').replace(/ç/g, 'c')
+                .replace(/Ş/g, 'S').replace(/ş/g, 's');
         }
 
         window.onload = async function() {
@@ -941,10 +942,10 @@
                     statusDisplay = `${checkIn} - ${checkOut}`;
                 } else {
                     if(noteText !== '') {
-                        statusDisplay = `<span onclick="openReasonModalPopup('${dateKey}', '${noteText}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənlək üçün kliklə">${noteText} ✏️</span>`;
+                        statusDisplay = `<span onclick="openReasonModalPopup('${dateKey}', '${noteText}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənləmək üçün kliklə"><span class="reason-text">${noteText}</span> <span class="no-print">✏️</span></span>`;
                         reasonBtnHtml = `<button onclick="openReasonModalPopup('${dateKey}', '${noteText}')" class="no-print bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] ml-2">Düzənlə</button>`;
                     } else {
-                        statusDisplay = `Gəlməyib`;
+                        statusDisplay = `<span class="reason-text">Gəlməyib</span>`;
                         reasonBtnHtml = `<button onclick="openReasonModalPopup('${dateKey}', '')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2.5 py-1 rounded text-xs ml-2">Səbəb yaz / Düzənlə</button>`;
                     }
                 }
@@ -1007,8 +1008,10 @@
             let element = document.getElementById('attendancePrintArea');
 
             let clone = element.cloneNode(true);
-            let buttons = clone.querySelectorAll('button');
-            buttons.forEach(b => b.remove());
+            
+            // PDF yaradılarkən bütün 'no-print' düymələri (Səbəb yaz / Düzənlə) təmizlənir
+            let noPrintElems = clone.querySelectorAll('.no-print');
+            noPrintElems.forEach(b => b.remove());
 
             function replaceTextNodes(node) {
                 if (node.nodeType === Node.TEXT_NODE) {
@@ -1298,10 +1301,7 @@
 
         async function rateProduct(productId, ratingValue) {
             let { error } = await _supabase.from('product_ratings').insert([{ product_id: productId, rating: ratingValue }]);
-            if(error) { 
-                alert('Xəta: ' + error.message); 
-                return; 
-            }
+            if(error) { alert('Xəta: ' + error.message); return; }
             alert('Qiymətləndirmeniz üçün təşəkkür edirik!');
             await loadDataFromCloud();
             renderCustomerCatalog();
