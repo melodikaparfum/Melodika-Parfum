@@ -62,14 +62,12 @@
             </header>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Ətirlərin Siyahısı -->
                 <div class="md:col-span-2 space-y-3">
                     <h2 class="text-sm font-semibold gold-text">Ətirlər və Notlar</h2>
                     <input type="text" id="customerSearch" oninput="renderCustomerCatalog()" placeholder="Ətir axtar..." class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs mb-2">
                     <div id="customerProductsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2"></div>
                 </div>
 
-                <!-- Səbət və Sifariş Formu -->
                 <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 h-fit sticky top-4">
                     <h2 class="text-sm font-semibold gold-text">Səbətiniz 🛒</h2>
                     <div id="cartItemsList" class="space-y-2 text-xs text-zinc-300 max-h-40 overflow-y-auto border-b border-zinc-800 pb-2">
@@ -101,6 +99,7 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="openAttendanceModal()" id="attendanceBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">İş Saatları Sheeti 🕒</button>
                     <button onclick="openExpensesModal()" id="expensesBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Xərclər Sheeti 📊</button>
                     <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
                     <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
@@ -109,16 +108,28 @@
                 </div>
             </header>
 
+            <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ -->
+            <div class="bg-zinc-900 border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
+                <div class="text-xs text-zinc-300">
+                    <span>İş Növbəsi Statusu: </span>
+                    <strong id="shiftStatusText" class="text-amber-400 font-mono">Yoxlanılır...</strong>
+                </div>
+                <div class="flex items-center space-x-2 w-full sm:w-auto">
+                    <button onclick="startShift()" id="startShiftBtn" class="flex-1 sm:flex-none bg-green-700 hover:bg-green-600 text-white font-bold px-3 py-1.5 rounded text-xs">Növbəni Başlat 🟢</button>
+                    <button onclick="endShift()" id="endShiftBtn" class="flex-1 sm:flex-none bg-red-800 hover:bg-red-700 text-white font-bold px-3 py-1.5 rounded text-xs">Növbəni Bağla 🔴</button>
+                </div>
+            </div>
+
             <!-- MAĞAZA ANALİTİKASI -->
             <div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
                     <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
                     
                     <div class="flex bg-zinc-800 p-1 rounded-lg text-xs space-x-1">
-                        <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
-                        <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
-                        <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
-                        <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/20 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
+                        <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
+                        <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
+                        <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
+                        <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
                     </div>
                 </div>
 
@@ -226,7 +237,7 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr id="logHeaderRow"><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Düzənlə</th></tr>
+                                <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Düzənlə</th></tr>
                             </thead>
                             <tbody id="logTable"></tbody>
                         </table>
@@ -288,6 +299,40 @@
             </div>
         </div>
 
+        <!-- İŞ SAATLARI SHEET (YALNIZ ADMİN) -->
+        <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
+            <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2">
+                    <div>
+                        <h2 class="text-lg font-bold gold-text"> İŞÇİLƏRİN İŞ SAATLARI SHEETİ</h2>
+                        <div class="text-xs text-zinc-400">Aylıq işə gəliş və gediş saatları cədvəli.</div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <select id="attYearSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
+                        <select id="attMonthSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold">
+                            <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
+                            <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
+                            <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
+                        </select>
+                        <button onclick="closeAttendanceModal()" class="no-print text-xs bg-zinc-800 px-3 py-1.5 rounded text-zinc-300 hover:bg-zinc-700">Bağla</button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto max-h-[60vh] overflow-y-auto pr-1">
+                    <table class="w-full text-left text-xs text-zinc-300 border-collapse">
+                        <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
+                            <tr>
+                                <th class="py-2 px-2 w-16 text-center">Tarix</th>
+                                <th class="py-2 px-2">Satıcı Gəliş / Gediş</th>
+                                <th class="py-2 px-2">Admin Gəliş / Gediş</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceRowsList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <!-- AYLIQ/İLLİK XƏRCLƏR SHEET (YALNIZ ADMİN) -->
         <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
@@ -299,24 +344,14 @@
                     <div class="flex items-center space-x-2">
                         <select id="expenseYearSelect" onchange="renderExpenseSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
                         <select id="expenseMonthSelect" onchange="renderExpenseSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold">
-                            <option value="1">Yanvar</option>
-                            <option value="2">Fevral</option>
-                            <option value="3">Mart</option>
-                            <option value="4">Aprel</option>
-                            <option value="5">May</option>
-                            <option value="6">İyun</option>
-                            <option value="7">İyul</option>
-                            <option value="8">Avqust</option>
-                            <option value="9">Sentyabr</option>
-                            <option value="10">Oktyabr</option>
-                            <option value="11">Noyabr</option>
-                            <option value="12">Dekabr</option>
+                            <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
+                            <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
+                            <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
                         </select>
                         <button onclick="closeExpensesModal()" class="no-print text-xs bg-zinc-800 px-3 py-1.5 rounded text-zinc-300 hover:bg-zinc-700">Bağla</button>
                     </div>
                 </div>
 
-                <!-- Xərc Cədvəli -->
                 <div class="overflow-x-auto max-h-[60vh] overflow-y-auto pr-1">
                     <table class="w-full text-left text-xs text-zinc-300 border-collapse table-fixed">
                         <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
@@ -331,7 +366,6 @@
                     </table>
                 </div>
 
-                <!-- Yekun Cəm -->
                 <div class="pt-3 border-t border-zinc-800 flex justify-between items-center">
                     <div class="text-xs text-zinc-400 font-mono">Dəyişikliklər "Yadda Saxla" düyməsinə basdıqda avtomatik yenilənir.</div>
                     <div class="text-right">
@@ -350,7 +384,6 @@
                     <button onclick="closeDayEndModal()" class="no-print text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <!-- Şəkil kimi yüklənəcək qutu -->
                 <div id="dayEndPrintArea" class="bg-zinc-900 p-2 space-y-4 text-xs font-mono">
                     <div id="dayEndContent" class="space-y-4 text-xs font-mono"></div>
                 </div>
@@ -361,7 +394,7 @@
             </div>
         </div>
 
-        <!-- MÜŞTƏRİ KATALOQ MƏLUMATLARI (EDİT) EKRANI (SHEET) -->
+        <!-- MÜŞTƏRİ KATALOQ MƏLUMATLARI (EDİT) EKRANI -->
         <div id="catalogDetailsModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -374,7 +407,7 @@
             </div>
         </div>
 
-        <!-- SİFARİŞLƏR PANELİ EKRANI (SHEET) -->
+        <!-- SİFARİŞLƏR PANELİ EKRANI -->
         <div id="ordersModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -451,6 +484,7 @@
         let sales = [];
         let orders = [];
         let expenses = [];
+        let attendances = [];
         let cart = [];
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
@@ -474,7 +508,7 @@
 
         window.onload = async function() {
             await loadDataFromCloud();
-            initExpenseYearOptions();
+            initYearOptions();
 
             if(role) {
                 document.getElementById('loginScreen').classList.add('hidden-screen');
@@ -484,12 +518,14 @@
                     document.getElementById('adminReportBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     document.getElementById('expensesBtn').classList.remove('hidden-screen');
+                    document.getElementById('attendanceBtn').classList.remove('hidden-screen');
                 }
                 loadAnalytics('day'); 
                 let today = getBakuDateString();
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
                 if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
                 document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
+                checkTodayShiftStatus();
                 renderUI();
                 checkNewOrdersBlinking();
             }
@@ -506,19 +542,21 @@
                 sales = sRes.data || [];
 
                 let oRes = await _supabase.from('orders').select('*');
-                if(!oRes.error) {
-                    orders = oRes.data || [];
-                }
+                if(!oRes.error) orders = oRes.data || [];
 
                 let eRes = await _supabase.from('expenses').select('*');
-                if(!eRes.error) {
-                    expenses = eRes.data || [];
-                }
+                if(!eRes.error) expenses = eRes.data || [];
+
+                let aRes = await _supabase.from('attendance').select('*');
+                if(!aRes.error) attendances = aRes.data || [];
 
                 document.getElementById('debugBox').textContent = "Status: Bulud bazasına uğurla qoşuldu (Canlı Sinxronizasiya)";
                 document.getElementById('debugBox').className = "bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print";
                 
-                if(role) checkNewOrdersBlinking();
+                if(role) {
+                    checkTodayShiftStatus();
+                    checkNewOrdersBlinking();
+                }
             } catch (err) {
                 console.error(err);
                 document.getElementById('debugBox').textContent = "Status Xətası: " + err.message;
@@ -526,24 +564,134 @@
             }
         }
 
+        function checkTodayShiftStatus() {
+            let todayStr = getBakuDateString();
+            let rec = attendances.find(a => a.work_date === todayStr && a.role_name === role);
+            let statusTextElem = document.getElementById('shiftStatusText');
+            
+            if(!rec) {
+                statusTextElem.textContent = "Növbə başlanmayıb";
+                statusTextElem.className = "text-red-400 font-mono";
+            } else if(rec.check_in && !rec.check_out) {
+                let timeStr = new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                statusTextElem.textContent = `Aktivdir (Gəliş: ${timeStr})`;
+                statusTextElem.className = "text-green-400 font-mono";
+            } else if(rec.check_in && rec.check_out) {
+                let inStr = new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                let outStr = new Date(rec.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                statusTextElem.textContent = `Tamamlanıb (${inStr} — ${outStr})`;
+                statusTextElem.className = "text-amber-400 font-mono";
+            }
+        }
+
+        async function startShift() {
+            let todayStr = getBakuDateString();
+            let nowIso = new Date().toISOString();
+
+            let existing = attendances.find(a => a.work_date === todayStr && a.role_name === role);
+            if(existing) {
+                let { error } = await _supabase.from('attendance').update({ check_in: nowIso }).eq('id', existing.id);
+                if(error) { alert('Xəta: ' + error.message); return; }
+            } else {
+                let { error } = await _supabase.from('attendance').insert([{ work_date: todayStr, role_name: role, check_in: nowIso }]);
+                if(error) { alert('Xəta: ' + error.message); return; }
+            }
+            alert('Növbə uğurla başlandı!');
+            await loadDataFromCloud();
+        }
+
+        async function endShift() {
+            let todayStr = getBakuDateString();
+            let nowIso = new Date().toISOString();
+
+            let existing = attendances.find(a => a.work_date === todayStr && a.role_name === role);
+            if(!existing || !existing.check_in) {
+                alert('Əvvəlcə növbəni başlamalısınız!');
+                return;
+            }
+
+            let { error } = await _supabase.from('attendance').update({ check_out: nowIso }).eq('id', existing.id);
+            if(error) { alert('Xəta: ' + error.message); return; }
+            
+            alert('Növbə uğurla bağlandı!');
+            await loadDataFromCloud();
+        }
+
+        function initYearOptions() {
+            let currentYr = new Date().getFullYear();
+            ['expenseYearSelect', 'attYearSelect'].forEach(id => {
+                let sel = document.getElementById(id);
+                if(!sel) return;
+                sel.innerHTML = '';
+                for(let y = currentYr - 2; y <= currentYr + 3; y++) {
+                    sel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
+                }
+            });
+            let currentMo = new Date().getMonth() + 1;
+            if(document.getElementById('expenseMonthSelect')) document.getElementById('expenseMonthSelect').value = currentMo;
+            if(document.getElementById('attMonthSelect')) document.getElementById('attMonthSelect').value = currentMo;
+        }
+
+        function openAttendanceModal() {
+            if(role !== 'ADMIN') return;
+            renderAttendanceSheet();
+            document.getElementById('attendanceModal').classList.remove('hidden-screen');
+        }
+
+        function closeAttendanceModal() {
+            document.getElementById('attendanceModal').classList.add('hidden-screen');
+        }
+
+        function getDaysInMonth(year, month) {
+            return new Date(year, month, 0).getDate();
+        }
+
+        function renderAttendanceSheet() {
+            let year = parseInt(document.getElementById('attYearSelect').value);
+            let month = parseInt(document.getElementById('attMonthSelect').value);
+            let daysCount = getDaysInMonth(year, month);
+            let monthStr = String(month).padStart(2, '0');
+
+            let tbody = document.getElementById('attendanceRowsList');
+            let html = '';
+
+            for(let day = 1; day <= daysCount; day++) {
+                let dayStr = String(day).padStart(2, '0');
+                let dateKey = `${year}-${monthStr}-${dayStr}`;
+
+                let sRecord = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI') || {};
+                let aRecord = attendances.find(a => a.work_date === dateKey && a.role_name === 'ADMIN') || {};
+
+                let sCheckIn = sRecord.check_in ? new Date(sRecord.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let sCheckOut = sRecord.check_out ? new Date(sRecord.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                
+                let aCheckIn = aRecord.check_in ? new Date(aRecord.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let aCheckOut = aRecord.check_out ? new Date(aRecord.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+
+                let sText = sRecord.check_in ? `${sCheckIn} - ${sCheckOut}` : '<span class="text-zinc-600">İştirak olmayıb</span>';
+                let aText = aRecord.check_in ? `${aCheckIn} - ${aCheckOut}` : '<span class="text-zinc-600">İştirak olmayıb</span>';
+
+                html += `
+                    <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 font-mono">
+                        <td class="py-2 px-2 text-center text-amber-400 font-bold">${day}</td>
+                        <td class="py-2 px-2">${sText}</td>
+                        <td class="py-2 px-2">${aText}</td>
+                    </tr>
+                `;
+            }
+            tbody.innerHTML = html;
+        }
+
         function checkNewOrdersBlinking() {
             if(!role) return;
             let ordersBtn = document.getElementById('ordersBtn');
             if(!ordersBtn) return;
-
             let lastSeenKey = `melodika_last_seen_order_${role}`;
             let lastSeenId = parseInt(localStorage.getItem(lastSeenKey) || '0');
-
             let maxId = 0;
-            orders.forEach(o => {
-                if(o.id > maxId) maxId = o.id;
-            });
-
-            if(maxId > lastSeenId) {
-                ordersBtn.classList.add('blinking-btn');
-            } else {
-                ordersBtn.classList.remove('blinking-btn');
-            }
+            orders.forEach(o => { if(o.id > maxId) maxId = o.id; });
+            if(maxId > lastSeenId) ordersBtn.classList.add('blinking-btn');
+            else ordersBtn.classList.remove('blinking-btn');
         }
 
         function login() {
@@ -553,7 +701,6 @@
             else { document.getElementById('loginError').classList.remove('hidden-screen'); return; }
 
             localStorage.setItem('melodika_current_role', role);
-
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
             
@@ -562,14 +709,14 @@
                 document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                 document.getElementById('expensesBtn').classList.remove('hidden-screen');
+                document.getElementById('attendanceBtn').classList.remove('hidden-screen');
             }
             loadAnalytics('day'); 
-
             let today = getBakuDateString();
             if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
             if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
-
             document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
+            checkTodayShiftStatus();
             renderUI();
             checkNewOrdersBlinking();
         }
@@ -580,11 +727,7 @@
         }
 
         async function trackVisit() {
-            try {
-                await _supabase.from('site_visits').insert([{}]);
-            } catch(e) {
-                console.error("Visit tracking error:", e);
-            }
+            try { await _supabase.from('site_visits').insert([{}]); } catch(e) {}
         }
 
         function openCustomerCatalog() {
@@ -602,12 +745,7 @@
         function renderCustomerCatalog() {
             let query = (document.getElementById('customerSearch').value || '').toLowerCase();
             let listHtml = '';
-            
-            let filtered = products.filter(p => 
-                p.code && 
-                p.code.toUpperCase().startsWith('A') && 
-                (p.code.toLowerCase().includes(query) || p.name.toLowerCase().includes(query))
-            );
+            let filtered = products.filter(p => p.code && p.code.toUpperCase().startsWith('A') && (p.code.toLowerCase().includes(query) || p.name.toLowerCase().includes(query)));
 
             if(filtered.length === 0) {
                 document.getElementById('customerProductsList').innerHTML = '<div class="text-zinc-500 text-xs">Məhsul tapılmadı.</div>';
@@ -617,7 +755,6 @@
             filtered.forEach(p => {
                 let sellPrice = Number(p.sell_price || 0);
                 let imgTag = p.image_url ? `<img src="${p.image_url}" class="w-16 h-16 object-cover rounded border border-zinc-700 mb-2">` : '';
-                
                 listHtml += `
                     <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl space-y-2">
                         <div class="flex items-start space-x-3">
@@ -646,27 +783,17 @@
 
         function calcCustItemPrice(id, pricePerGram) {
             let grams = parseFloat(document.getElementById(`gram_${id}`).value) || 0;
-            let total = grams * pricePerGram;
-            document.getElementById(`total_${id}`).textContent = total.toFixed(2) + ' AZN';
+            document.getElementById(`total_${id}`).textContent = (grams * pricePerGram).toFixed(2) + ' AZN';
         }
 
         function addToCart(id, name, pricePerGram) {
             let gramsInput = document.getElementById(`gram_${id}`);
             let grams = parseFloat(gramsInput.value) || 0;
-            if(grams <= 0) {
-                alert('Zəhmət olmasa miqdarı (qram) daxil edin!');
-                return;
-            }
+            if(grams <= 0) { alert('Zəhmət olmasa miqdarı (qram) daxil edin!'); return; }
             let total = grams * pricePerGram;
-
             let existing = cart.find(x => x.id === id);
-            if(existing) {
-                existing.grams += grams;
-                existing.total += total;
-            } else {
-                cart.push({ id, name, grams, total });
-            }
-
+            if(existing) { existing.grams += grams; existing.total += total; }
+            else { cart.push({ id, name, grams, total }); }
             gramsInput.value = '';
             document.getElementById(`total_${id}`).textContent = '0.00 AZN';
             renderCart();
@@ -683,7 +810,6 @@
                 updateCartTotal(0);
                 return;
             }
-
             let html = '';
             let grandTotal = 0;
             cart.forEach((item, idx) => {
@@ -699,50 +825,32 @@
                 `;
             });
             container.innerHTML = html;
-            
-            if (document.getElementById('custDelivery').checked && grandTotal >= 30) {
-                deliveryFee = 0;
-            }
+            if (document.getElementById('custDelivery').checked && grandTotal >= 30) deliveryFee = 0;
             updateCartTotal(grandTotal);
         }
 
         function updateCartTotal(grandTotal) {
             let totalWithDelivery = grandTotal + deliveryFee;
             let totalText = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
-            if (deliveryFee > 0) {
-                totalText = `Məhsullar: ${grandTotal.toFixed(2)} AZN + Çatdırılma: ${deliveryFee.toFixed(2)} AZN = <span class="gold-text">Yekun: ${totalWithDelivery.toFixed(2)} AZN</span>`;
-            } else {
-                totalText = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
-            }
+            if (deliveryFee > 0) totalText = `Məhsullar: ${grandTotal.toFixed(2)} AZN + Çatdırılma: ${deliveryFee.toFixed(2)} AZN = <span class="gold-text">Yekun: ${totalWithDelivery.toFixed(2)} AZN</span>`;
             document.getElementById('cartTotalPrice').innerHTML = totalText;
         }
 
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            renderCart();
-        }
+        function removeFromCart(index) { cart.splice(index, 1); renderCart(); }
 
         function toggleAddressBox() {
             let isChecked = document.getElementById('custDelivery').checked;
             let box = document.getElementById('addressBox');
-            
             let grandTotal = 0;
             cart.forEach(item => grandTotal += item.total);
-
             if (isChecked) {
                 if (grandTotal < 30) {
                     document.getElementById('custDelivery').checked = false;
                     document.getElementById('deliveryConfirmModal').classList.remove('hidden-screen');
                     box.classList.add('hidden-screen');
                     return;
-                } else {
-                    deliveryFee = 0;
-                    box.classList.remove('hidden-screen');
-                }
-            } else {
-                deliveryFee = 0;
-                box.classList.add('hidden-screen');
-            }
+                } else { deliveryFee = 0; box.classList.remove('hidden-screen'); }
+            } else { deliveryFee = 0; box.classList.add('hidden-screen'); }
             updateCartTotal(grandTotal);
         }
 
@@ -751,7 +859,6 @@
             document.getElementById('custDelivery').checked = true;
             document.getElementById('addressBox').classList.remove('hidden-screen');
             document.getElementById('deliveryConfirmModal').classList.add('hidden-screen');
-            
             let grandTotal = 0;
             cart.forEach(item => grandTotal += item.total);
             updateCartTotal(grandTotal);
@@ -762,7 +869,6 @@
             deliveryFee = 0;
             document.getElementById('addressBox').classList.add('hidden-screen');
             document.getElementById('deliveryConfirmModal').classList.add('hidden-screen');
-            
             let grandTotal = 0;
             cart.forEach(item => grandTotal += item.total);
             updateCartTotal(grandTotal);
@@ -773,91 +879,56 @@
             let phone = document.getElementById('custPhone').value.trim();
             let isDelivery = document.getElementById('custDelivery').checked;
             let address = document.getElementById('custAddress').value.trim();
-
             let grandTotal = 0;
             cart.forEach(item => grandTotal += item.total);
             let finalAmount = grandTotal + deliveryFee;
 
-            if(!name || !phone) {
-                alert('Zəhmət olmasa Ad və Əlaqə nömrənizi qeyd edin!');
-                return;
-            }
-            if(cart.length === 0) {
-                alert('Səbətinizdə heç bir məhsul yoxdur!');
-                return;
-            }
-            if(isDelivery && !address) {
-                alert('Zəhmət olmasa çatdırılma ünvanını qeyd edin!');
-                return;
-            }
+            if(!name || !phone) { alert('Zəhmət olmasa Ad və Əlaqə nömrənizi qeyd edin!'); return; }
+            if(cart.length === 0) { alert('Səbətinizdə heç bir məhsul yoxdur!'); return; }
+            if(isDelivery && !address) { alert('Zəhmət olmasa çatdırılma ünvanını qeyd edin!'); return; }
 
             let orderData = {
-                customer_name: name,
-                customer_phone: phone,
-                is_delivery: isDelivery,
-                delivery_fee: deliveryFee,
-                total_amount: finalAmount,
-                address: isDelivery ? address : 'Yerindən götürmə',
-                items: cart,
-                status: 'Gözləmədə',
-                created_at: new Date().toISOString()
+                customer_name: name, customer_phone: phone, is_delivery: isDelivery,
+                delivery_fee: deliveryFee, total_amount: finalAmount,
+                address: isDelivery ? address : 'Yerindən götürmə', items: cart,
+                status: 'Gözləmədə', created_at: new Date().toISOString()
             };
 
             let { error } = await _supabase.from('orders').insert([orderData]);
-            if(error) {
-                alert('Sifariş göndərilərkən xəta baş verdi: ' + error.message);
-                return;
-            }
+            if(error) { alert('Xəta: ' + error.message); return; }
 
-            alert(`Təşəkkür edirik, ${name}! Sifarişiniz qeydə alındı, sizinlə gün ərzində əlaqə saxlanılacaq.`);
-            
-            cart = [];
-            deliveryFee = 0;
+            alert(`Təşəkkür edirik, ${name}! Sifarişiniz qeydə alındı.`);
+            cart = []; deliveryFee = 0;
             document.getElementById('custName').value = '';
             document.getElementById('custPhone').value = '';
             document.getElementById('custDelivery').checked = false;
             document.getElementById('custAddress').value = '';
-            toggleAddressBox();
-            renderCart();
-            closeCustomerCatalog();
+            toggleAddressBox(); renderCart(); closeCustomerCatalog();
             await loadDataFromCloud();
         }
 
         function openOrdersModal() {
             let maxId = 0;
             orders.forEach(o => { if(o.id > maxId) maxId = o.id; });
-            if(maxId > 0 && role) {
-                localStorage.setItem(`melodika_last_seen_order_${role}`, maxId);
-            }
-            
+            if(maxId > 0 && role) localStorage.setItem(`melodika_last_seen_order_${role}`, maxId);
             let ordersBtn = document.getElementById('ordersBtn');
             if(ordersBtn) ordersBtn.classList.remove('blinking-btn');
-
             renderOrdersList();
             document.getElementById('ordersModal').classList.remove('hidden-screen');
         }
 
-        function closeOrdersModal() {
-            document.getElementById('ordersModal').classList.add('hidden-screen');
-        }
+        function closeOrdersModal() { document.getElementById('ordersModal').classList.add('hidden-screen'); }
 
         function renderOrdersList() {
             let container = document.getElementById('ordersListContent');
-            if(orders.length === 0) {
-                container.innerHTML = '<div class="text-zinc-500 text-xs">Heç bir sifariş yoxdur.</div>';
-                return;
-            }
-
+            if(orders.length === 0) { container.innerHTML = '<div class="text-zinc-500 text-xs">Heç bir sifariş yoxdur.</div>'; return; }
             let html = '';
             orders.slice().reverse().forEach(o => {
-                let formattedDate = o.created_at ? getBakuDateTimeString(o.created_at) : (o.date ? getBakuDateTimeString(o.date) : '');
+                let formattedDate = o.created_at ? getBakuDateTimeString(o.created_at) : '';
                 let itemsStr = '';
                 if(Array.isArray(o.items)) {
-                    o.items.forEach(i => {
-                        itemsStr += `<div>• ${i.name} - ${i.grams} qr (${i.total.toFixed(2)} AZN)</div>`;
-                    });
+                    o.items.forEach(i => { itemsStr += `<div>• ${i.name} - ${i.grams} qr (${i.total.toFixed(2)} AZN)</div>`; });
                 }
-
                 let statusColor = o.status === 'Qəbul edildi' ? 'text-green-400' : (o.status === 'Ləğv edildi' ? 'text-red-400' : 'text-amber-400');
                 let deliveryInfoStr = o.is_delivery ? ` | Çatdırılma: ${o.delivery_fee ? o.delivery_fee + ' AZN' : 'Pulsuz'}` : '';
 
@@ -872,7 +943,7 @@
                         <div class="text-zinc-400 text-[11px]">Tarix: ${formattedDate}</div>
                         <div class="flex space-x-2 pt-2 border-t border-zinc-700/50">
                             <button onclick="updateOrderStatus(${o.id}, 'Qəbul edildi')" class="bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded font-bold">Qəbul Et</button>
-                            <button onclick="updateOrderStatus(${o.id}, 'Ləğv edildi')" class="bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded font-bold">Ləğv Et (Otmenit)</button>
+                            <button onclick="updateOrderStatus(${o.id}, 'Ləğv edildi')" class="bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded font-bold">Ləğv Et</button>
                             <button onclick="deleteOrder(${o.id})" class="bg-zinc-700 hover:bg-red-900 text-white px-3 py-1 rounded font-bold ml-auto">Sil 🗑️</button>
                         </div>
                     </div>
@@ -883,69 +954,42 @@
 
         async function updateOrderStatus(orderId, newStatus) {
             let { error } = await _supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
-            if(error) {
-                alert('Xəta: ' + error.message);
-                return;
-            }
-            await loadDataFromCloud();
-            renderOrdersList();
+            if(error) { alert('Xəta: ' + error.message); return; }
+            await loadDataFromCloud(); renderOrdersList();
         }
 
         async function deleteOrder(orderId) {
             if(confirm('Bu sifarişi bazadan tamamilə silmək istədiyinizə əminsiniz?')) {
                 let { error } = await _supabase.from('orders').delete().eq('id', orderId);
-                if(error) {
-                    alert('Silinərkən xəta baş verdi: ' + error.message);
-                    return;
-                }
-                await loadDataFromCloud();
-                renderOrdersList();
-                loadAnalytics('day');
+                if(error) { alert('Xəta: ' + error.message); return; }
+                await loadDataFromCloud(); renderOrdersList(); loadAnalytics('day');
             }
         }
 
         function initExpenseYearOptions() {
-            let sel = document.getElementById('expenseYearSelect');
             let currentYr = new Date().getFullYear();
+            let sel = document.getElementById('expenseYearSelect');
+            if(!sel) return;
             sel.innerHTML = '';
-            for(let y = currentYr - 2; y <= currentYr + 3; y++) {
-                sel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
-            }
-            let currentMo = new Date().getMonth() + 1;
-            document.getElementById('expenseMonthSelect').value = currentMo;
+            for(let y = currentYr - 2; y <= currentYr + 3; y++) sel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
+            document.getElementById('expenseMonthSelect').value = new Date().getMonth() + 1;
         }
 
-        function openExpensesModal() {
-            if(role !== 'ADMIN') return;
-            renderExpenseSheet();
-            document.getElementById('expensesModal').classList.remove('hidden-screen');
-        }
-
-        function closeExpensesModal() {
-            document.getElementById('expensesModal').classList.add('hidden-screen');
-        }
-
-        function getDaysInMonth(year, month) {
-            return new Date(year, month, 0).getDate();
-        }
+        function openExpensesModal() { if(role !== 'ADMIN') return; renderExpenseSheet(); document.getElementById('expensesModal').classList.remove('hidden-screen'); }
+        function closeExpensesModal() { document.getElementById('expensesModal').classList.add('hidden-screen'); }
 
         function renderExpenseSheet() {
             let year = parseInt(document.getElementById('expenseYearSelect').value);
             let month = parseInt(document.getElementById('expenseMonthSelect').value);
             let daysCount = getDaysInMonth(year, month);
-            let monthName = monthNamesAz[month - 1];
-
-            document.getElementById('expenseHeaderTitle').textContent = `${monthName} ${year} ayı üzrə xərclər`;
+            document.getElementById('expenseHeaderTitle').textContent = `${monthNamesAz[month - 1]} ${year} ayı üzrə xərclər`;
 
             let tbody = document.getElementById('expenseRowsList');
             let html = '';
             let monthTotal = 0;
 
             for(let day = 1; day <= daysCount; day++) {
-                let dayStr = String(day).padStart(2, '0');
-                let monthStr = String(month).padStart(2, '0');
-                let dateKey = `${year}-${monthStr}-${dayStr}`;
-
+                let dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 let existing = expenses.find(e => e.expense_date === dateKey) || {};
                 let title = existing.title || '';
                 let amount = existing.amount || 0;
@@ -954,19 +998,12 @@
                 html += `
                     <tr class="border-b border-zinc-800 hover:bg-zinc-800/30">
                         <td class="py-2 px-1 font-mono text-amber-400/90 font-bold text-center">${day}</td>
-                        <td class="py-2 px-1">
-                            <input type="text" id="exp_title_${dateKey}" value="${title}" placeholder="Xərcin adını yazın..." class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-amber-500">
-                        </td>
-                        <td class="py-2 px-1">
-                            <input type="number" step="0.01" id="exp_amt_${dateKey}" value="${amount ? amount : ''}" oninput="updateTempExpenseTotal()" placeholder="0.00" class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs text-right font-bold gold-text focus:outline-none focus:border-amber-500">
-                        </td>
-                        <td class="py-2 px-1 text-center">
-                            <button onclick="saveSingleExpense('${dateKey}')" class="gold-bg font-bold px-2 py-1 rounded text-[10px]">Yadda</button>
-                        </td>
+                        <td class="py-2 px-1"><input type="text" id="exp_title_${dateKey}" value="${title}" placeholder="Xərcin adını yazın..." class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs"></td>
+                        <td class="py-2 px-1"><input type="number" step="0.01" id="exp_amt_${dateKey}" value="${amount ? amount : ''}" oninput="updateTempExpenseTotal()" placeholder="0.00" class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs text-right font-bold gold-text"></td>
+                        <td class="py-2 px-1 text-center"><button onclick="saveSingleExpense('${dateKey}')" class="gold-bg font-bold px-2 py-1 rounded text-[10px]">Yadda</button></td>
                     </tr>
                 `;
             }
-
             tbody.innerHTML = html;
             document.getElementById('monthlyExpenseTotal').textContent = monthTotal.toFixed(2) + ' AZN';
         }
@@ -975,16 +1012,11 @@
             let year = parseInt(document.getElementById('expenseYearSelect').value);
             let month = parseInt(document.getElementById('expenseMonthSelect').value);
             let daysCount = getDaysInMonth(year, month);
-            let monthStr = String(month).padStart(2, '0');
-
             let tempSum = 0;
             for(let day = 1; day <= daysCount; day++) {
-                let dayStr = String(day).padStart(2, '0');
-                let dateKey = `${year}-${monthStr}-${dayStr}`;
+                let dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 let amtInput = document.getElementById(`exp_amt_${dateKey}`);
-                if(amtInput) {
-                    tempSum += parseFloat(amtInput.value) || 0;
-                }
+                if(amtInput) tempSum += parseFloat(amtInput.value) || 0;
             }
             document.getElementById('monthlyExpenseTotal').textContent = tempSum.toFixed(2) + ' AZN';
         }
@@ -992,51 +1024,36 @@
         async function saveSingleExpense(dateKey) {
             let title = document.getElementById(`exp_title_${dateKey}`).value.trim();
             let amount = parseFloat(document.getElementById(`exp_amt_${dateKey}`).value) || 0;
-
             let existing = expenses.find(e => e.expense_date === dateKey);
 
             if(existing && existing.id) {
                 let { error } = await _supabase.from('expenses').update({ title, amount }).eq('id', existing.id);
-                if(error) { alert('Xəta baş verdi: ' + error.message); return; }
+                if(error) { alert('Xəta: ' + error.message); return; }
             } else {
                 let { error } = await _supabase.from('expenses').insert([{ expense_date: dateKey, title, amount }]);
-                if(error) { alert('Xəta baş verdi: ' + error.message); return; }
+                if(error) { alert('Xəta: ' + error.message); return; }
             }
-
-            alert(`${dateKey} tarixi üçün xərc məlumatı yadda saxlanıldı!`);
+            alert('Xərc yadda saxlanıldı!');
             await loadDataFromCloud();
             renderExpenseSheet();
         }
 
-        // KATALOQ MƏLUMATLARI (YALNIZ 'A' KODLU MƏHSULLAR) SHEET
         function openCatalogDetailsModal() {
             let listHtml = '';
             let aProducts = products.filter(p => p.code && p.code.toUpperCase().startsWith('A'));
-
-            if(aProducts.length === 0) {
-                listHtml = '<div class="text-zinc-500 text-xs">A kodu ilə başlayan məhsul tapılmadı.</div>';
-            } else {
+            if(aProducts.length === 0) listHtml = '<div class="text-zinc-500 text-xs">A kodu ilə başlayan məhsul tapılmadı.</div>';
+            else {
                 aProducts.forEach(p => {
                     let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-700">` : '<div class="w-12 h-12 bg-zinc-800 rounded border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
-                    
                     listHtml += `
                         <div class="bg-zinc-800/50 p-3 rounded-lg space-y-2 border border-zinc-700">
                             <div class="font-bold gold-text text-sm">${p.name} (${p.code})</div>
                             <div class="flex items-center space-x-3">
                                 ${imgPreview}
                                 <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                                    <div class="flex flex-col">
-                                        <label class="text-[10px] text-zinc-400 mb-0.5">Şəkil Seçin</label>
-                                        <input type="file" id="det_img_${p.id}" accept="image/*" class="bg-zinc-800 border border-zinc-700 p-1 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black hover:file:bg-amber-600">
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-[10px] text-zinc-400 mb-0.5">Tərkibi</label>
-                                        <input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" placeholder="Tərkibi" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
-                                    </div>
-                                    <div class="flex flex-col">
-                                        <label class="text-[10px] text-zinc-400 mb-0.5">İç notları</label>
-                                        <input type="text" id="det_note_${p.id}" value="${p.notes || ''}" placeholder="İç notları" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
-                                    </div>
+                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-400 mb-0.5">Şəkil Seçin</label><input type="file" id="det_img_${p.id}" accept="image/*" class="bg-zinc-800 border border-zinc-700 p-1 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black hover:file:bg-amber-600"></div>
+                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-400 mb-0.5">Tərkibi</label><input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs"></div>
+                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-400 mb-0.5">İç notları</label><input type="text" id="det_note_${p.id}" value="${p.notes || ''}" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs"></div>
                                 </div>
                             </div>
                             <button onclick="saveCatalogDetails(${p.id})" class="gold-bg font-bold px-3 py-1 rounded text-xs">Yadda Saxla</button>
@@ -1048,50 +1065,26 @@
             document.getElementById('catalogDetailsModal').classList.remove('hidden-screen');
         }
 
-        function closeCatalogDetailsModal() {
-            document.getElementById('catalogDetailsModal').classList.add('hidden-screen');
-        }
+        function closeCatalogDetailsModal() { document.getElementById('catalogDetailsModal').classList.add('hidden-screen'); }
 
         async function saveCatalogDetails(id) {
             let fileInput = document.getElementById(`det_img_${id}`);
             let ingredients = document.getElementById(`det_ing_${id}`).value;
             let notes = document.getElementById(`det_note_${id}`).value;
             let p = products.find(x => x.id == id);
-
             let imageUrl = p ? p.image_url : '';
 
             if (fileInput && fileInput.files.length > 0) {
                 let file = fileInput.files[0];
                 let fileName = `${Date.now()}_${file.name}`;
-
-                let { data: uploadData, error: uploadError } = await _supabase.storage
-                    .from('perfume-images')
-                    .upload(fileName, file);
-
-                if (uploadError) {
-                    alert('Şəkil yüklənərkən xəta baş verdi: ' + uploadError.message);
-                    return;
-                }
-
-                let { data: publicURLData } = _supabase.storage
-                    .from('perfume-images')
-                    .getPublicUrl(fileName);
-
-                imageUrl = publicURLData.publicUrl;
+                let { error: uploadError } = await _supabase.storage.from('perfume-images').upload(fileName, file);
+                if (uploadError) { alert('Xəta: ' + uploadError.message); return; }
+                imageUrl = _supabase.storage.from('perfume-images').getPublicUrl(fileName).data.publicUrl;
             }
 
-            let { error } = await _supabase.from('products').update({ 
-                image_url: imageUrl, 
-                ingredients, 
-                notes 
-            }).eq('id', id);
-
-            if(error) {
-                alert('Xəta: ' + error.message);
-                return;
-            }
-
-            alert('Məlumat və şəkil uğurla yeniləndi!');
+            let { error } = await _supabase.from('products').update({ image_url: imageUrl, ingredients, notes }).eq('id', id);
+            if(error) { alert('Xəta: ' + error.message); return; }
+            alert('Məlumat yeniləndi!');
             await loadDataFromCloud();
             openCatalogDetailsModal();
         }
@@ -1099,38 +1092,20 @@
         async function loadAnalytics(period = 'day') {
             const now = new Date();
             let startDate = new Date();
-
-            if (period === 'day') {
+            if (period === 'day') startDate.setHours(0, 0, 0, 0);
+            else if (period === 'week') {
+                startDate.setDate(now.getDate() - (now.getDay() || 7) + 1);
                 startDate.setHours(0, 0, 0, 0);
-            } else if (period === 'week') {
-                const dayOfWeek = now.getDay() || 7;
-                startDate.setDate(now.getDate() - dayOfWeek + 1);
-                startDate.setHours(0, 0, 0, 0);
-            } else if (period === 'month') {
-                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-            } else if (period === 'year') {
-                startDate = new Date(now.getFullYear(), 0, 1);
-            }
+            } else if (period === 'month') startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+            else if (period === 'year') startDate = new Date(now.getFullYear(), 0, 1);
 
-            const isoStartDate = startDate.toISOString();
+            let isoStartDate = startDate.toISOString();
+            let { count: visitsCount } = await _supabase.from('site_visits').select('*', { count: 'exact', head: true }).gte('created_at', isoStartDate);
+            let { count: ordersCount } = await _supabase.from('orders').select('*', { count: 'exact', head: true }).gte('created_at', isoStartDate);
 
-            const { count: visitsCount, error: vErr } = await _supabase
-                .from('site_visits')
-                .select('*', { count: 'exact', head: true })
-                .gte('created_at', isoStartDate);
-
-            const { count: ordersCount, error: oErr } = await _supabase
-                .from('orders')
-                .select('*', { count: 'exact', head: true })
-                .gte('created_at', isoStartDate);
-
-            if (!vErr && !oErr) {
-                document.getElementById('stat-visits').innerText = visitsCount || 0;
-                document.getElementById('stat-orders').innerText = ordersCount || 0;
-                
-                const conversion = visitsCount > 0 ? ((ordersCount / visitsCount) * 100).toFixed(1) : 0;
-                document.getElementById('stat-conversion').innerText = conversion + '%';
-            }
+            document.getElementById('stat-visits').innerText = visitsCount || 0;
+            document.getElementById('stat-orders').innerText = ordersCount || 0;
+            document.getElementById('stat-conversion').innerText = (visitsCount > 0 ? ((ordersCount / visitsCount) * 100).toFixed(1) : 0) + '%';
         }
 
         function renderUI() {
@@ -1140,84 +1115,44 @@
             
             let stockMap = {};
             products.forEach(p => { stockMap[p.id] = Number(p.initial_stock || 0); });
-
             sales.forEach(s => {
                 let g = Number(s.grams_sold || 0);
                 if(stockMap[s.product_id] !== undefined) {
-                    if(s.type === 'MEXARIC' || s.type === 'ITKI') {
-                        stockMap[s.product_id] -= g;
-                    } else if(s.type === 'MEDAXIL') {
-                        stockMap[s.product_id] += g;
-                    }
+                    if(s.type === 'MEXARIC' || s.type === 'ITKI') stockMap[s.product_id] -= g;
+                    else if(s.type === 'MEDAXIL') stockMap[s.product_id] += g;
                 }
             });
 
-            let thBuy = document.getElementById('thBuyPrice');
-            if(role === 'SATICI') {
-                if(thBuy) thBuy.style.display = 'none';
-            } else {
-                if(thBuy) thBuy.style.display = '';
-            }
+            if(role === 'SATICI' && document.getElementById('thBuyPrice')) document.getElementById('thBuyPrice').style.display = 'none';
 
             let prodHtml = '';
             products.forEach(p => {
                 let currentStock = stockMap[p.id] !== undefined ? stockMap[p.id] : p.initial_stock;
                 sel.innerHTML += `<option value="${p.id}">[${p.code}] ${p.name} (Qalıq: ${currentStock} qr)</option>`;
-                
-                let matchesSearch = p.code.toLowerCase().includes(searchQuery) || p.name.toLowerCase().includes(searchQuery);
-                if(matchesSearch) {
-                    let actionBtns = '-';
-                    if(role === 'ADMIN') {
-                        actionBtns = `
-                            <div class="flex space-x-2">
-                                <button onclick="editProduct(${p.id})" class="text-amber-400 hover:text-amber-300 font-bold">Düzənlə</button>
-                                <button onclick="deleteProduct(${p.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>
-                            </div>
-                        `;
-                    }
-
+                if(p.code.toLowerCase().includes(searchQuery) || p.name.toLowerCase().includes(searchQuery)) {
+                    let actionBtns = role === 'ADMIN' ? `<div class="flex space-x-2"><button onclick="editProduct(${p.id})" class="text-amber-400 font-bold">Düzənlə</button><button onclick="deleteProduct(${p.id})" class="text-red-400 font-bold">X</button></div>` : '-';
                     let buyPriceTd = role === 'ADMIN' ? `<td class="py-1 text-zinc-400">${p.buy_price || 0} AZN</td>` : '';
-
-                    prodHtml += `<tr class="border-b border-zinc-800">
-                        <td class="py-1 font-mono">${p.code}</td>
-                        <td class="py-1">${p.name}</td>
-                        <td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>
-                        ${buyPriceTd}
-                        <td class="py-1 font-semibold gold-text">${p.sell_price || 0} AZN</td>
-                        <td class="py-1">${actionBtns}</td>
-                    </tr>`;
+                    prodHtml += `<tr class="border-b border-zinc-800"><td class="py-1 font-mono">${p.code}</td><td class="py-1">${p.name}</td><td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>${buyPriceTd}<td class="py-1 font-semibold gold-text">${p.sell_price || 0} AZN</td><td class="py-1">${actionBtns}</td></tr>`;
                 }
             });
-            let colSpanCount = role === 'ADMIN' ? 6 : 5;
-            document.getElementById('prodTable').innerHTML = prodHtml || `<tr><td colspan="${colSpanCount}" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>`;
+            document.getElementById('prodTable').innerHTML = prodHtml || `<tr><td colspan="${role === 'ADMIN' ? 6 : 5}" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>`;
 
             let now = new Date();
             let todayStr = getBakuDateString(now);
-            let currentYear = now.getFullYear();
-            
-            let firstDayOfWeek = new Date(now);
-            let day = now.getDay();
-            let diff = now.getDate() - day + (day === 0 ? -6 : 1);
-            firstDayOfWeek.setDate(diff);
-            let weekStartStr = getBakuDateString(firstDayOfWeek);
-
+            let weekStartStr = getBakuDateString(new Date(now.setDate(now.getDate() - (now.getDay() || 7) + 1)));
             let currentMonthPrefix = todayStr.substring(0, 7);
-            let currentYearPrefix = String(currentYear);
+            let currentYearPrefix = String(new Date().getFullYear());
 
             let dailySum = 0, weeklySum = 0, monthlySum = 0, yearlySum = 0;
             let nagdSum = 0, posSum = 0, cardSum = 0;
-
             let startDateStr = role === 'ADMIN' ? document.getElementById('startDate').value : '';
             let endDateStr = role === 'ADMIN' ? document.getElementById('endDate').value : '';
-
             let logHtml = '';
-            let totalSalesSum = 0;
-            let totalProfitSum = 0;
+            let totalSalesSum = 0, totalProfitSum = 0;
 
             sales.slice().reverse().forEach((s) => {
                 let p = products.find(x => x.id == s.product_id);
                 let pName = p ? p.name : 'Naməlum';
-                
                 let sDate = s.date ? getBakuDateString(s.date) : '';
                 let price = Number(s.total_price || 0);
 
@@ -1236,34 +1171,14 @@
                 let inRange = true;
                 if(startDateStr && sDate < startDateStr) inRange = false;
                 if(endDateStr && sDate > endDateStr) inRange = false;
-
-                if(inRange && s.type === 'MEXARIC') {
-                    totalSalesSum += price;
-                    totalProfitSum += Number(s.profit || 0);
-                }
+                if(inRange && s.type === 'MEXARIC') { totalSalesSum += price; totalProfitSum += Number(s.profit || 0); }
 
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
                 let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
-                
                 let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Düzənlə</button>`;
-                if(role === 'ADMIN') {
-                    actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">Sil</button>`;
-                }
-                
-                let formattedDate = s.date ? getBakuDateTimeString(s.date) : '-';
-                let typeColor = s.type === 'MEXARIC' ? 'text-green-400' : (s.type === 'MEDAXIL' ? 'text-blue-400' : 'text-red-400');
+                if(role === 'ADMIN') actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">Sil</button>`;
 
-                logHtml += `<tr class="border-b border-zinc-800">
-                    <td class="py-1 text-zinc-400 text-[11px]">${formattedDate}</td>
-                    <td class="py-1 font-bold ${typeColor}">${s.type}</td>
-                    <td class="py-1">${pName}</td>
-                    <td class="py-1">${s.grams_sold}</td>
-                    <td class="py-1 text-zinc-300">${s.payType || 'Nəğd'}</td>
-                    <td class="py-1">${s.total_price} AZN</td>
-                    <td class="py-1 text-center">${adBadge}</td>
-                    <td class="py-1 text-center">${cashBadge}</td>
-                    <td class="py-1">${actionCellHtml}</td>
-                </tr>`;
+                logHtml += `<tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400 text-[11px]">${s.date ? getBakuDateTimeString(s.date) : '-'}</td><td class="py-1 font-bold ${s.type === 'MEXARIC' ? 'text-green-400' : 'text-blue-400'}">${s.type}</td><td class="py-1">${pName}</td><td class="py-1">${s.grams_sold}</td><td class="py-1 text-zinc-300">${s.payType || 'Nəğd'}</td><td class="py-1">${s.total_price} AZN</td><td class="py-1 text-center">${adBadge}</td><td class="py-1 text-center">${cashBadge}</td><td class="py-1">${actionCellHtml}</td></tr>`;
             });
             document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="9" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
 
@@ -1271,9 +1186,8 @@
             document.getElementById('salesWeekly').textContent = weeklySum.toFixed(2) + ' AZN';
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
-
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
-            document.getElementById('payPos').textContent = payPos.toFixed(2) + ' AZN';
+            document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
             document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
 
             if(role === 'ADMIN') {
@@ -1285,7 +1199,6 @@
         function editSale(id) {
             let s = sales.find(x => x.id == id);
             if(!s) return;
-
             document.getElementById('editingSaleId').value = s.id;
             document.getElementById('opType').value = s.type;
             document.getElementById('opProduct').value = s.product_id;
@@ -1295,7 +1208,6 @@
             document.getElementById('opDiscount').value = '';
             document.getElementById('fromAd').checked = !!s.fromAd;
             document.getElementById('toCashRegister').checked = !!s.toCashRegister;
-
             document.getElementById('opFormTitle').textContent = "Satış / Əməliyyatı Düzənlə";
             document.getElementById('saveOpBtn').textContent = "Yadda Saxla";
             document.getElementById('cancelOpBtn').classList.remove('hidden-screen');
@@ -1309,7 +1221,6 @@
             document.getElementById('opDiscount').value = '';
             document.getElementById('fromAd').checked = false;
             document.getElementById('toCashRegister').checked = false;
-
             document.getElementById('opFormTitle').textContent = "Satış / Əməliyyat";
             document.getElementById('saveOpBtn').textContent = "Təsdiq Et";
             document.getElementById('cancelOpBtn').classList.add('hidden-screen');
@@ -1318,49 +1229,28 @@
         function openDayEndModal() {
             let nowStr = getBakuDateString(new Date());
             let todaySales = sales.filter(s => s.date && getBakuDateString(s.date) === nowStr && s.type === 'MEXARIC');
-            
-            let totalAmount = 0;
-            let adAmount = 0;
-            let cashRegisterAmount = 0;
-
+            let totalAmount = 0, adAmount = 0, cashRegisterAmount = 0;
             let listHtml = `<div class="font-bold text-amber-400 mb-2">Tarix (Bakı vaxtı): ${nowStr}</div>`;
-            if(todaySales.length === 0) {
-                listHtml += `<div class="text-zinc-500">Bugünkü tarixə aid satış qeydə alınmayıb.</div>`;
-            } else {
+            if(todaySales.length === 0) listHtml += `<div class="text-zinc-500">Bugünkü tarixə aid satış qeydə alınmayıb.</div>`;
+            else {
                 todaySales.forEach((s, idx) => {
                     let p = products.find(x => x.id == s.product_id);
-                    let pName = p ? p.name : 'Naməlum';
                     let price = Number(s.total_price || 0);
                     totalAmount += price;
                     if(s.fromAd) adAmount += price;
                     if(s.toCashRegister) cashRegisterAmount += price;
-
-                    let adText = s.fromAd ? 'Bəli' : 'Xeyr';
-                    let cashText = s.toCashRegister ? 'Bəli' : 'Xeyr';
-
-                    listHtml += `<div class="border-b border-zinc-800 py-1">
-                        ${idx + 1}. ${pName} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) | Reklam: ${adText} | Kassaya vuruldu: ${cashText}
-                    </div>`;
+                    listHtml += `<div class="border-b border-zinc-800 py-1">${idx + 1}. ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) | Reklam: ${s.fromAd ? 'Bəli' : 'Xeyr'} | Kassa: ${s.toCashRegister ? 'Bəli' : 'Xeyr'}</div>`;
                 });
             }
-
-            let summaryHtml = `<div class="mt-4 pt-3 border-t border-zinc-700 space-y-1 font-bold text-right">
-                <div>Ümumi satış: ${totalAmount.toFixed(2)} AZN</div>
-                <div>Reklam: ${adAmount.toFixed(2)} AZN</div>
-                <div>Kassa aparatına vurulan: ${cashRegisterAmount.toFixed(2)} AZN</div>
-            </div>`;
-
+            let summaryHtml = `<div class="mt-4 pt-3 border-t border-zinc-700 space-y-1 font-bold text-right"><div>Ümumi satış: ${totalAmount.toFixed(2)} AZN</div><div>Reklam: ${adAmount.toFixed(2)} AZN</div><div>Kassa aparatına vurulan: ${cashRegisterAmount.toFixed(2)} AZN</div></div>`;
             document.getElementById('dayEndContent').innerHTML = listHtml + summaryHtml;
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
-        function closeDayEndModal() {
-            document.getElementById('dayEndModal').classList.add('hidden-screen');
-        }
+        function closeDayEndModal() { document.getElementById('dayEndModal').classList.add('hidden-screen'); }
 
         function downloadDayEndAsImage() {
-            let printArea = document.getElementById('dayEndPrintArea');
-            html2canvas(printArea, { backgroundColor: '#18181b', scale: 2 }).then(canvas => {
+            html2canvas(document.getElementById('dayEndPrintArea'), { backgroundColor: '#18181b', scale: 2 }).then(canvas => {
                 let link = document.createElement('a');
                 link.download = `GunSonu_${getBakuDateString()}.png`;
                 link.href = canvas.toDataURL('image/png');
@@ -1377,7 +1267,6 @@
             document.getElementById('pStock').value = p.initial_stock;
             document.getElementById('pBuy').value = p.buy_price || 0;
             document.getElementById('pSell').value = p.sell_price || 0;
-            
             document.getElementById('adminFormTitle').textContent = "Məhsulu Düzənlə";
             document.getElementById('saveProdBtn').textContent = "Yadda Saxla";
             document.getElementById('cancelEditBtn').classList.remove('hidden-screen');
@@ -1391,7 +1280,6 @@
             document.getElementById('pStock').value = '';
             document.getElementById('pBuy').value = '';
             document.getElementById('pSell').value = '';
-
             document.getElementById('adminFormTitle').textContent = "Yeni Məhsul / Ətir Əlavə Et";
             document.getElementById('saveProdBtn').textContent = "Əlavə Et";
             document.getElementById('cancelEditBtn').classList.add('hidden-screen');
@@ -1401,35 +1289,21 @@
             let editingId = document.getElementById('editingProductId').value;
             let code = document.getElementById('pCode').value;
             let name = document.getElementById('pName').value;
-            let initial_stock = parseFloat(document.getElementById('pStock').value) || 0;
-            let buy_price = parseFloat(document.getElementById('pBuy').value) || 0;
-            let sell_price = parseFloat(document.getElementById('pSell').value) || 0;
-
+            let payload = { code, name, initial_stock: parseFloat(document.getElementById('pStock').value) || 0, buy_price: parseFloat(document.getElementById('pBuy').value) || 0, sell_price: parseFloat(document.getElementById('pSell').value) || 0 };
             if(!code || !name) return alert('Kod və ad yazın!');
 
-            let payload = { code, name, initial_stock, buy_price, sell_price };
-
-            if(editingId) {
-                let { error } = await _supabase.from('products').update(payload).eq('id', editingId);
-                if(error) { alert('Xəta baş verdi: ' + error.message); return; }
-                alert('Məhsul uğurla yeniləndi!');
-            } else {
-                let { error } = await _supabase.from('products').insert([payload]);
-                if(error) { alert('Xəta baş verdi: ' + error.message); return; }
-                alert('Məhsul uğurla əlavə edildi!');
-            }
-
-            cancelEdit();
-            await loadDataFromCloud();
-            renderUI();
+            let query = editingId ? _supabase.from('products').update(payload).eq('id', editingId) : _supabase.from('products').insert([payload]);
+            let { error } = await query;
+            if(error) { alert('Xəta: ' + error.message); return; }
+            alert('Məhsul yadda saxlanıldı!');
+            cancelEdit(); await loadDataFromCloud(); renderUI();
         }
 
         async function deleteProduct(id) {
             if(confirm('Bu məhsulu silmək istədiyinizə əminsiniz?')) {
                 let { error } = await _supabase.from('products').delete().eq('id', id);
                 if(error) { alert('Xəta: ' + error.message); return; }
-                await loadDataFromCloud();
-                renderUI();
+                await loadDataFromCloud(); renderUI();
             }
         }
 
@@ -1437,17 +1311,15 @@
             if(confirm('Bu əməliyyatı jurnaldan silmək istəyirsiniz?')) {
                 let { error } = await _supabase.from('sales').delete().eq('id', id);
                 if(error) { alert('Xəta: ' + error.message); return; }
-                await loadDataFromCloud();
-                renderUI();
+                await loadDataFromCloud(); renderUI();
             }
         }
 
         function calcPrice() {
-            let id = document.getElementById('opProduct').value;
+            let p = products.find(x => x.id == document.getElementById('opProduct').value);
+            if(!p) return;
             let gram = parseFloat(document.getElementById('opGram').value) || 0;
             let disc = parseFloat(document.getElementById('opDiscount').value) || 0;
-            let p = products.find(x => x.id == id);
-            if(!p) return;
             let total = gram * (p.sell_price || 0);
             if(disc > 0) total -= total * (disc / 100);
             document.getElementById('opPrice').value = total.toFixed(2);
@@ -1466,31 +1338,18 @@
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
 
             let p = products.find(x => x.id == product_id);
-            let total_cost = grams_sold * (p.buy_price || 0);
-            let profit = total_price - total_cost;
-
-            let opPayload = { 
-                product_id: Number(product_id), 
-                type, 
-                grams_sold, 
-                total_price, 
-                total_cost, 
-                profit, 
-                payType, 
-                fromAd, 
-                toCashRegister
-            };
+            let opPayload = { product_id: Number(product_id), type, grams_sold, total_price, total_cost: grams_sold * (p.buy_price || 0), profit: total_price - (grams_sold * (p.buy_price || 0)), payType, fromAd, toCashRegister };
 
             if(editingSaleId) {
                 let { error } = await _supabase.from('sales').update(opPayload).eq('id', editingSaleId);
                 if(error) { alert('Xəta: ' + error.message); return; }
-                alert('Əməliyyat uğurla yeniləndi!');
+                alert('Əməliyyat yeniləndi!');
                 cancelEditSale();
             } else {
                 opPayload.date = new Date().toISOString();
                 let { error } = await _supabase.from('sales').insert([opPayload]);
                 if(error) { alert('Xəta: ' + error.message); return; }
-                alert('Əməliyyat uğurla yadda saxlanıldı!');
+                alert('Əməliyyat yadda saxlanıldı!');
             }
 
             document.getElementById('opGram').value = '';
@@ -1498,9 +1357,7 @@
             document.getElementById('opDiscount').value = '';
             document.getElementById('fromAd').checked = false;
             document.getElementById('toCashRegister').checked = false;
-
-            await loadDataFromCloud();
-            renderUI();
+            await loadDataFromCloud(); renderUI();
         }
     </script>
 </body>
