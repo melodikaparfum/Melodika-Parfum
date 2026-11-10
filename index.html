@@ -155,7 +155,7 @@
                     <!-- ARXİV SHEET BUTTONU - YALNIZ ADMIN ÜÇÜN -->
                     <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Sheeti 🗂️</button>
                     
-                    <!-- ƏMƏLİYYATLAR JURNALI DÜYMƏSİ (HƏM SATICI, HƏM ADMIN ÜÇÜN YUXARIDA) -->
+                    <!-- ƏMƏLİYYATLAR JURNALI DÜYMƏSİ -->
                     <button onclick="openOperationsLogModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
                     
                     <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
@@ -322,7 +322,7 @@
                     </div>
                 </div>
 
-                <!-- Cədvəllər (Yalnız Məhsul Kataloqu qalır, Əməliyyat Jurnalı yuxarıda düyməyə keçirildi) -->
+                <!-- Cədvəllər -->
                 <div class="grid grid-cols-1 gap-4 no-print">
                     <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-2">
                         <div class="flex justify-between items-center">
@@ -384,8 +384,26 @@
                     <h2 class="text-lg font-bold gold-text">📋 BÜTÜN ƏMƏLİYYATLAR JURNALI</h2>
                     <button onclick="closeOperationsLogModal()" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded text-white">Bağla</button>
                 </div>
-                <div class="text-xs text-zinc-400">Buradan bütün əməliyyatları nəzərdən keçirə, redaktə edə və ya silə bilərsiniz.</div>
-                <div class="overflow-x-auto max-h-[65vh] overflow-y-auto">
+
+                <!-- BU GÜNÜN SATIŞLARI QUTUSU (BOX) -->
+                <div class="bg-zinc-800/90 border border-amber-500/60 p-4 rounded-xl space-y-2 shadow-lg">
+                    <div class="flex justify-between items-center border-b border-zinc-700 pb-2">
+                        <h3 class="text-sm font-bold gold-text flex items-center space-x-1">
+                            <span>📌 Bu Günün Satışları (Box)</span>
+                        </h3>
+                        <span id="todayTotalBadge" class="text-xs bg-amber-500/20 text-amber-400 font-bold px-2.5 py-1 rounded font-mono">0.00 AZN</span>
+                    </div>
+                    <div id="todaySalesBoxContent" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-xs text-zinc-300">
+                        <div class="text-zinc-500 text-center py-2">Bu gün hələ satış qeydə alınmayıb.</div>
+                    </div>
+                </div>
+
+                <!-- AXTARIŞ SAHƏSİ (HƏR ŞEY ÜZRƏ: AD, TARİX, KOD, SMEN VƏ S.) -->
+                <div class="pt-1">
+                    <input type="text" id="logSearchInput" oninput="renderOperationsLogTable()" placeholder="Axtar (Ad, kod, tarix, smen, ödəniş, növ...)" class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-lg text-white text-xs focus:outline-none gold-border">
+                </div>
+
+                <div class="overflow-x-auto max-h-[50vh] overflow-y-auto">
                     <table class="w-full text-left text-xs text-zinc-300">
                         <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
                             <tr>
@@ -1031,6 +1049,7 @@
         }
 
         function openOperationsLogModal() {
+            if(document.getElementById('logSearchInput')) document.getElementById('logSearchInput').value = '';
             renderOperationsLogTable();
             document.getElementById('operationsLogModal').classList.remove('hidden-screen');
         }
@@ -2431,21 +2450,56 @@
         }
 
         function renderOperationsLogTable() {
+            let searchQuery = (document.getElementById('logSearchInput')?.value || '').toLowerCase().trim();
             let logHtml = '';
+            let todayBoxHtml = '';
+            let todayTotalSum = 0;
             let index = 1;
+            let todayStr = getBakuDateString(new Date());
 
             sales.slice().reverse().forEach((s) => {
                 let p = products.find(x => x.id == s.product_id);
-                let pName = p ? p.name : 'Naməlum';
+                let pName = p ? (p.name || '') : 'Naməlum';
+                let pCode = p ? (p.code || '') : '';
                 let sDate = s.date ? getBakuDateTimeString(s.date) : '-';
+                let sDateShort = s.date ? getBakuDateString(s.date) : '';
 
+                let shiftNameText = '';
                 let shiftBadge = '';
-                if(s.shift_name === 'SEHER') shiftBadge = '<span class="text-amber-300 font-semibold text-[10px]">☀️ Səhər</span>';
-                else if(s.shift_name === 'GUNORTA') shiftBadge = '<span class="text-blue-300 font-semibold text-[10px]">🌙 Günorta</span>';
-                else shiftBadge = '<span class="text-purple-300 font-semibold text-[10px]">👑 Admin</span>';
+                if(s.shift_name === 'SEHER') {
+                    shiftNameText = 'səhər';
+                    shiftBadge = '<span class="text-amber-300 font-semibold text-[10px]">☀️ Səhər</span>';
+                } else if(s.shift_name === 'GUNORTA') {
+                    shiftNameText = 'günorta';
+                    shiftBadge = '<span class="text-blue-300 font-semibold text-[10px]">🌙 Günorta</span>';
+                } else {
+                    shiftNameText = 'admin';
+                    shiftBadge = '<span class="text-purple-300 font-semibold text-[10px]">👑 Admin</span>';
+                }
 
                 let adStatus = s.fromAd ? '✅ Hə' : '❌ Yox';
                 let cashStatus = s.toCashRegister ? '✅ Vurulub' : '❌ Vurulmayıb';
+                let payTypeText = s.payType || 'Nəğd';
+                let typeText = s.type || '';
+                let priceText = String(s.total_price || 0);
+
+                // BU GÜNÜN SATIŞLARI BOX ÜÇÜN YOXLAMA (YALNIZ MEXARIC VƏ BUGÜNKÜ TARİX)
+                if(sDateShort === todayStr && s.type === 'MEXARIC') {
+                    let pPrice = Number(s.total_price || 0);
+                    todayTotalSum += pPrice;
+                    todayBoxHtml += `
+                        <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-700/60">
+                            <div><strong>${pName}</strong> (${s.grams_sold} qr) — <span class="text-zinc-400">${payTypeText}</span></div>
+                            <div class="font-bold gold-text">${pPrice.toFixed(2)} AZN</div>
+                        </div>
+                    `;
+                }
+
+                // UNİVERSAL AXTARIŞ (AD, TARİX, KOD, SMEN, ÖDƏNİŞ, NÖV VƏ S.)
+                let searchableString = `${pName} ${pCode} ${sDate} ${shiftNameText} ${payTypeText} ${typeText} ${priceText} ${s.grams_sold}`.toLowerCase();
+                if(searchQuery && !searchableString.includes(searchQuery)) {
+                    return; // Əgər axtarışa uyğun gəlmirsə, cədvələ əlavə etmirik
+                }
 
                 let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Redaktə et</button>`;
                 if(role === 'ADMIN') actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">Sil</button>`;
@@ -2456,9 +2510,9 @@
                         <td class="p-2 text-zinc-400 text-[11px]">${sDate}</td>
                         <td class="p-2">${shiftBadge}</td>
                         <td class="p-2 font-bold ${s.type === 'MEXARIC' ? 'text-green-400' : 'text-blue-400'}">${s.type}</td>
-                        <td class="p-2">${pName}</td>
+                        <td class="p-2">${pName} <span class="text-zinc-500 font-mono text-[10px]">(${pCode})</span></td>
                         <td class="p-2">${s.grams_sold}</td>
-                        <td class="p-2 text-zinc-300">${s.payType || 'Nəğd'}</td>
+                        <td class="p-2 text-zinc-300">${payTypeText}</td>
                         <td class="p-2 font-bold gold-text">${s.total_price} AZN</td>
                         <td class="p-2">${adStatus}</td>
                         <td class="p-2">${cashStatus}</td>
@@ -2467,7 +2521,17 @@
                 `;
                 index++;
             });
-            document.getElementById('modalLogTable').innerHTML = logHtml || '<tr><td colspan="11" class="p-4 text-zinc-500 text-center">Əməliyyat yoxdur</td></tr>';
+
+            document.getElementById('modalLogTable').innerHTML = logHtml || '<tr><td colspan="11" class="p-4 text-zinc-500 text-center">Əməliyyat tapılmadı</td></tr>';
+            
+            let todayBoxContainer = document.getElementById('todaySalesBoxContent');
+            if(todayBoxContainer) {
+                todayBoxContainer.innerHTML = todayBoxHtml || '<div class="text-zinc-500 text-center py-2">Bu gün hələ satış qeydə alınmayıb.</div>';
+            }
+            let todayTotalBadge = document.getElementById('todayTotalBadge');
+            if(todayTotalBadge) {
+                todayTotalBadge.textContent = todayTotalSum.toFixed(2) + ' AZN';
+            }
         }
 
         function renderUI() {
