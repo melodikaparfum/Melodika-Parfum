@@ -149,6 +149,19 @@
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">📊 HESABATLAR SHEETİ (ADMİN MƏRKƏZİ)</h2>
                     <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Bütün Hesabatlar</span>
                 </div>
+                
+                <!-- Tarix Seçimi İnputları (Tarixlər üzrə hesabat üçün) -->
+                <div class="bg-zinc-800/80 p-3 rounded-lg border border-zinc-700 grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Başlanğıc Tarix</label>
+                        <input type="date" id="startDate" onchange="renderUI()" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Son Tarix</label>
+                        <input type="date" id="endDate" onchange="renderUI()" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                    </div>
+                </div>
+
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                     <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
                         <span class="text-base">📝</span>
@@ -337,30 +350,7 @@
                     </div>
                 </div>
 
-                <!-- Xalis Gəlir (Admin) -->
-                <div id="adminReportBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
-                    <h2 class="text-sm font-semibold gold-text">Xalis Gəlir Hesabatı (Admin)</h2>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <div>
-                            <label class="text-[11px] text-zinc-400">Başlanğıc Tarix</label>
-                            <input type="date" id="startDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                        </div>
-                        <div>
-                            <label class="text-[11px] text-zinc-400">Son Tarix</label>
-                            <input type="date" id="endDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-800 text-center">
-                        <div class="bg-zinc-800/50 p-3 rounded-lg">
-                            <div class="text-xs text-zinc-400">Seçilmiş Aralıq Dövriyyə</div>
-                            <div id="reportTotalSales" class="text-lg font-bold gold-text">0.00 AZN</div>
-                        </div>
-                        <div class="bg-zinc-800/50 p-3 rounded-lg">
-                            <div class="text-xs text-zinc-400">Xalis Gəlir</div>
-                            <div id="reportNetProfit" class="text-lg font-bold text-green-400">0.00 AZN</div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Gizli saxlanılan və ya ehtiyac olmayan aşağıdakı xalis gəlir qutusu təmizləndi -->
             </div>
         </div>
 
@@ -675,7 +665,6 @@
 
                 if(role === 'ADMIN') {
                     document.getElementById('adminBox').classList.remove('hidden-screen');
-                    document.getElementById('adminReportBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
@@ -1008,8 +997,6 @@
             let element = document.getElementById('attendancePrintArea');
 
             let clone = element.cloneNode(true);
-            
-            // PDF yaradılarkən bütün 'no-print' düymələri (Səbəb yaz / Düzənlə) təmizlənir
             let noPrintElems = clone.querySelectorAll('.no-print');
             noPrintElems.forEach(b => b.remove());
 
@@ -1045,20 +1032,35 @@
             if(!start || !end) { alert('Başlanğıc və son tarixi seçin!'); return; }
 
             document.getElementById('rangeReportHeader').textContent = `${start}-dən - ${end}-dək hesabat:`;
-            document.getElementById('repModalTotal').textContent = document.getElementById('reportTotalSales').textContent;
-            document.getElementById('repModalProfit').textContent = document.getElementById('reportNetProfit').textContent;
             
+            let totalSalesSum = 0;
+            let totalGrossProfitSum = 0;
             let rAd = 0, rPos = 0, rCard = 0;
+
             sales.forEach(s => {
                 let sDate = s.date ? getBakuDateString(s.date) : '';
                 if(s.type === 'MEXARIC' && sDate >= start && sDate <= end) {
                     let p = Number(s.total_price || 0);
+                    totalSalesSum += p;
+                    totalGrossProfitSum += Number(s.profit || 0);
                     if(s.fromAd) rAd += p;
                     if(s.payType === 'POS Terminal') rPos += p;
                     if(s.payType === 'Karta göndərmə') rCard += p;
                 }
             });
 
+            let rangeExpensesTotal = 0;
+            expenses.forEach(e => {
+                let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+                if(eDate >= start && eDate <= end) {
+                    rangeExpensesTotal += Number(e.amount || 0);
+                }
+            });
+
+            let netProfitFinal = totalGrossProfitSum - rangeExpensesTotal;
+
+            document.getElementById('repModalTotal').textContent = totalSalesSum.toFixed(2) + ' AZN';
+            document.getElementById('repModalProfit').textContent = netProfitFinal.toFixed(2) + ' AZN';
             document.getElementById('repModalAd').textContent = rAd.toFixed(2) + ' AZN';
             document.getElementById('repModalPos').textContent = rPos.toFixed(2) + ' AZN';
             document.getElementById('repModalCard').textContent = rCard.toFixed(2) + ' AZN';
@@ -1121,7 +1123,6 @@
 
             if(role === 'ADMIN') {
                 document.getElementById('adminBox').classList.remove('hidden-screen');
-                document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                 if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
@@ -1714,10 +1715,7 @@
 
             let dailySum = 0, weeklySum = 0, monthlySum = 0, yearlySum = 0;
             let nagdSum = 0, posSum = 0, cardSum = 0;
-            let startDateStr = role === 'ADMIN' ? document.getElementById('startDate').value : '';
-            let endDateStr = role === 'ADMIN' ? document.getElementById('endDate').value : '';
             let logHtml = '';
-            let totalSalesSum = 0, totalGrossProfitSum = 0;
 
             sales.slice().reverse().forEach((s) => {
                 let p = products.find(x => x.id == s.product_id);
@@ -1737,14 +1735,6 @@
                     if(sDate.startsWith(currentYearPrefix)) yearlySum += price;
                 }
 
-                let inRange = true;
-                if(startDateStr && sDate < startDateStr) inRange = false;
-                if(endDateStr && sDate > endDateStr) inRange = false;
-                if(inRange && s.type === 'MEXARIC') { 
-                    totalSalesSum += price; 
-                    totalGrossProfitSum += Number(s.profit || 0); 
-                }
-
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
                 let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
                 let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Düzənlə</button>`;
@@ -1761,22 +1751,6 @@
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
             document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
             document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
-
-            if(role === 'ADMIN') {
-                let rangeExpensesTotal = 0;
-                expenses.forEach(e => {
-                    let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
-                    let inExpRange = true;
-                    if(startDateStr && eDate < startDateStr) inExpRange = false;
-                    if(endDateStr && eDate > endDateStr) inExpRange = false;
-                    if(inExpRange) rangeExpensesTotal += Number(e.amount || 0);
-                });
-
-                let netProfitFinal = totalGrossProfitSum - rangeExpensesTotal;
-
-                document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
-                document.getElementById('reportNetProfit').textContent = netProfitFinal.toFixed(2) + ' AZN';
-            }
         }
 
         function editSale(id) {
