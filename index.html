@@ -7,6 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body { background-color: #0f0f0f; color: #f3f4f6; font-family: sans-serif; }
         .gold-border { border-color: #d4af37; }
@@ -306,13 +307,13 @@
                         </div>
                     </div>
                     <div class="pt-2 text-right">
-                        <button onclick="openRangeReportModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Aralıq Hesabatı Şəkil Kimi Çıxart 📥</button>
+                        <button onclick="openRangeReportModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Aralıq Hesabatı PDF İle Çıxart 📄</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- SATICI İŞ SAATLARI SHEET (Ağ vərəq üslubunda) -->
+        <!-- SATICI İŞ SAATLARI SHEET -->
         <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
@@ -331,7 +332,6 @@
                     </div>
                 </div>
 
-                <!-- Word Sənədi Üslubunda (Ağ vərəq, qara hərflər) -->
                 <div id="attendancePrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
                     <div id="attendancePrintHeader" class="text-base font-bold text-black border-b-2 border-black pb-2">Noyabr 2026 cı il üzrə İş Saatları Hesabatı:</div>
                     
@@ -346,16 +346,30 @@
                 </div>
 
                 <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
-                    <button onclick="downloadAttendanceAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
+                    <button onclick="downloadAttendanceAsPDF()" class="gold-bg font-bold px-4 py-2 rounded text-xs">PDF Kimi Yadda Saxla (Multi-page) 📄</button>
                 </div>
             </div>
         </div>
 
-        <!-- ARALIQ HESABAT (XALİS GƏLİR) ŞƏKİL MODALI -->
+        <!-- SƏBƏB QEYD ETMƏK ÜÇÜN POPUP MODAL -->
+        <div id="reasonModal" class="hidden-screen fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <h3 class="text-sm font-bold gold-text">İşə gəlməmə səbəbi (Üzürlü / Üzürsüz)</h3>
+                <input type="hidden" id="modalDateKey">
+                <input type="hidden" id="modalStatusType">
+                <textarea id="modalReasonInput" placeholder="Səbəbi ətraflı qeyd edin..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs h-24 focus:outline-none gold-border"></textarea>
+                <div class="flex space-x-2">
+                    <button onclick="closeReasonModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina Et</button>
+                    <button onclick="saveAttendanceReason()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Təsdiq Et və Yadda Saxla</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARALIQ HESABAT (XALİS GƏLİR) PDF MODALI -->
         <div id="rangeReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                    <h2 class="text-sm font-bold gold-text">Aralıq Hesabatı Şəkil</h2>
+                    <h2 class="text-sm font-bold gold-text">Aralıq Hesabatı PDF</h2>
                     <button onclick="closeRangeReportModal()" class="text-xs bg-zinc-800 px-2.5 py-1 rounded">X</button>
                 </div>
                 <div id="rangeReportPrintArea" class="bg-white text-black p-6 rounded-lg space-y-3 font-sans text-left text-sm shadow-lg">
@@ -372,12 +386,12 @@
                     </div>
                 </div>
                 <div class="pt-2 no-print">
-                    <button onclick="downloadRangeReportAsImage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs">Şəkil Kimi Yüklə (PNG) 📥</button>
+                    <button onclick="downloadRangeReportAsPDF()" class="w-full gold-bg font-bold py-2.5 rounded text-xs">PDF Kimi Yüklə 📄</button>
                 </div>
             </div>
         </div>
 
-        <!-- AYLIQ/İLLİK XƏRCLƏR SHEET (Ağ vərəq üslubunda) -->
+        <!-- AYLIQ/İLLİK XƏRCLƏR SHEET -->
         <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
@@ -396,7 +410,6 @@
                     </div>
                 </div>
 
-                <!-- Word Sənədi Üslubunda (Ağ vərəq, qara hərflər) -->
                 <div id="expensesPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
                     <div id="expensesPrintHeader" class="text-base font-bold text-black border-b-2 border-black pb-2">Noyabr ay 2026 cı il üzrə Xərclər:</div>
                     
@@ -426,7 +439,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
-                    <button onclick="downloadExpensesAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
+                    <button onclick="downloadExpensesAsPDF()" class="gold-bg font-bold px-4 py-2 rounded text-xs">PDF Kimi Yadda Saxla (PDF) 📄</button>
                 </div>
             </div>
         </div>
@@ -444,7 +457,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
-                    <button onclick="downloadDayEndAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
+                    <button onclick="downloadDayEndAsPDF()" class="gold-bg font-bold px-4 py-2 rounded text-xs">PDF Kimi Yadda Saxla 📄</button>
                 </div>
             </div>
         </div>
@@ -731,7 +744,6 @@
 
             let container = document.getElementById('attendanceRowsList');
             let html = '';
-
             let weekDayCounter = 1;
 
             for(let day = 1; day <= daysCount; day++) {
@@ -755,37 +767,66 @@
                 }
 
                 html += `
-                    <div class="border-b border-gray-300 pb-2 space-y-1">
+                    <div class="border-b border-gray-300 pb-2.5 space-y-1.5">
                         <div class="flex justify-between items-center font-bold">
                             <span>${weekDayCounter}-ci gün (${day}.${monthStr})</span>
                             <span>${timeDisplay}</span>
                         </div>
-                        <div class="flex items-center space-x-4 text-xs no-print pt-1">
+                        <div class="flex items-center space-x-4 text-xs no-print pt-0.5">
                             <label class="flex items-center space-x-1 cursor-pointer">
-                                <input type="checkbox" ${isExcused ? 'checked' : ''} onchange="updateAttendanceStatus('${dateKey}', 'excused', this.checked)" class="accent-black">
+                                <input type="checkbox" ${isExcused ? 'checked' : ''} onchange="handleAttendanceCheckbox('${dateKey}', 'excused', this.checked)" class="accent-black w-4 h-4">
                                 <span>Üzürlü</span>
                             </label>
                             <label class="flex items-center space-x-1 cursor-pointer">
-                                <input type="checkbox" ${isUnexcused ? 'checked' : ''} onchange="updateAttendanceStatus('${dateKey}', 'unexcused', this.checked)" class="accent-black">
+                                <input type="checkbox" ${isUnexcused ? 'checked' : ''} onchange="handleAttendanceCheckbox('${dateKey}', 'unexcused', this.checked)" class="accent-black w-4 h-4">
                                 <span>Üzürsüz</span>
                             </label>
                         </div>
-                        ${(isExcused || isUnexcused || noteText) ? `
-                        <div class="pt-1">
-                            <input type="text" value="${noteText}" onchange="updateAttendanceNote('${dateKey}', this.value)" placeholder="Səbəbi ətraflı yazın..." class="w-full border border-gray-400 p-1.5 rounded text-black text-xs font-sans">
-                        </div>` : ''}
+                        ${(isExcused || isUnexcused) ? `<div class="text-xs text-blue-700 font-semibold">[Səbəb: ${noteText || 'Qeyd yazılmayıb'}]</div>` : ''}
                     </div>
                 `;
 
                 weekDayCounter++;
-                if(weekDayCounter > 7) weekDayCounter = 1; // 1-dən 7-yə təkrar
+                if(weekDayCounter > 7) weekDayCounter = 1;
             }
             container.innerHTML = html;
         }
 
-        async function updateAttendanceStatus(dateKey, type, isChecked) {
+        function handleAttendanceCheckbox(dateKey, type, isChecked) {
+            if(isChecked) {
+                // Səbəb daxil etmək üçün Modal (bildiriş pəncərəsi) açırıq
+                document.getElementById('modalDateKey').value = dateKey;
+                document.getElementById('modalStatusType').value = type;
+                document.getElementById('modalReasonInput').value = '';
+                document.getElementById('reasonModal').classList.remove('hidden-screen');
+            } else {
+                updateAttendanceCheckboxData(dateKey, type, false, '');
+            }
+        }
+
+        async function saveAttendanceReason() {
+            let dateKey = document.getElementById('modalDateKey').value;
+            let type = document.getElementById('modalStatusType').value;
+            let reason = document.getElementById('modalReasonInput').value.trim();
+
+            if(!reason) { alert('Zəhmət olmasa səbəbi qeyd edin!'); return; }
+
+            await updateAttendanceCheckboxData(dateKey, type, true, reason);
+            closeReasonModal();
+        }
+
+        function closeReasonModal() {
+            document.getElementById('reasonModal').classList.add('hidden-screen');
+            renderAttendanceSheet();
+        }
+
+        async function updateAttendanceCheckboxData(dateKey, type, isChecked, note) {
             let rec = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI');
-            let payload = type === 'excused' ? { is_excused: isChecked, is_unexcused: isChecked ? false : (rec ? rec.is_unexcused : false) } : { is_unexcused: isChecked, is_excused: isChecked ? false : (rec ? rec.is_excused : false) };
+            let payload = type === 'excused' ? 
+                { is_excused: isChecked, is_unexcused: isChecked ? false : (rec ? rec.is_unexcused : false), note: isChecked ? note : (rec ? rec.note : '') } : 
+                { is_unexcused: isChecked, is_excused: isChecked ? false : (rec ? rec.is_excused : false), note: isChecked ? note : (rec ? rec.note : '') };
+
+            if(!isChecked) payload.note = '';
 
             if(rec && rec.id) {
                 await _supabase.from('attendance').update(payload).eq('id', rec.id);
@@ -798,24 +839,21 @@
             renderAttendanceSheet();
         }
 
-        async function updateAttendanceNote(dateKey, note) {
-            let rec = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI');
-            if(rec && rec.id) {
-                await _supabase.from('attendance').update({ note }).eq('id', rec.id);
-            } else {
-                await _supabase.from('attendance').insert([{ work_date: dateKey, role_name: 'SATICI', note }]);
-            }
-            await loadDataFromCloud();
-        }
+        function downloadAttendanceAsPDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF('p', 'mm', 'a4');
+            let element = document.getElementById('attendancePrintArea');
 
-        function downloadAttendanceAsImage() {
-            html2canvas(document.getElementById('attendancePrintArea'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
-                let link = document.createElement('a');
-                let year = document.getElementById('attYearSelect').value;
-                let month = document.getElementById('attMonthSelect').value;
-                link.download = `IsSaatlari_${year}_${month}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+            doc.html(element, {
+                callback: function (doc) {
+                    let year = document.getElementById('attYearSelect').value;
+                    let month = document.getElementById('attMonthSelect').value;
+                    doc.save(`IsSaatlari_${year}_${month}.pdf`);
+                },
+                x: 10,
+                y: 10,
+                width: 190,
+                windowWidth: 650
             });
         }
 
@@ -847,12 +885,34 @@
 
         function closeRangeReportModal() { document.getElementById('rangeReportModal').classList.add('hidden-screen'); }
 
-        function downloadRangeReportAsImage() {
-            html2canvas(document.getElementById('rangeReportPrintArea'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
-                let link = document.createElement('a');
-                link.download = `AraliqHesabat_${getBakuDateString()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
+        function downloadRangeReportAsPDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF('p', 'mm', 'a4');
+            doc.html(document.getElementById('rangeReportPrintArea'), {
+                callback: function (doc) { doc.save(`AraliqHesabat_${getBakuDateString()}.pdf`); },
+                x: 10, y: 10, width: 190, windowWidth: 650
+            });
+        }
+
+        function downloadDayEndAsPDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF('p', 'mm', 'a4');
+            doc.html(document.getElementById('dayEndPrintArea'), {
+                callback: function (doc) { doc.save(`GunSonu_${getBakuDateString()}.pdf`); },
+                x: 10, y: 10, width: 190, windowWidth: 650
+            });
+        }
+
+        function downloadExpensesAsPDF() {
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF('p', 'mm', 'a4');
+            doc.html(document.getElementById('expensesPrintArea'), {
+                callback: function (doc) {
+                    let year = document.getElementById('expenseYearSelect').value;
+                    let month = document.getElementById('expenseMonthSelect').value;
+                    doc.save(`Xercler_${year}_${month}.pdf`);
+                },
+                x: 10, y: 10, width: 190, windowWidth: 650
             });
         }
 
@@ -1251,17 +1311,6 @@
             }
         }
 
-        function downloadExpensesAsImage() {
-            html2canvas(document.getElementById('expensesPrintArea'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
-                let link = document.createElement('a');
-                let year = document.getElementById('expenseYearSelect').value;
-                let month = document.getElementById('expenseMonthSelect').value;
-                link.download = `Xercler_${year}_${month}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-        }
-
         function openCatalogDetailsModal() {
             let listHtml = '';
             let aProducts = products.filter(p => p.code && p.code.toUpperCase().startsWith('A'));
@@ -1472,15 +1521,6 @@
         }
 
         function closeDayEndModal() { document.getElementById('dayEndModal').classList.add('hidden-screen'); }
-
-        function downloadDayEndAsImage() {
-            html2canvas(document.getElementById('dayEndPrintArea'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
-                let link = document.createElement('a');
-                link.download = `GunSonu_${getBakuDateString()}.png`;
-                link.href = canvas.toDataURL('image/png');
-                link.click();
-            });
-        }
 
         function editProduct(id) {
             let p = products.find(x => x.id == id);
