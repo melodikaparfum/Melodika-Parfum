@@ -506,10 +506,26 @@
                 <div class="space-y-4">
                     <div class="text-xs text-zinc-400 font-medium">Bütün vaxtlar üzrə qeydə alınmış Gün Sonu Hesabatları və Aylıq Arxivlər burada saxlanılır.</div>
                     
-                    <div class="space-y-2">
-                        <h3 class="text-sm font-bold gold-text border-b border-zinc-800 pb-1">📅 Gün Sonu Hesabatları Arxivi:</h3>
-                        <div id="masterDayEndArchiveList" class="space-y-2 max-h-60 overflow-y-auto pr-1 text-xs">
-                            <div class="text-zinc-500 text-center py-2">Yüklənir...</div>
+                    <div class="space-y-3 bg-zinc-800/80 p-3 rounded-xl border border-zinc-700">
+                        <h3 class="text-sm font-bold gold-text border-b border-zinc-800 pb-1">📅 Gün Sonu Hesabatları Arxivi (İl və Ay Seçimi):</h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[10px] text-zinc-400 block mb-1">İl seçin:</label>
+                                <select id="archiveYearSelect" onchange="renderArchiveCalendar()" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs font-bold"></select>
+                            </div>
+                            <div>
+                                <label class="text-[10px] text-zinc-400 block mb-1">Ay seçin:</label>
+                                <select id="archiveMonthSelect" onchange="renderArchiveCalendar()" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs font-bold">
+                                    <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
+                                    <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
+                                    <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="archiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-700">
+                            <!-- Günlər bura yüklənəcək -->
                         </div>
                     </div>
 
@@ -829,7 +845,6 @@
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans"></div>
                 </div>
 
-                <!-- ARXİVƏ YADDA SAXLA DÜYMƏSİ (HƏM ADMİN, HƏM SATICILAR ÜÇÜN) -->
                 <div id="adminArchiveSaveSection" class="pt-2 no-print">
                     <button onclick="confirmAndSaveDayEndArchive()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-lg text-sm shadow-lg flex items-center justify-center space-x-2">
                         <span>📥 Arxivə Təsdiq Et və Yadda Saxla</span>
@@ -870,7 +885,7 @@
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
                 <div class="text-4xl">⚠️</div>
                 <div class="text-sm font-medium text-zinc-200 leading-relaxed">
-                    Minimum 30 AZN sifariş edildikdə, çatdırılma pulsuzdur. Əks halda 7 AZN əlavə ödəniş ediləcək.
+                    Minimum 30 AZN sifariş edildikdə, çatdırılma pulsuzddur. Əks halda 7 AZN əlavə ödəniş ediləcək.
                 </div>
                 <div class="flex space-x-3 pt-2">
                     <button onclick="rejectDelivery()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2.5 rounded-lg text-xs">İmtina Et</button>
@@ -1296,6 +1311,7 @@
             if(pin === '000') {
                 closeMasterArchivePinModal();
                 await loadDataFromCloud();
+                initArchiveSelectors();
                 renderGlobalMasterArchiveLists();
                 document.getElementById('globalMasterArchiveModal').classList.remove('hidden-screen');
             } else {
@@ -1307,26 +1323,66 @@
             document.getElementById('globalMasterArchiveModal').classList.add('hidden-screen');
         }
 
-        function renderGlobalMasterArchiveLists() {
-            let dayEndContainer = document.getElementById('masterDayEndArchiveList');
-            if(dayEndArchive.length === 0) {
-                dayEndContainer.innerHTML = '<div class="text-zinc-500 text-center py-2">Hələ qeydə alınmış gün sonu arxivi yoxdur.</div>';
-            } else {
-                let html = '';
-                dayEndArchive.slice().reverse().forEach(item => {
-                    html += `
-                        <div class="bg-zinc-800/80 p-2.5 rounded border border-zinc-700 space-y-1">
-                            <div class="flex justify-between items-center font-bold text-amber-400">
-                                <span>Tarix: ${item.report_date}</span>
-                                <button onclick="deleteDayEndArchive(${item.id})" class="text-red-400 hover:text-red-600 font-bold text-[10px] bg-zinc-900 px-1.5 py-0.5 rounded border border-zinc-700">Sil</button>
-                            </div>
-                            <div class="text-zinc-300 text-[11px] leading-relaxed bg-white p-2 rounded text-black">${item.content_summary}</div>
-                        </div>
-                    `;
-                });
-                dayEndContainer.innerHTML = html;
+        function initArchiveSelectors() {
+            let currentYr = new Date().getFullYear();
+            let currentMo = new Date().getMonth() + 1;
+            
+            let yearSel = document.getElementById('archiveYearSelect');
+            if(yearSel) {
+                yearSel.innerHTML = '';
+                for(let y = currentYr - 2; y <= currentYr + 2; y++) {
+                    yearSel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
+                }
             }
+            let monthSel = document.getElementById('archiveMonthSelect');
+            if(monthSel) {
+                monthSel.value = currentMo;
+            }
+        }
 
+        function renderArchiveCalendar() {
+            let year = parseInt(document.getElementById('archiveYearSelect').value);
+            let month = parseInt(document.getElementById('archiveMonthSelect').value);
+            let daysInMonth = getDaysInMonth(year, month);
+            let monthName = monthNamesAz[month - 1];
+            let monthStr = String(month).padStart(2, '0');
+
+            let container = document.getElementById('archiveDaysContainer');
+            if(!container) return;
+
+            let html = '';
+            for(let d = 1; d <= daysInMonth; d++) {
+                let dayStr = String(d).padStart(2, '0');
+                let dateKey = `${year}-${monthStr}-${dayStr}`;
+                
+                let foundArchive = dayEndArchive.find(item => String(item.report_date) === dateKey);
+                let badgeIndicator = foundArchive ? '🟢' : '⚪';
+
+                html += `
+                    <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-700/60 hover:bg-zinc-800 transition-colors">
+                        <span onclick="openSpecificDayArchive('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50">${d} ${monthName}</span>
+                        <span class="text-[10px] text-zinc-400">${badgeIndicator} ${foundArchive ? 'Hesabat mövcuddur' : 'Hesabat yoxdur'}</span>
+                    </div>
+                `;
+            }
+            container.innerHTML = html;
+
+            renderMonthlyArchiveOnlyList();
+        }
+
+        function openSpecificDayArchive(dateKey) {
+            let found = dayEndArchive.find(item => String(item.report_date) === dateKey);
+            if(!found) {
+                alert(`${dateKey} tarixinə aid gün sonu hesabatı tapılmadı.`);
+                return;
+            }
+            currentDayEndSummaryHtml = found.content_summary;
+            document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
+            document.getElementById('adminArchiveSaveSection').classList.add('hidden-screen');
+            document.getElementById('dayEndModal').classList.remove('hidden-screen');
+        }
+
+        function renderMonthlyArchiveOnlyList() {
             let monthlyContainer = document.getElementById('masterMonthlyArchiveList');
             if(yearlyArchive.length === 0) {
                 monthlyContainer.innerHTML = '<div class="text-zinc-500 text-center py-2">Hələ qeydə alınmış aylıq/illik arxiv yoxdur.</div>';
@@ -1351,12 +1407,17 @@
             }
         }
 
+        function renderGlobalMasterArchiveLists() {
+            initArchiveSelectors();
+            renderArchiveCalendar();
+        }
+
         async function deleteDayEndArchive(id) {
             if(confirm('Bu gün sonu arxivini silmək istədiyinizə əminsiniz?')) {
                 let { error } = await _supabase.from('day_end_archive').delete().eq('id', id);
                 if(error) { alert('Xəta: ' + error.message); return; }
                 await loadDataFromCloud();
-                renderGlobalMasterArchiveLists();
+                renderArchiveCalendar();
             }
         }
 
