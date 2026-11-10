@@ -313,7 +313,7 @@
             </div>
         </div>
 
-        <!-- SATICI İŞ SAATLARI SHEET (PDF) -->
+        <!-- SATICI İŞ SAATLARI SHEET (PDF - Əvəzlənmiş Şriftlərlə) -->
         <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
@@ -346,7 +346,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
-                    <button onclick="downloadAttendanceAsPDF()" class="gold-bg font-bold px-4 py-2 rounded text-xs">PDF Kimi Yadda Saxla (Səhifələnmiş) 📄</button>
+                    <button onclick="downloadAttendanceAsPDF()" class="gold-bg font-bold px-4 py-2 rounded text-xs">PDF Kimi Yadda Saxla (Şrift Uyğunlaşdırılmış) 📄</button>
                 </div>
             </div>
         </div>
@@ -395,7 +395,7 @@
             </div>
         </div>
 
-        <!-- AYLIQ/İLLİK XƏRCLƏR SHEET (ŞƏKİL) -->
+        <!-- AYLIQ/İLLİK XƏRCLƏR SHEET (ŞƏKİL KİMİ - Göndərdiyin formalı) -->
         <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
@@ -414,32 +414,34 @@
                     </div>
                 </div>
 
-                <!-- Şəkil kimi çıxarılacaq təmiz hissə (Yuxarıdakı idarəetmə elementləri yoxdur) -->
-                <div id="expensesPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
-                    <div id="expensesPrintHeader" class="text-base font-bold text-black border-b-2 border-black pb-2">Noyabr ay 2026 cı il üzrə Xərclər:</div>
-                    
-                    <div class="no-print space-y-2 border-b border-zinc-800 pb-3">
-                        <div class="text-xs text-amber-400 font-bold">Yeni Xərc Əlavə Et / Düzənlə:</div>
-                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                            <select id="expInputDay" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs">
-                                <option value="">Gün seçin...</option>
-                            </select>
-                            <input type="text" id="expInputTitle" placeholder="Xərcin Adı (Qeyd)" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs sm:col-span-2">
-                            <input type="number" step="0.01" id="expInputAmount" placeholder="Məbləğ (AZN)" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs">
-                        </div>
-                        <button onclick="saveNewOrUpdateExpense()" class="gold-bg font-bold px-3 py-1.5 rounded text-xs w-full">Yadda Saxla</button>
+                <!-- Əlavə etmə paneli (Yalnız ekranda görünür, şəkildə çıxmayacaq) -->
+                <div class="no-print space-y-2 bg-zinc-800 p-3 rounded-lg border border-zinc-700">
+                    <div class="text-xs text-amber-400 font-bold">Yeni Xərc Əlavə Et / Düzənlə:</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                        <select id="expInputDay" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                            <option value="">Gün seçin...</option>
+                        </select>
+                        <input type="text" id="expInputTitle" placeholder="Xərcin Adı (Qeyd)" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs sm:col-span-2">
+                        <input type="number" step="0.01" id="expInputAmount" placeholder="Məbləğ (AZN)" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
                     </div>
+                    <button onclick="saveNewOrUpdateExpense()" class="gold-bg font-bold px-3 py-1.5 rounded text-xs w-full">Yadda Saxla</button>
+                </div>
 
+                <!-- Şəkil kimi çıxarılacaq təmiz hissə (Göndərdiyin formaya tam uyğun) -->
+                <div id="expensesPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
+                    <div id="expensesPrintHeader" class="text-xl font-bold text-black">Noyabr ay 2026 ci il üzrə</div>
+                    <div class="text-xl font-bold text-black border-b-2 border-black pb-2">Xərclər:</div>
+                    
                     <div class="space-y-2">
                         <div id="expenseRowsList" class="space-y-2 text-sm"></div>
                     </div>
                     
-                    <div class="pt-3 border-t-2 border-black flex justify-between items-center text-xs font-bold text-black">
+                    <div class="pt-4 border-t-2 border-black flex justify-between items-center text-sm font-bold text-black">
                         <div>
-                            <span class="uppercase">Aylıq Xərc Məbləği: </span>
-                            <span id="monthlyExpenseTotal" class="text-sm font-bold ml-2">0.00 AZN</span>
+                            <div>AYLIQ XƏRC MƏBLƏĞİ:</div>
+                            <div id="monthlyExpenseTotal" class="text-lg font-bold mt-1">0.00 AZN</div>
                         </div>
-                        <span>Yerinə yetirildi</span>
+                        <div class="text-right">Yerinə yetirildi</div>
                     </div>
                 </div>
 
@@ -449,7 +451,7 @@
             </div>
         </div>
 
-        <!-- GÜN SONU HESABAT EKRANI (ŞƏKİL VƏ DİNAMİK UZANMA) -->
+        <!-- GÜN SONU HESABAT EKRANI -->
         <div id="dayEndModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
@@ -577,6 +579,19 @@
             let d = new Date(dateInput);
             d.setHours(d.getHours() + 4);
             return d.toISOString().replace('T', ' ').substring(0, 16);
+        }
+
+        // Azərbaycan şriftlərini PDF üçün təmiz latına əvəzləyən funksiya
+        function replaceAzCharsForPDF(text) {
+            if (!text) return '';
+            return text
+                .replace(/ə/g, 'e').replace(/Ə/g, 'E')
+                .replace(/ş/g, 's').replace(/Ş/g, 'S')
+                .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+                .replace(/ı/g, 'i').replace(/İ/g, 'I')
+                .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+                .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+                .replace(/ğ/g, 'g').replace(/Ğ/g, 'G');
         }
 
         window.onload = async function() {
@@ -766,10 +781,8 @@
                 if(weekDayCounter === 6) {
                     timeDisplay = `İSTİRAHƏT GÜNÜ`;
                 } else if(!rec.check_in && !rec.check_out) {
-                    if (isExcused) {
-                        timeDisplay = `Üzürlü - ${noteText}`;
-                    } else if (isUnexcused) {
-                        timeDisplay = `Üzürsüz - ${noteText}`;
+                    if (isExcused || isUnexcused) {
+                        timeDisplay = `${noteText}`;
                     } else {
                         timeDisplay = `Gəlməyib`;
                     }
@@ -777,7 +790,8 @@
                     timeDisplay = `${checkIn} - ${checkOut}`;
                 }
 
-                let reasonBtnHtml = (!rec.check_in && !rec.check_out && weekDayCounter !== 6) ? `
+                // Əgər səbəb qeyd edilibsə, "Səbəb yaz / Düzənlə" düyməsi yox olur, səbəb günün altında görünür.
+                let reasonBtnHtml = (!rec.check_in && !rec.check_out && weekDayCounter !== 6 && !isExcused && !isUnexcused) ? `
                     <button onclick="openReasonModalPopup('${dateKey}')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2 py-1 rounded text-xs ml-2">Səbəb yaz / Düzənlə</button>
                 ` : '';
 
@@ -845,7 +859,21 @@
             let doc = new jsPDF('p', 'mm', 'a4');
             let element = document.getElementById('attendancePrintArea');
 
-            doc.html(element, {
+            // HTML-i kopyalayıb Azərbaycan hərflərini təmiz latına əvəzləyirik ki, PDF bərbad çıxmasın
+            let clone = element.cloneNode(true);
+            
+            function replaceTextNodes(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.nodeValue = replaceAzCharsForPDF(node.nodeValue);
+                } else {
+                    for (let child of node.childNodes) {
+                        replaceTextNodes(child);
+                    }
+                }
+            }
+            replaceTextNodes(clone);
+
+            doc.html(clone, {
                 callback: function (doc) {
                     let year = document.getElementById('attYearSelect').value;
                     let month = document.getElementById('attMonthSelect').value;
@@ -1233,7 +1261,7 @@
             let monthName = monthNamesAz[month - 1];
             
             document.getElementById('expenseHeaderTitle').textContent = `${monthName} ${year} ayı üzrə xərclər`;
-            document.getElementById('expensesPrintHeader').textContent = `${monthName} ay 2026 cı il üzrə Xərclər:`;
+            document.getElementById('expensesPrintHeader').textContent = `${monthName} ay 2026 cı il üzrə`;
             initExpenseDaySelect();
 
             let container = document.getElementById('expenseRowsList');
