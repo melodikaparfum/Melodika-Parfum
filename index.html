@@ -106,6 +106,7 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
                     <button onclick="openAttendanceModal()" id="attendanceBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Satıcı İş Saatları Sheeti 🕒</button>
                     <button onclick="openExpensesModal()" id="expensesBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Xərclər Sheeti 📊</button>
                     <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
@@ -309,6 +310,25 @@
                     <div class="pt-2 text-right">
                         <button onclick="openRangeReportModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Aralıq Hesabatı Şəkil Kimi Çıxart 📥</button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÇAT MODALI -->
+        <div id="chatModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-lg w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                    <h2 class="text-base font-bold gold-text">💬 Daxili Çat / Qeydlər Paneli</h2>
+                    <button onclick="closeChatModal()" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded">Bağla</button>
+                </div>
+                
+                <div id="chatMessagesList" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 bg-zinc-950 p-3 rounded-xl border border-zinc-800 text-xs">
+                    <div class="text-zinc-500 text-center">Mesajlar yüklənir...</div>
+                </div>
+
+                <div class="space-y-2 pt-2 border-t border-zinc-800">
+                    <textarea id="chatInputText" placeholder="Mesajınızı və ya qeydinizi yazın..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs h-20 focus:outline-none gold-border"></textarea>
+                    <button onclick="sendChatMessage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs">Göndər 📤</button>
                 </div>
             </div>
         </div>
@@ -554,6 +574,7 @@
         let orders = [];
         let expenses = [];
         let attendances = [];
+        let chatMessages = [];
         let cart = [];
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
@@ -626,6 +647,7 @@
 
                 renderUI();
                 checkNewOrdersBlinking();
+                checkNewChatBlinking();
             }
         };
 
@@ -648,12 +670,18 @@
                     if(!aRes.error) attendances = aRes.data || [];
                 } catch(e) { attendances = []; }
 
+                try {
+                    let cRes = await _supabase.from('chats').select('*').order('created_at', { ascending: true });
+                    if(!cRes.error) chatMessages = cRes.data || [];
+                } catch(e) { chatMessages = []; }
+
                 document.getElementById('debugBox').textContent = "Status: Bulud bazasına uğurla qoşuldu (Canlı Sinxronizasiya)";
                 document.getElementById('debugBox').className = "bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print";
                 
                 if(role) {
                     if(role === 'SATICI') checkTodayShiftStatus();
                     checkNewOrdersBlinking();
+                    checkNewChatBlinking();
                 }
             } catch (err) {
                 console.error(err);
@@ -736,6 +764,81 @@
             let currentMo = new Date().getMonth() + 1;
             if(document.getElementById('expenseMonthSelect')) document.getElementById('expenseMonthSelect').value = currentMo;
             if(document.getElementById('attMonthSelect')) document.getElementById('attMonthSelect').value = currentMo;
+        }
+
+        async function openChatModal() {
+            let unreadIds = chatMessages.filter(m => m.sender !== role && !m.is_read).map(m => m.id);
+            if(unreadIds.length > 0) {
+                await _supabase.from('chats').update({ is_read: true }).in('id', unreadIds);
+                await loadDataFromCloud();
+            }
+            let chatBtn = document.getElementById('chatBtn');
+            if(chatBtn) chatBtn.classList.remove('blinking-btn');
+            renderChatMessages();
+            document.getElementById('chatModal').classList.remove('hidden-screen');
+        }
+
+        function closeChatModal() { document.getElementById('chatModal').classList.add('hidden-screen'); }
+
+        function checkNewChatBlinking() {
+            if(!role) return;
+            let chatBtn = document.getElementById('chatBtn');
+            if(!chatBtn) return;
+            let unreadExists = chatMessages.some(m => m.sender !== role && !m.is_read);
+            if(unreadExists) chatBtn.classList.add('blinking-btn');
+            else chatBtn.classList.remove('blinking-btn');
+        }
+
+        function renderChatMessages() {
+            let container = document.getElementById('chatMessagesList');
+            if(chatMessages.length === 0) {
+                container.innerHTML = '<div class="text-zinc-500 text-center text-xs py-4">Hələ heç bir mesaj yoxdur.</div>';
+                return;
+            }
+            let html = '';
+            chatMessages.forEach(m => {
+                let isMe = m.sender === role;
+                let alignClass = isMe ? 'text-right ml-auto bg-amber-500/10 border-amber-500/30' : 'text-left mr-auto bg-zinc-800 border-zinc-700';
+                let senderLabel = m.sender === 'ADMIN' ? '👑 Admin' : '👤 Satıcı';
+                let timeStr = m.created_at ? getBakuDateTimeString(m.created_at) : '';
+
+                let readIcon = m.is_read 
+                    ? `<span style="color: #3b82f6; font-weight: bold; font-size: 13px;" title="Oxundu">✓✓</span>` 
+                    : `<span style="color: #6b7280; font-weight: bold; font-size: 13px;" title="Göndərildi">✓✓</span>`;
+
+                html += `
+                    <div class="max-w-[85%] p-2.5 rounded-lg border ${alignClass} space-y-1">
+                        <div class="flex justify-between items-center text-[10px] text-zinc-400 font-bold border-b border-zinc-800 pb-1">
+                            <span>${senderLabel}</span>
+                            <span>${timeStr}</span>
+                        </div>
+                        <div class="text-white text-xs break-words">${m.message}</div>
+                        ${isMe ? `<div class="text-right pt-0.5">${readIcon}</div>` : ''}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            container.scrollTop = container.scrollHeight;
+        }
+
+        async function sendChatMessage() {
+            let input = document.getElementById('chatInputText');
+            let message = input.value.trim();
+            if(!message) { alert('Mesaj boş ola bilməz!'); return; }
+
+            let payload = {
+                sender: role,
+                message: message,
+                is_read: false,
+                created_at: new Date().toISOString()
+            };
+
+            let { error } = await _supabase.from('chats').insert([payload]);
+            if(error) { alert('Xəta: ' + error.message); return; }
+
+            input.value = '';
+            await loadDataFromCloud();
+            renderChatMessages();
         }
 
         function openAttendanceModal() {
@@ -976,6 +1079,7 @@
             document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
             renderUI();
             checkNewOrdersBlinking();
+            checkNewChatBlinking();
         }
 
         function logout() { localStorage.removeItem('melodika_current_role'); location.reload(); }
