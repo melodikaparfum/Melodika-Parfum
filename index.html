@@ -231,7 +231,7 @@
                     <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
                         <div class="bg-zinc-800/30 p-2 rounded">Nəğd: <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
                         <div class="bg-zinc-800/30 p-2 rounded">POS: <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
-                        <div class="bg-zinc-800/30 p-2 rounded">Karta: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="bg-zinc-800/30 p-2 rounded">Kassa: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
                     </div>
                 </div>
             </div>
@@ -420,7 +420,7 @@
                             <select id="payType" class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                                 <option value="Nəğd">Nəğd</option>
                                 <option value="POS Terminal">POS Terminal</option>
-                                <option value="Karta göndərmə">Karta göndərmə</option>
+                                <option value="Kassa">Kassa</option>
                             </select>
                         </div>
                         <div>
@@ -871,6 +871,12 @@
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
                     <h2 class="text-lg font-bold gold-text">GÜN SONU HESABATI</h2>
                     <button onclick="closeDayEndModal()" class="text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
+                </div>
+
+                <!-- GÜN SONU ÜÇÜN TARİX SEÇİCİ -->
+                <div class="bg-zinc-800/80 p-3 rounded-xl border border-zinc-700 flex justify-between items-center gap-2 text-xs no-print">
+                    <span class="text-amber-400 font-bold">Hesabat Tarixi Seçin:</span>
+                    <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs font-bold">
                 </div>
 
                 <div id="dayEndPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 text-sm font-sans shadow-lg">
@@ -2045,7 +2051,7 @@
                     if(s.fromAd) rAd += p;
                     if(s.payType === 'POS Terminal') rPos += p;
                     if(s.toCashRegister) rCashReg += p;
-                    if(s.payType === 'Karta göndərmə') rCard += p;
+                    if(s.payType === 'Kassa') rCard += p;
                 }
             });
 
@@ -2105,7 +2111,7 @@
                     if(s.fromAd) rAd += p;
                     if(s.payType === 'POS Terminal') rPos += p;
                     if(s.toCashRegister) rCashReg += p;
-                    if(s.payType === 'Karta göndərmə') rCard += p;
+                    if(s.payType === 'Kassa') rCard += p;
                 }
             });
 
@@ -2155,7 +2161,8 @@
         function downloadDayEndAsImage() {
             html2canvas(document.getElementById('dayEndPrintArea'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
                 let link = document.createElement('a');
-                link.download = `GunSonu_${getBakuDateString()}.png`;
+                let targetDate = document.getElementById('dayEndDatePicker').value || getBakuDateString();
+                link.download = `GunSonu_${targetDate}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
@@ -2862,21 +2869,21 @@
             let currentYearPrefix = String(new Date().getFullYear());
 
             let dailySum = 0, weeklySum = 0, monthlySum = 0, yearlySum = 0;
-            let nagdSum = 0, posSum = 0, cardSum = 0;
+            let nagdSum = 0, posSum = 0, kassaSum = 0;
 
             sales.forEach((s) => {
                 let sDate = s.date ? getBakuDateString(s.date) : '';
                 let price = Number(s.total_price || 0);
 
                 if(s.type === 'MEXARIC') {
-                    if(sDate === todayStr) {
-                        dailySum += price;
+                    if(sDate === todayStr) dailySum += price;
+                    if(sDate >= weekStartStr && sDate <= todayStr) weeklySum += price;
+                    if(sDate.startsWith(currentMonthPrefix)) {
+                        monthlySum += price;
                         if(s.payType === 'Nəğd') nagdSum += price;
                         if(s.payType === 'POS Terminal') posSum += price;
-                        if(s.payType === 'Karta göndərmə') cardSum += price;
+                        if(s.payType === 'Kassa') kassaSum += price;
                     }
-                    if(sDate >= weekStartStr && sDate <= todayStr) weeklySum += price;
-                    if(sDate.startsWith(currentMonthPrefix)) monthlySum += price;
                     if(sDate.startsWith(currentYearPrefix)) yearlySum += price;
                 }
             });
@@ -2887,7 +2894,7 @@
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
             document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
-            document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
+            document.getElementById('payCard').textContent = kassaSum.toFixed(2) + ' AZN';
         }
 
         function editSale(id) {
@@ -2936,10 +2943,24 @@
             alert(`Vaxt dünənki gün saat 23:59-a təyin edildi (${getBakuDateTimeString(newIsoDate)}). İndi "Təsdiq Et" düyməsini sıxın.`);
         }
 
-        async function openDayEndModal() {
+        function openDayEndModal() {
             let nowStr = getBakuDateString(new Date());
-            currentDayEndReportDate = nowStr;
-            let todaySales = sales.filter(s => s.date && getBakuDateString(s.date) === nowStr && s.type === 'MEXARIC');
+            let datePicker = document.getElementById('dayEndDatePicker');
+            if(datePicker) datePicker.value = nowStr;
+            renderDayEndReportForDate(nowStr);
+            document.getElementById('dayEndModal').classList.remove('hidden-screen');
+        }
+
+        function onDayEndDatePickerChange() {
+            let selectedDate = document.getElementById('dayEndDatePicker').value;
+            if(selectedDate) {
+                renderDayEndReportForDate(selectedDate);
+            }
+        }
+
+        function renderDayEndReportForDate(targetDateStr) {
+            currentDayEndReportDate = targetDateStr;
+            let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
             let totalAmount = 0;
             
             let seherTotal = 0, seherAd = 0, seherCash = 0, seherPos = 0;
@@ -2947,12 +2968,12 @@
             let adminTotal = 0, adminAd = 0, adminCash = 0, adminPos = 0;
             let totalPosSum = 0, totalCashRegSum = 0;
 
-            let listHtml = `<div style="font-weight: bold; margin-bottom: 8px; color: #000;">Tarix (Bakı vaxtı): ${nowStr}</div>`;
+            let listHtml = `<div style="font-weight: bold; margin-bottom: 8px; color: #000;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
-            if(todaySales.length === 0) {
-                listHtml += `<div style="color: #666; padding: 10px 0;">Bugünkü tarixə aid satış qeydə alınmayıb.</div>`;
+            if(targetSales.length === 0) {
+                listHtml += `<div style="color: #666; padding: 10px 0;">Seçilmiş tarixə aid satış qeydə alınmayıb.</div>`;
             } else {
-                todaySales.forEach((s, idx) => {
+                targetSales.forEach((s, idx) => {
                     let p = products.find(x => x.id == s.product_id);
                     let price = Number(s.total_price || 0);
                     totalAmount += price;
@@ -3020,8 +3041,6 @@
 
             currentDayEndSummaryHtml = listHtml + summaryHtml;
             document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
-
-            document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
         async function confirmAndSaveDayEndArchive() {
@@ -3032,10 +3051,10 @@
                 });
                 
                 if (error) {
-                    let { error: insertErr } = await _supabase.from('day_end_archive').insert([{ 
+                    let { error: insertErr } = await _supabase.from('day_end_archive').upsert([{ 
                         report_date: currentDayEndReportDate, 
                         content_summary: currentDayEndSummaryHtml 
-                    }]);
+                    }], { onConflict: 'report_date' });
                     
                     if (insertErr) {
                         alert('Xəta baş verdi: ' + insertErr.message);
@@ -3043,7 +3062,7 @@
                     }
                 }
 
-                alert('Hesabat uğurla arxivə təsdiq edildi!');
+                alert(`Hesabat ${currentDayEndReportDate} tarixi üzrə arxivə uğurla yadda saxlanıldı!`);
                 await loadDataFromCloud();
                 closeDayEndModal();
             } catch(e) {
