@@ -99,7 +99,7 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <button onclick="openAttendanceModal()" id="attendanceBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">İş Saatları Sheeti 🕒</button>
+                    <button onclick="openAttendanceModal()" id="attendanceBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Satıcı İş Saatları Sheeti 🕒</button>
                     <button onclick="openExpensesModal()" id="expensesBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Xərclər Sheeti 📊</button>
                     <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
                     <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
@@ -108,10 +108,10 @@
                 </div>
             </header>
 
-            <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ -->
-            <div class="bg-zinc-900 border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
+            <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ (YALNIZ SATICI ÜÇÜN) -->
+            <div id="shiftControlBox" class="bg-zinc-900 border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
                 <div class="text-xs text-zinc-300">
-                    <span>İş Növbəsi Statusu: </span>
+                    <span>Satıcı Növbə Statusu: </span>
                     <strong id="shiftStatusText" class="text-amber-400 font-mono">Yoxlanılır...</strong>
                 </div>
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
@@ -299,13 +299,13 @@
             </div>
         </div>
 
-        <!-- İŞ SAATLARI SHEET (YALNIZ ADMİN) -->
+        <!-- SATICI İŞ SAATLARI SHEET (YALNIZ ADMİN) -->
         <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2">
                     <div>
-                        <h2 class="text-lg font-bold gold-text"> İŞÇİLƏRİN İŞ SAATLARI SHEETİ</h2>
-                        <div class="text-xs text-zinc-400">Aylıq işə gəliş və gediş saatları cədvəli.</div>
+                        <h2 class="text-lg font-bold gold-text">🕒 SATICI İŞ SAATLARI SHEETİ</h2>
+                        <div class="text-xs text-zinc-400">Satıcının ayın günləri üzrə gəliş və gediş saatları.</div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <select id="attYearSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
@@ -322,9 +322,9 @@
                     <table class="w-full text-left text-xs text-zinc-300 border-collapse">
                         <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
                             <tr>
-                                <th class="py-2 px-2 w-16 text-center">Tarix</th>
-                                <th class="py-2 px-2">Satıcı Gəliş / Gediş</th>
-                                <th class="py-2 px-2">Admin Gəliş / Gediş</th>
+                                <th class="py-2 px-2 w-20 text-center">Tarix</th>
+                                <th class="py-2 px-2">Gəliş Saatı</th>
+                                <th class="py-2 px-2">Gediş Saatı</th>
                             </tr>
                         </thead>
                         <tbody id="attendanceRowsList"></tbody>
@@ -513,19 +513,28 @@
             if(role) {
                 document.getElementById('loginScreen').classList.add('hidden-screen');
                 document.getElementById('mainApp').classList.remove('hidden-screen');
+                
+                let shiftBox = document.getElementById('shiftControlBox');
+                let attBtn = document.getElementById('attendanceBtn');
+
                 if(role === 'ADMIN') {
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('adminReportBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     document.getElementById('expensesBtn').classList.remove('hidden-screen');
-                    document.getElementById('attendanceBtn').classList.remove('hidden-screen');
+                    if(attBtn) attBtn.classList.remove('hidden-screen');
+                    if(shiftBox) shiftBox.classList.add('hidden-screen'); // Adminin növbə düymələri görünmür
+                } else {
+                    if(shiftBox) shiftBox.classList.remove('hidden-screen'); // Satıcı üçün görünür
+                    if(attBtn) attBtn.classList.add('hidden-screen');
                 }
+
                 loadAnalytics('day'); 
                 let today = getBakuDateString();
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
                 if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
                 document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
-                checkTodayShiftStatus();
+                if(role === 'SATICI') checkTodayShiftStatus();
                 renderUI();
                 checkNewOrdersBlinking();
             }
@@ -554,7 +563,7 @@
                 document.getElementById('debugBox').className = "bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print";
                 
                 if(role) {
-                    checkTodayShiftStatus();
+                    if(role === 'SATICI') checkTodayShiftStatus();
                     checkNewOrdersBlinking();
                 }
             } catch (err) {
@@ -566,8 +575,9 @@
 
         function checkTodayShiftStatus() {
             let todayStr = getBakuDateString();
-            let rec = attendances.find(a => a.work_date === todayStr && a.role_name === role);
+            let rec = attendances.find(a => a.work_date === todayStr && a.role_name === 'SATICI');
             let statusTextElem = document.getElementById('shiftStatusText');
+            if(!statusTextElem) return;
             
             if(!rec) {
                 statusTextElem.textContent = "Növbə başlanmayıb";
@@ -588,12 +598,12 @@
             let todayStr = getBakuDateString();
             let nowIso = new Date().toISOString();
 
-            let existing = attendances.find(a => a.work_date === todayStr && a.role_name === role);
+            let existing = attendances.find(a => a.work_date === todayStr && a.role_name === 'SATICI');
             if(existing) {
                 let { error } = await _supabase.from('attendance').update({ check_in: nowIso }).eq('id', existing.id);
                 if(error) { alert('Xəta: ' + error.message); return; }
             } else {
-                let { error } = await _supabase.from('attendance').insert([{ work_date: todayStr, role_name: role, check_in: nowIso }]);
+                let { error } = await _supabase.from('attendance').insert([{ work_date: todayStr, role_name: 'SATICI', check_in: nowIso }]);
                 if(error) { alert('Xəta: ' + error.message); return; }
             }
             alert('Növbə uğurla başlandı!');
@@ -604,7 +614,7 @@
             let todayStr = getBakuDateString();
             let nowIso = new Date().toISOString();
 
-            let existing = attendances.find(a => a.work_date === todayStr && a.role_name === role);
+            let existing = attendances.find(a => a.work_date === todayStr && a.role_name === 'SATICI');
             if(!existing || !existing.check_in) {
                 alert('Əvvəlcə növbəni başlamalısınız!');
                 return;
@@ -623,9 +633,7 @@
                 let sel = document.getElementById(id);
                 if(!sel) return;
                 sel.innerHTML = '';
-                for(let y = currentYr - 2; y <= currentYr + 3; y++) {
-                    sel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
-                }
+                for(let y = currentYr - 2; y <= currentYr + 3; y++) sel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
             });
             let currentMo = new Date().getMonth() + 1;
             if(document.getElementById('expenseMonthSelect')) document.getElementById('expenseMonthSelect').value = currentMo;
@@ -638,13 +646,9 @@
             document.getElementById('attendanceModal').classList.remove('hidden-screen');
         }
 
-        function closeAttendanceModal() {
-            document.getElementById('attendanceModal').classList.add('hidden-screen');
-        }
+        function closeAttendanceModal() { document.getElementById('attendanceModal').classList.add('hidden-screen'); }
 
-        function getDaysInMonth(year, month) {
-            return new Date(year, month, 0).getDate();
-        }
+        function getDaysInMonth(year, month) { return new Date(year, month, 0).getDate(); }
 
         function renderAttendanceSheet() {
             let year = parseInt(document.getElementById('attYearSelect').value);
@@ -656,26 +660,18 @@
             let html = '';
 
             for(let day = 1; day <= daysCount; day++) {
-                let dayStr = String(day).padStart(2, '0');
-                let dateKey = `${year}-${monthStr}-${dayStr}`;
+                let dateKey = `${year}-${monthStr}-${String(day).padStart(2, '0')}`;
+                let rec = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI') || {};
 
-                let sRecord = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI') || {};
-                let aRecord = attendances.find(a => a.work_date === dateKey && a.role_name === 'ADMIN') || {};
-
-                let sCheckIn = sRecord.check_in ? new Date(sRecord.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
-                let sCheckOut = sRecord.check_out ? new Date(sRecord.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
-                
-                let aCheckIn = aRecord.check_in ? new Date(aRecord.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
-                let aCheckOut = aRecord.check_out ? new Date(aRecord.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
-
-                let sText = sRecord.check_in ? `${sCheckIn} - ${sCheckOut}` : '<span class="text-zinc-600">İştirak olmayıb</span>';
-                let aText = aRecord.check_in ? `${aCheckIn} - ${aCheckOut}` : '<span class="text-zinc-600">İştirak olmayıb</span>';
+                let checkIn = rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let checkOut = rec.check_out ? new Date(rec.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let timeText = rec.check_in ? `${checkIn} — ${checkOut}` : '<span class="text-zinc-600">İştirak olmayıb</span>';
 
                 html += `
                     <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 font-mono">
                         <td class="py-2 px-2 text-center text-amber-400 font-bold">${day}</td>
-                        <td class="py-2 px-2">${sText}</td>
-                        <td class="py-2 px-2">${aText}</td>
+                        <td class="py-2 px-2">${rec.check_in ? checkIn : '<span class="text-zinc-600">--:--</span>'}</td>
+                        <td class="py-2 px-2">${rec.check_out ? checkOut : '<span class="text-zinc-600">--:--</span>'}</td>
                     </tr>
                 `;
             }
@@ -686,8 +682,7 @@
             if(!role) return;
             let ordersBtn = document.getElementById('ordersBtn');
             if(!ordersBtn) return;
-            let lastSeenKey = `melodika_last_seen_order_${role}`;
-            let lastSeenId = parseInt(localStorage.getItem(lastSeenKey) || '0');
+            let lastSeenId = parseInt(localStorage.getItem(`melodika_last_seen_order_${role}`) || '0');
             let maxId = 0;
             orders.forEach(o => { if(o.id > maxId) maxId = o.id; });
             if(maxId > lastSeenId) ordersBtn.classList.add('blinking-btn');
@@ -704,27 +699,32 @@
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
             
+            let shiftBox = document.getElementById('shiftControlBox');
+            let attBtn = document.getElementById('attendanceBtn');
+
             if(role === 'ADMIN') {
                 document.getElementById('adminBox').classList.remove('hidden-screen');
                 document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                 document.getElementById('expensesBtn').classList.remove('hidden-screen');
-                document.getElementById('attendanceBtn').classList.remove('hidden-screen');
+                if(attBtn) attBtn.classList.remove('hidden-screen');
+                if(shiftBox) shiftBox.classList.add('hidden-screen');
+            } else {
+                if(shiftBox) shiftBox.classList.remove('hidden-screen');
+                if(attBtn) attBtn.classList.add('hidden-screen');
             }
+
             loadAnalytics('day'); 
             let today = getBakuDateString();
             if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
             if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
             document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
-            checkTodayShiftStatus();
+            if(role === 'SATICI') checkTodayShiftStatus();
             renderUI();
             checkNewOrdersBlinking();
         }
 
-        function logout() { 
-            localStorage.removeItem('melodika_current_role');
-            location.reload(); 
-        }
+        function logout() { localStorage.removeItem('melodika_current_role'); location.reload(); }
 
         async function trackVisit() {
             try { await _supabase.from('site_visits').insert([{}]); } catch(e) {}
@@ -1187,7 +1187,7 @@
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
-            document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
+            document.getElementById('payPos').textContent = payPos.toFixed(2) + ' AZN';
             document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
 
             if(role === 'ADMIN') {
