@@ -136,6 +136,7 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
+                    <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
                     <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
                     <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
                     <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
@@ -143,7 +144,7 @@
                 </div>
             </header>
 
-            <!-- HESABATLAR SHEETS BÖLGƏSİ (YALNIZ ADMİN ÜÇÜN) -->
+            <!-- HESABATLAR SHEETS BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN) -->
             <div id="adminReportsSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
                 <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">📊 HESABATLAR SHEETİ (ADMİN MƏRKƏZİ)</h2>
@@ -349,8 +350,6 @@
                         <div class="bg-zinc-800/30 p-2 rounded">Karta: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
                     </div>
                 </div>
-
-                <!-- Gizli saxlanılan və ya ehtiyac olmayan aşağıdakı xalis gəlir qutusu təmizləndi -->
             </div>
         </div>
 
@@ -1204,7 +1203,6 @@
             let container = document.getElementById('topFeaturedContainer');
             if(!container) return;
             
-            // Top 3 seçilən ətirlər (Afnan Tribute, Afnan 9 PM, Sospiro Accento)
             let featuredNames = ["Afnan Tribute", "Afnan 9 PM", "Sospiro Accento"];
             let html = '';
 
