@@ -178,8 +178,8 @@
                     </div>
                 </div>
 
-                <!-- DÖVRİ HESABAT DÜYMƏLƏRİ VƏ DİGƏrləri -->
-                <div class="grid grid-cols-2 sm:grid-cols-7 gap-2">
+                <!-- DÖVRİ HESABAT DÜYMƏLƏRİ VƏ DİGƏRLƏRİ (GÜN SONU BURADAN SİLİNDİ) -->
+                <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
                     <button onclick="openPeriodicReport('weekly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>📅</span><span>Həftəlik</span>
                     </button>
@@ -188,9 +188,6 @@
                     </button>
                     <button onclick="openPeriodicReport('yearly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>📈</span><span>İllik</span>
-                    </button>
-                    <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>📝</span><span>Gün Sonu</span>
                     </button>
                     <button onclick="openRangeReportModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>🔍</span><span>Aralıq</span>
@@ -452,7 +449,7 @@
             </div>
         </div>
 
-        <!-- DÖVRİ HESABAT MODALI (HƏFTƏLİK / AYLıQ / İLLİK) -->
+        <!-- DÖVRİ HESABAT MODALI (HƏFTƏLİK / AYLıQ / İLLİK - XƏRCLƏR DAHİL) -->
         <div id="periodicReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
@@ -466,6 +463,7 @@
                         <div>Ümumi satış: <span id="repPeriodTotal" class="font-bold float-right">0.00 AZN</span></div>
                         <div>Səhər smeni satışı: <span id="repPeriodSeher" class="font-bold float-right">0.00 AZN</span></div>
                         <div>Günorta smeni satışı: <span id="repPeriodGunorta" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Xərclər: <span id="repPeriodExpenses" class="font-bold float-right text-red-600">0.00 AZN</span></div>
                         <div>Xalis gəlir: <span id="repPeriodProfit" class="font-bold float-right text-green-700">0.00 AZN</span></div>
                         <div>Reklamdan: <span id="repPeriodAd" class="font-bold float-right">0.00 AZN</span></div>
                         <div>Pos terminal: <span id="repPeriodPos" class="font-bold float-right">0.00 AZN</span></div>
@@ -482,7 +480,7 @@
             </div>
         </div>
 
-        <!-- ARALIQ HESABAT (XALİS GƏLİR) ŞƏKİL MODALI -->
+        <!-- ARALIQ HESABAT (XALİS GƏLİR VƏ XƏRCLƏR) ŞƏKİL MODALI -->
         <div id="rangeReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
@@ -493,6 +491,7 @@
                     <div id="rangeReportHeader" class="font-bold text-black text-center border-b-2 border-black pb-2">Hesabat</div>
                     <div class="space-y-2 pt-1 text-black font-medium text-xs">
                         <div>Ümumi satış: <span id="repModalTotal" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Xərclər: <span id="repModalExpenses" class="font-bold float-right text-red-600">0.00 AZN</span></div>
                         <div>Xalis gəlir: <span id="repModalProfit" class="font-bold float-right text-green-700">0.00 AZN</span></div>
                         <div>Reklamdan: <span id="repModalAd" class="font-bold float-right">0.00 AZN</span></div>
                         <div>Pos terminal: <span id="repModalPos" class="font-bold float-right">0.00 AZN</span></div>
@@ -1180,6 +1179,7 @@
             document.getElementById('repPeriodTotal').textContent = totalSalesSum.toFixed(2) + ' AZN';
             document.getElementById('repPeriodSeher').textContent = seherSum.toFixed(2) + ' AZN';
             document.getElementById('repPeriodGunorta').textContent = gunortaSum.toFixed(2) + ' AZN';
+            document.getElementById('repPeriodExpenses').textContent = rangeExpensesTotal.toFixed(2) + ' AZN';
             document.getElementById('repPeriodProfit').textContent = netProfitFinal.toFixed(2) + ' AZN';
             document.getElementById('repPeriodAd').textContent = rAd.toFixed(2) + ' AZN';
             document.getElementById('repPeriodPos').textContent = rPos.toFixed(2) + ' AZN';
@@ -1234,6 +1234,7 @@
             let netProfitFinal = totalGrossProfitSum - rangeExpensesTotal;
 
             document.getElementById('repModalTotal').textContent = totalSalesSum.toFixed(2) + ' AZN';
+            document.getElementById('repModalExpenses').textContent = rangeExpensesTotal.toFixed(2) + ' AZN';
             document.getElementById('repModalProfit').textContent = netProfitFinal.toFixed(2) + ' AZN';
             document.getElementById('repModalAd').textContent = rAd.toFixed(2) + ' AZN';
             document.getElementById('repModalPos').textContent = rPos.toFixed(2) + ' AZN';
@@ -2116,12 +2117,22 @@
 
             if(editingSaleId) {
                 let { error } = await _supabase.from('sales').update(opPayload).eq('id', editingSaleId);
-                if(error) { alert('Xəta: ' + error.message); return; }
+                if(error) { 
+                    // Fallback to avoid shift_name column error if not migrated
+                    delete opPayload.shift_name;
+                    let { error: err2 } = await _supabase.from('sales').update(opPayload).eq('id', editingSaleId);
+                    if(err2) { alert('Xəta: ' + err2.message); return; }
+                }
                 alert('Əməliyyat yeniləndi!');
                 cancelEditSale();
             } else {
                 let { error } = await _supabase.from('sales').insert([opPayload]);
-                if(error) { alert('Xəta: ' + error.message); return; }
+                if(error) { 
+                    // Fallback to avoid shift_name column error if not migrated
+                    delete opPayload.shift_name;
+                    let { error: err2 } = await _supabase.from('sales').insert([opPayload]);
+                    if(err2) { alert('Xəta: ' + err2.message); return; }
+                }
                 alert('Əməliyyat yadda saxlanıldı!');
             }
 
