@@ -435,7 +435,7 @@
 
                 <!-- RASİM KASSA EDİT PANELİ -->
                 <div id="rasimCashControls" class="hidden-screen space-y-3 bg-zinc-800/80 p-4 rounded-xl border border-zinc-700">
-                    <div class="text-xs text-amber-400 font-bold">Rasim - Günlük Kassa Qeydi (Ev / Mağaza):</div>
+                    <div class="text-xs text-amber-400 font-bold">Günlük Kassa Qeydi (Ev / Mağaza):</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div>
                             <label class="text-zinc-400 block mb-1">Evdəki kassaya qoydum:</label>
@@ -472,12 +472,8 @@
 
                     <div class="space-y-1.5 pt-2 border-t border-zinc-700/80">
                         <div class="flex justify-between">
-                            <span class="text-zinc-300">Satış (Seçilmiş Ay):</span>
-                            <strong id="kassaTotalSales" class="gold-text">0.00 AZN</strong>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-zinc-300">Qazanc (Mayasız/Ümumi):</span>
-                            <strong id="kassaGrossProfit" class="text-blue-400">0.00 AZN</strong>
+                            <span class="font-bold text-amber-300">Ay Sonu Yekun Kassa:</span>
+                            <strong id="kassaAySonuYekun" class="text-amber-400 text-sm">0.00 AZN</strong>
                         </div>
                         <div class="flex justify-between">
                             <span class="text-zinc-300">Xərclər:</span>
@@ -1061,7 +1057,7 @@
                 document.getElementById('adminHomeCashInput').value = cashState.home_cash || 0;
                 document.getElementById('adminStoreCashInput').value = cashState.store_cash || 0;
             } else {
-                document.getElementById('cashSheetTitle').textContent = 'KASSA SHEET-İ (RASİM)';
+                document.getElementById('cashSheetTitle').textContent = 'KASSA SHEET-İ';
                 adminControls.classList.add('hidden-screen');
                 rasimControls.classList.remove('hidden-screen');
                 adminReset.classList.add('hidden-screen');
@@ -1089,17 +1085,6 @@
 
             let monthPrefix = `${selYear}-${String(selMonth).padStart(2, '0')}`;
 
-            let totalSalesFromMonth = 0;
-            let grossProfitFromMonth = 0;
-
-            sales.forEach(s => {
-                let sDate = s.date ? getBakuDateString(s.date) : '';
-                if(s.type === 'MEXARIC' && sDate.startsWith(monthPrefix)) {
-                    totalSalesFromMonth += Number(s.total_price || 0);
-                    grossProfitFromMonth += Number(s.profit || 0);
-                }
-            });
-
             let totalExpFromMonth = 0;
             expenses.forEach(e => {
                 let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
@@ -1108,10 +1093,10 @@
                 }
             });
 
-            let netProfitFromMonth = grossProfitFromMonth - totalExpFromMonth;
+            let aySonuYekun = combinedVal;
+            let netProfitFromMonth = aySonuYekun - totalExpFromMonth;
 
-            document.getElementById('kassaTotalSales').textContent = totalSalesFromMonth.toFixed(2) + ' AZN';
-            document.getElementById('kassaGrossProfit').textContent = grossProfitFromMonth.toFixed(2) + ' AZN';
+            document.getElementById('kassaAySonuYekun').textContent = aySonuYekun.toFixed(2) + ' AZN';
             document.getElementById('kassaTotalExpenses').textContent = totalExpFromMonth.toFixed(2) + ' AZN';
             document.getElementById('kassaNetProfit').textContent = netProfitFromMonth.toFixed(2) + ' AZN';
         }
@@ -1160,16 +1145,9 @@
 
             let monthPrefix = `${selYear}-${String(selMonth).padStart(2, '0')}`;
 
-            let totalSales = 0;
-            let grossProfit = 0;
-
-            sales.forEach(s => {
-                let sDate = s.date ? getBakuDateString(s.date) : '';
-                if(s.type === 'MEXARIC' && sDate.startsWith(monthPrefix)) {
-                    totalSales += Number(s.total_price || 0);
-                    grossProfit += Number(s.profit || 0);
-                }
-            });
+            let homeVal = Number(cashState.home_cash || 0);
+            let storeVal = Number(cashState.store_cash || 0);
+            let aySonuYekun = homeVal + storeVal;
 
             let totalExp = 0;
             expenses.forEach(e => {
@@ -1179,12 +1157,12 @@
                 }
             });
 
-            let netProfit = grossProfit - totalExp;
+            let netProfit = aySonuYekun - totalExp;
 
             let archivePayload = {
                 year: selYear,
                 month_name: `${monthName} ${selYear}`,
-                total_gain: grossProfit, // Qazanc (mayasız)
+                total_gain: aySonuYekun,
                 total_expense: totalExp,
                 net_profit: netProfit,
                 created_at: new Date().toISOString()
@@ -1203,7 +1181,7 @@
             await loadDataFromCloud();
             closeCashSheetModal();
 
-            alert(`${monthName} ${selYear} üzrə kassa sıfırlandı!\n\nSatış: ${totalSales.toFixed(2)} manat\nQazanc: ${grossProfit.toFixed(2)} manat\nXərclər: ${totalExp.toFixed(2)} manat\nNet gəlir: ${netProfit.toFixed(2)} manat`);
+            alert(`${monthName} ${selYear} üzrə kassa sıfırlandı!\n\nAy Sonu Yekun Kassa: ${aySonuYekun.toFixed(2)} manat\nXərclər: ${totalExp.toFixed(2)} manat\nNet gəlir: ${netProfit.toFixed(2)} manat`);
         }
 
         async function openYearlyReportModal() {
@@ -1220,7 +1198,7 @@
                                 <button onclick="deleteYearlyArchive(${item.id})" class="text-red-400 hover:text-red-600 font-bold text-xs bg-zinc-900 px-2 py-0.5 rounded border border-zinc-700">Sil 🗑️</button>
                             </div>
                             <div class="pl-2 space-y-0.5 text-zinc-300">
-                                <div>Qazanc - ${Number(item.total_gain || 0).toFixed(2)} manat</div>
+                                <div>Ay Sonu Yekun Kassa - ${Number(item.total_gain || 0).toFixed(2)} manat</div>
                                 <div>Xərc - ${Number(item.total_expense || 0).toFixed(2)} manat</div>
                                 <div class="font-bold text-green-400">Net gəlir - ${Number(item.net_profit || 0).toFixed(2)} manat</div>
                             </div>
