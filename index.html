@@ -1298,7 +1298,10 @@
 
         async function rateProduct(productId, ratingValue) {
             let { error } = await _supabase.from('product_ratings').insert([{ product_id: productId, rating: ratingValue }]);
-            if(error) { alert('Xəta: ' + error.message); return; }
+            if(error) { 
+                alert('Xəta: ' + error.message); 
+                return; 
+            }
             alert('Qiymətləndirmeniz üçün təşəkkür edirik!');
             await loadDataFromCloud();
             renderCustomerCatalog();
