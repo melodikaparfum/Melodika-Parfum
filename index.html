@@ -160,6 +160,18 @@
                 </div>
             </header>
 
+            <!-- KASSA SHEETE GİRİŞ BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN) -->
+            <div id="adminCashSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
+                <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
+                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">💰 KASSA MƏRKƏZİ (ADMIN)</h2>
+                    <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Kassa Sheet</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-zinc-300">Evdəki və Mağazadakı kassa balanslarını idarə edin, ay sonu sıfırlayın.</span>
+                    <button onclick="openCashPinModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs shadow-md">Kassa Sheet-i Aç 💼</button>
+                </div>
+            </div>
+
             <!-- HESABATLAR SHEETS BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN) -->
             <div id="adminReportsSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
                 <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
@@ -367,6 +379,93 @@
                         <div class="bg-zinc-800/30 p-2 rounded">POS: <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
                         <div class="bg-zinc-800/30 p-2 rounded">Karta: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KASSA PİN MODALI -->
+        <div id="cashPinModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
+            <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
+                <h2 class="text-base font-bold gold-text">Kassa Paneli Girişi</h2>
+                <p class="text-xs text-zinc-400">Admin (000) və ya Rasim (111) PIN kodunu daxil edin:</p>
+                <input type="password" id="cashPinInput" placeholder="PIN Kod" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
+                <div class="flex space-x-2">
+                    <button onclick="closeCashPinModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina</button>
+                    <button onclick="verifyCashPin()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Daxil Ol</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- KASSA SHEET / İDARƏETMƏ MODALI -->
+        <div id="cashSheetModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
+            <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                    <h2 class="text-lg font-bold gold-text" id="cashSheetTitle">KASSA SHEET-İ</h2>
+                    <button onclick="closeCashSheetModal()" class="text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
+                </div>
+
+                <div id="adminCashControls" class="hidden-screen space-y-3 bg-zinc-800/80 p-4 rounded-xl border border-zinc-700">
+                    <div class="text-xs text-amber-400 font-bold">Admin İdarəetmə Paneli:</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <label class="text-zinc-400 block mb-1">Evdəki Kassa Balansı (AZN)</label>
+                            <input type="number" step="0.01" id="adminHomeCashInput" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white">
+                        </div>
+                        <div>
+                            <label class="text-zinc-400 block mb-1">Mağazadakı Kassa Balansı (AZN)</label>
+                            <input type="number" step="0.01" id="adminStoreCashInput" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white">
+                        </div>
+                    </div>
+                    <button onclick="adminSaveCashBalances()" class="gold-bg font-bold py-2 px-4 rounded text-xs w-full">Balansları Yadda Saxla / Yenilə</button>
+                </div>
+
+                <div id="rasimCashControls" class="hidden-screen space-y-3 bg-zinc-800/80 p-4 rounded-xl border border-zinc-700">
+                    <div class="text-xs text-amber-400 font-bold">Rasim - Günlük Kassa Qeydi (Ev / Mağaza):</div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div>
+                            <label class="text-zinc-400 block mb-1">Evdəki kassaya qoydum:</label>
+                            <input type="number" step="0.01" id="rasimHomeInput" placeholder="Məs: 50" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white">
+                        </div>
+                        <div>
+                            <label class="text-zinc-400 block mb-1">Mağazadakı kassaya qoydum:</label>
+                            <input type="number" step="0.01" id="rasimStoreInput" placeholder="Məs: 20" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white">
+                        </div>
+                    </div>
+                    <button onclick="rasimSaveDailyCash()" class="gold-bg font-bold py-2 px-4 rounded text-xs w-full">Təsdiq Et və Çıx</button>
+                </div>
+
+                <div class="bg-zinc-800/50 p-4 rounded-xl space-y-3 text-xs border border-zinc-700">
+                    <div class="font-bold gold-text text-sm">Cari Kassa Vəziyyəti (Ayın 1-dən indiyə):</div>
+                    <div class="flex justify-between border-b border-zinc-700 pb-2">
+                        <span>Toplam Kassa (Ayın 1-dən satışlar):</span>
+                        <strong id="kassaTotalSales" class="gold-text text-sm">0.00 AZN</strong>
+                    </div>
+                    <div class="flex justify-between border-b border-zinc-700 pb-2">
+                        <span>Evdəki Kassa (Üst-üstə yığılan):</span>
+                        <strong id="kassaHomeBalance" class="text-green-400 text-sm">0.00 AZN</strong>
+                    </div>
+                    <div class="flex justify-between border-b border-zinc-700 pb-2">
+                        <span>Mağazadakı Kassa (Günlük qalıq):</span>
+                        <strong id="kassaStoreBalance" class="text-amber-400 text-sm">0.00 AZN</strong>
+                    </div>
+                </div>
+
+                <div id="adminResetSection" class="hidden-screen pt-2 space-y-2 border-t border-zinc-800">
+                    <button onclick="resetMonthlyCash()" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2.5 rounded text-xs">Kassanı Sıfırla (Ayın 1-i) 🔄</button>
+                    <button onclick="openYearlyReportModal()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold py-2.5 rounded text-xs">İllik Hesabat 📈</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- İLLİK HESABAT MODALI -->
+        <div id="yearlyReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                    <h2 class="text-sm font-bold gold-text">İllik Hesabat Arxivi</h2>
+                    <button onclick="closeYearlyReportModal()" class="text-xs bg-zinc-800 px-2.5 py-1 rounded">X</button>
+                </div>
+                <div id="yearlyReportList" class="space-y-3 max-h-[60vh] overflow-y-auto text-xs">
+                    <div class="text-zinc-500 text-center">Arxiv yüklənir...</div>
                 </div>
             </div>
         </div>
@@ -673,6 +772,8 @@
         let attendances = [];
         let chatMessages = [];
         let productRatings = [];
+        let cashState = { home_cash: 0, store_cash: 0 };
+        let yearlyArchive = [];
         let cart = [];
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
@@ -720,16 +821,19 @@
                 
                 let shiftBox = document.getElementById('shiftControlBox');
                 let adminReportsSheet = document.getElementById('adminReportsSheetSection');
+                let adminCashSheet = document.getElementById('adminCashSheetSection');
 
                 if(role === 'ADMIN') {
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
+                    if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
                     document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                     setOperationalState(true);
                 } else {
                     if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
+                    if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
                     let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                     document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -760,6 +864,18 @@
 
                 let eRes = await _supabase.from('expenses').select('*');
                 if(!eRes.error) expenses = eRes.data || [];
+
+                try {
+                    let cRes = await _supabase.from('cash_state').select('*').limit(1);
+                    if(!cRes.error && cRes.data && cRes.data.length > 0) {
+                        cashState = cRes.data[0];
+                    }
+                } catch(e) {}
+
+                try {
+                    let yRes = await _supabase.from('yearly_archive').select('*');
+                    if(!yRes.error) yearlyArchive = yRes.data || [];
+                } catch(e) { yearlyArchive = []; }
 
                 try {
                     let rRes = await _supabase.from('product_ratings').select('*');
@@ -855,6 +971,185 @@
             alert('Növbə bağlandı! Əməliyyatlar bloklandı.');
             await loadDataFromCloud();
             checkTodayShiftStatus();
+        }
+
+        function openCashPinModal() {
+            document.getElementById('cashPinInput').value = '';
+            document.getElementById('cashPinModal').classList.remove('hidden-screen');
+        }
+
+        function closeCashPinModal() {
+            document.getElementById('cashPinModal').classList.add('hidden-screen');
+        }
+
+        async function verifyCashPin() {
+            let pin = document.getElementById('cashPinInput').value;
+            if(pin === '000') {
+                closeCashPinModal();
+                openCashSheetModal('ADMIN');
+            } else if(pin === '111') {
+                closeCashPinModal();
+                openCashSheetModal('RASIM');
+            } else {
+                alert('Yanlış PIN kod! (Admin üçün 000, Rasim üçün 111)');
+            }
+        }
+
+        function openCashSheetModal(userType) {
+            let now = new Date();
+            let monthStartStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+
+            let totalSalesFromMonth = 0;
+            sales.forEach(s => {
+                let sDate = s.date ? getBakuDateString(s.date) : '';
+                if(s.type === 'MEXARIC' && sDate >= monthStartStr) {
+                    totalSalesFromMonth += Number(s.total_price || 0);
+                }
+            });
+
+            document.getElementById('kassaTotalSales').textContent = totalSalesFromMonth.toFixed(2) + ' AZN';
+            document.getElementById('kassaHomeBalance').textContent = Number(cashState.home_cash || 0).toFixed(2) + ' AZN';
+            document.getElementById('kassaStoreBalance').textContent = Number(cashState.store_cash || 0).toFixed(2) + ' AZN';
+
+            let adminControls = document.getElementById('adminCashControls');
+            let rasimControls = document.getElementById('rasimCashControls');
+            let adminReset = document.getElementById('adminResetSection');
+
+            if(userType === 'ADMIN') {
+                document.getElementById('cashSheetTitle').textContent = 'KASSA SHEET-İ (ADMIN)';
+                adminControls.classList.remove('hidden-screen');
+                rasimControls.classList.add('hidden-screen');
+                adminReset.classList.remove('hidden-screen');
+                document.getElementById('adminHomeCashInput').value = cashState.home_cash || 0;
+                document.getElementById('adminStoreCashInput').value = cashState.store_cash || 0;
+            } else {
+                document.getElementById('cashSheetTitle').textContent = 'KASSA SHEET-İ (RASİM)';
+                adminControls.classList.add('hidden-screen');
+                rasimControls.classList.remove('hidden-screen');
+                adminReset.classList.add('hidden-screen');
+                document.getElementById('rasimHomeInput').value = '';
+                document.getElementById('rasimStoreInput').value = '';
+            }
+
+            document.getElementById('cashSheetModal').classList.remove('hidden-screen');
+        }
+
+        function closeCashSheetModal() {
+            document.getElementById('cashSheetModal').classList.add('hidden-screen');
+        }
+
+        async function adminSaveCashBalances() {
+            let newHome = parseFloat(document.getElementById('adminHomeCashInput').value) || 0;
+            let newStore = parseFloat(document.getElementById('adminStoreCashInput').value) || 0;
+
+            let payload = { home_cash: newHome, store_cash: newStore, updated_at: new Date().toISOString() };
+            let query = cashState.id ? _supabase.from('cash_state').update(payload).eq('id', cashState.id) : _supabase.from('cash_state').insert([payload]);
+            let { error } = await query;
+            if(error) { alert('Xəta: ' + error.message); return; }
+
+            alert('Kassa balansları uğurla yeniləndi!');
+            await loadDataFromCloud();
+            openCashSheetModal('ADMIN');
+        }
+
+        async function rasimSaveDailyCash() {
+            let addHome = parseFloat(document.getElementById('rasimHomeInput').value) || 0;
+            let setStore = parseFloat(document.getElementById('rasimStoreInput').value) || 0;
+
+            let updatedHome = Number(cashState.home_cash || 0) + addHome;
+            let updatedStore = setStore; // Mağazadakı günlük yenilənən qalıq
+
+            let payload = { home_cash: updatedHome, store_cash: updatedStore, updated_at: new Date().toISOString() };
+            let query = cashState.id ? _supabase.from('cash_state').update(payload).eq('id', cashState.id) : _supabase.from('cash_state').insert([payload]);
+            let { error } = await query;
+            if(error) { alert('Xəta: ' + error.message); return; }
+
+            alert('Kassa qeydləriniz yadda saxlanıldı!');
+            await loadDataFromCloud();
+            closeCashSheetModal();
+        }
+
+        async function resetMonthlyCash() {
+            if(!confirm('Kassanı sıfırlamaq və ayı bağlamaq istədiyinizə əminsiniz? (Xərclər ümumi qazancdan çıxılacaq və arxivə yazılacaq)')) return;
+
+            let now = new Date();
+            let currentYear = now.getFullYear();
+            let currentMonthNum = now.getMonth() + 1; // 1-12
+            let prevMonthIndex = currentMonthNum - 1 === 0 ? 11 : currentMonthNum - 2;
+            let prevMonthYear = currentMonthNum - 1 === 0 ? currentYear - 1 : currentYear;
+            let monthName = monthNamesAz[prevMonthIndex];
+
+            let startStr = `${prevMonthYear}-${String(prevMonthIndex + 1).padStart(2, '0')}-01`;
+            let endStr = `${prevMonthYear}-${String(prevMonthIndex + 1).padStart(2, '0')}-31`;
+
+            let totalGain = 0;
+            sales.forEach(s => {
+                let sDate = s.date ? getBakuDateString(s.date) : '';
+                if(s.type === 'MEXARIC' && sDate >= startStr && sDate <= endStr) {
+                    totalGain += Number(s.total_price || 0);
+                }
+            });
+
+            let totalExp = 0;
+            expenses.forEach(e => {
+                let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+                if(eDate >= startStr && eDate <= endStr) {
+                    totalExp += Number(e.amount || 0);
+                }
+            });
+
+            let netProfit = totalGain - totalExp;
+
+            let archivePayload = {
+                year: prevMonthYear,
+                month_name: `${monthName} ${prevMonthYear}`,
+                total_gain: totalGain,
+                total_expense: totalExp,
+                net_profit: netProfit,
+                created_at: new Date().toISOString()
+            };
+
+            let { error: arcErr } = await _supabase.from('yearly_archive').insert([archivePayload]);
+            if(arcErr) { alert('Arxiv xətası: ' + arcErr.message); return; }
+
+            let cashPayload = { home_cash: 0, store_cash: 0, updated_at: new Date().toISOString() };
+            if(cashState.id) {
+                await _supabase.from('cash_state').update(cashPayload).eq('id', cashState.id);
+            } else {
+                await _supabase.from('cash_state').insert([cashPayload]);
+            }
+
+            await loadDataFromCloud();
+            closeCashSheetModal();
+
+            alert(`Kassa sıfırlandı!\n\nAy ərzində toplam qazanc: ${totalGain.toFixed(2)} manat\nAy ərzində toplam xərclər: ${totalExp.toFixed(2)} manat\nNet gəlir: ${netProfit.toFixed(2)} manat`);
+        }
+
+        async function openYearlyReportModal() {
+            let container = document.getElementById('yearlyReportList');
+            if(yearlyArchive.length === 0) {
+                container.innerHTML = '<div class="text-zinc-500 text-center py-4">Hələ qeydə alınmış illik arxiv yoxdur.</div>';
+            } else {
+                let html = '';
+                yearlyArchive.forEach((item, idx) => {
+                    html += `
+                        <div class="bg-zinc-800/80 p-3 rounded-lg border border-zinc-700 space-y-1">
+                            <div class="font-bold gold-text">${idx + 1}. ${item.month_name}:</div>
+                            <div class="pl-2 space-y-0.5 text-zinc-300">
+                                <div>Qazanc - ${Number(item.total_gain || 0).toFixed(2)} manat</div>
+                                <div>Xərc - ${Number(item.total_expense || 0).toFixed(2)} manat</div>
+                                <div class="font-bold text-green-400">Net gəlir - ${Number(item.net_profit || 0).toFixed(2)} manat</div>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+            document.getElementById('yearlyReportModal').classList.remove('hidden-screen');
+        }
+
+        function closeYearlyReportModal() {
+            document.getElementById('yearlyReportModal').classList.add('hidden-screen');
         }
 
         function initYearOptions() {
@@ -983,7 +1278,6 @@
             for(let day = 1; day <= daysCount; day++) {
                 let dateKey = `${year}-${monthStr}-${String(day).padStart(2, '0')}`;
                 
-                // Səhər smeni
                 let recSeher = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_SEHER') || {};
                 let checkInS = recSeher.check_in ? new Date(recSeher.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let checkOutS = recSeher.check_out ? new Date(recSeher.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
@@ -1004,7 +1298,6 @@
                     }
                 }
 
-                // Günorta smeni
                 let recGunorta = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_GUNORTA') || {};
                 let checkInG = recGunorta.check_in ? new Date(recGunorta.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
@@ -1307,16 +1600,19 @@
             
             let shiftBox = document.getElementById('shiftControlBox');
             let adminReportsSheet = document.getElementById('adminReportsSheetSection');
+            let adminCashSheet = document.getElementById('adminCashSheetSection');
 
             if(role === 'ADMIN') {
                 document.getElementById('adminBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                 if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
+                if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                 setOperationalState(true);
             } else {
                 if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
+                if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
                 let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                 document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
