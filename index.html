@@ -862,7 +862,10 @@
 
             let container = document.getElementById('attendanceRowsList');
             let html = '';
-            let weekDayCounter = 1;
+
+            // Ayın 1-ci gününün həftənin hansı gününə düşdüyünü dəqiq hesablayırıq
+            let firstDayIndex = new Date(year, month - 1, 1).getDay();
+            let currentDayOfWeek = firstDayIndex === 0 ? 7 : firstDayIndex;
 
             for(let day = 1; day <= daysCount; day++) {
                 let dateKey = `${year}-${monthStr}-${String(day).padStart(2, '0')}`;
@@ -876,7 +879,7 @@
                 let statusDisplay = '';
                 let reasonBtnHtml = '';
 
-                if(weekDayCounter === 6) {
+                if(currentDayOfWeek === 6) {
                     statusDisplay = `İSTİRAHƏT GÜNÜ`;
                 } else if(rec.check_in && !rec.check_out) {
                     statusDisplay = `${checkIn} - Gözlənilir`;
@@ -895,7 +898,7 @@
                 html += `
                     <div style="border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 8px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px;">
-                            <span>${weekDayCounter}-ci gün (${day}.${monthStr})</span>
+                            <span>${currentDayOfWeek}-ci gün (${day}.${monthStr})</span>
                             <div style="display: flex; align-items: center;">
                                 <span>${statusDisplay}</span>
                                 ${reasonBtnHtml}
@@ -904,8 +907,8 @@
                     </div>
                 `;
 
-                weekDayCounter++;
-                if(weekDayCounter > 7) weekDayCounter = 1;
+                currentDayOfWeek++;
+                if(currentDayOfWeek > 7) currentDayOfWeek = 1;
             }
             container.innerHTML = html;
         }
