@@ -95,9 +95,7 @@
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">🌟 İlin Top 3 Seçilən Ətri (Xüsusi Seçim)</h2>
                     <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Top Hit</span>
                 </div>
-                <div id="topFeaturedContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <!-- Dinamik olaraq aşağıdakı bazadan doldurulacaq -->
-                </div>
+                <div id="topFeaturedContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -172,7 +170,6 @@
                     <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Bütün Hesabatlar</span>
                 </div>
                 
-                <!-- Tarix Seçimi İnputları (Tarixlər üzrə hesabat üçün) -->
                 <div class="bg-zinc-800/80 p-3 rounded-lg border border-zinc-700 grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
                     <div>
                         <label class="text-[10px] text-zinc-400 block mb-1">Başlanğıc Tarix</label>
@@ -336,7 +333,7 @@
                         <div class="overflow-x-auto max-h-48 overflow-y-auto">
                             <table class="w-full text-left text-xs text-zinc-300">
                                 <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                    <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Düzənlə</th></tr>
+                                    <tr><th>Tarix</th><th>Smen</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Düzənlə</th></tr>
                                 </thead>
                                 <tbody id="logTable"></tbody>
                             </table>
@@ -447,7 +444,7 @@
                 <h3 id="modalTitleText" class="text-sm font-bold gold-text">İşə gəlməmə səbəbi yaz / redaktə et</h3>
                 <input type="hidden" id="modalDateKey">
                 <input type="hidden" id="modalRoleName">
-                <textarea id="modalReasonInput" placeholder="Səbəbi ətraflı qeyd edin (məs: yatıb qalıb)..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs h-24 focus:outline-none gold-border"></textarea>
+                <textarea id="modalReasonInput" placeholder="Səbəbi ətraflı qeyd edin (məs: İstirahət, İcazə)..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs h-24 focus:outline-none gold-border"></textarea>
                 <div class="flex space-x-2">
                     <button onclick="closeReasonModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina Et</button>
                     <button onclick="saveAttendanceReason()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Yerinə Yetirildi</button>
@@ -650,7 +647,7 @@
         let cart = [];
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
-        let shiftType = localStorage.getItem('melodika_current_shift') || ''; // 'SEHER' və ya 'GUNORTA'
+        let shiftType = localStorage.getItem('melodika_current_shift') || ''; 
 
         const monthNamesAz = [
             "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
@@ -845,7 +842,7 @@
         }
 
         async function openChatModal() {
-            let unreadIds = chatMessages.filter(m => m.sender !== role && !m.is_read).map(m => m.id);
+            let unreadIds = chatMessages.filter(m => m.sender !== (role === 'SATICI' ? 'SATICI_' + shiftType : role) && !m.is_read).map(m => m.id);
             if(unreadIds.length > 0) {
                 await _supabase.from('messages').update({ is_read: true }).in('id', unreadIds);
                 await loadDataFromCloud();
@@ -862,7 +859,8 @@
             if(!role) return;
             let chatBtn = document.getElementById('chatBtn');
             if(!chatBtn) return;
-            let unreadExists = chatMessages.some(m => m.sender !== role && !m.is_read);
+            let currentSenderKey = role === 'SATICI' ? 'SATICI_' + shiftType : role;
+            let unreadExists = chatMessages.some(m => m.sender !== currentSenderKey && !m.is_read);
             if(unreadExists) chatBtn.classList.add('blinking-btn');
             else chatBtn.classList.remove('blinking-btn');
         }
@@ -874,15 +872,22 @@
                 return;
             }
             let html = '';
-            chatMessages.forEach(m => {
-                let isMe = m.sender === role;
-                let alignClass = isMe ? 'text-right ml-auto bg-amber-500/10 border-amber-500/30' : 'text-left mr-auto bg-zinc-800 border-zinc-700';
-                let senderLabel = m.sender === 'ADMIN' ? '👑 Admin' : '👤 Satıcı';
-                let timeStr = m.created_at ? getBakuDateTimeString(m.created_at) : '';
+            let currentSenderKey = role === 'SATICI' ? 'SATICI_' + shiftType : role;
 
-                let readIcon = m.is_read 
-                    ? `<span style="color: #3b82f6; font-weight: bold; font-size: 13px;" title="Oxundu">✓✓</span>` 
-                    : `<span style="color: #6b7280; font-weight: bold; font-size: 13px;" title="Göndərildi">✓✓</span>`;
+            chatMessages.forEach(m => {
+                let isMe = m.sender === currentSenderKey || (role === 'SATICI' && m.sender.startsWith('SATICI_'));
+                if (role !== 'ADMIN' && m.sender === 'ADMIN') isMe = false;
+                if (role !== 'ADMIN' && m.sender.startsWith('SATICI_') && m.sender === currentSenderKey) isMe = true;
+
+                let alignClass = isMe ? 'text-right ml-auto bg-amber-500/10 border-amber-500/30' : 'text-left mr-auto bg-zinc-800 border-zinc-700';
+                
+                let senderLabel = '👤 Satıcı';
+                if(m.sender === 'ADMIN') senderLabel = '👑 Admin';
+                else if(m.sender === 'SATICI_SEHER') senderLabel = '☀️ Səhər smeni';
+                else if(m.sender === 'SATICI_GUNORTA') senderLabel = '🌙 Günorta smeni';
+
+                let timeStr = m.created_at ? getBakuDateTimeString(m.created_at) : '';
+                let readIcon = m.is_read ? `<span style="color: #3b82f6; font-weight: bold; font-size: 13px;" title="Oxundu">✓✓</span>` : `<span style="color: #6b7280; font-weight: bold; font-size: 13px;" title="Göndərildi">✓✓</span>`;
 
                 html += `
                     <div class="max-w-[85%] p-2.5 rounded-lg border ${alignClass} space-y-1">
@@ -904,8 +909,10 @@
             let message = input.value.trim();
             if(!message) { alert('Mesaj boş ola bilməz!'); return; }
 
+            let senderKey = role === 'ADMIN' ? 'ADMIN' : ('SATICI_' + shiftType);
+
             let payload = {
-                sender: role,
+                sender: senderKey,
                 message: message,
                 is_read: false,
                 created_at: new Date().toISOString()
@@ -949,7 +956,7 @@
             for(let day = 1; day <= daysCount; day++) {
                 let dateKey = `${year}-${monthStr}-${String(day).padStart(2, '0')}`;
                 
-                // Səhər smeni qeydi
+                // Səhər smeni
                 let recSeher = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_SEHER') || {};
                 let checkInS = recSeher.check_in ? new Date(recSeher.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let checkOutS = recSeher.check_out ? new Date(recSeher.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
@@ -958,9 +965,7 @@
                 let statusDisplayS = '';
                 let reasonBtnHtmlS = '';
 
-                if(currentDayOfWeek === 6) {
-                    statusDisplayS = `İSTİRAHƏT GÜNÜ`;
-                } else if(recSeher.check_in && !recSeher.check_out) {
+                if(recSeher.check_in && !recSeher.check_out) {
                     statusDisplayS = `${checkInS} - Gözlənilir`;
                 } else if(recSeher.check_in && recSeher.check_out) {
                     statusDisplayS = `${checkInS} - ${checkOutS}`;
@@ -986,7 +991,7 @@
                     </div>
                 `;
 
-                // Günorta smeni qeydi
+                // Günorta smeni
                 let recGunorta = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_GUNORTA') || {};
                 let checkInG = recGunorta.check_in ? new Date(recGunorta.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
@@ -995,9 +1000,7 @@
                 let statusDisplayG = '';
                 let reasonBtnHtmlG = '';
 
-                if(currentDayOfWeek === 6) {
-                    statusDisplayG = `İSTİRAHƏT GÜNÜ`;
-                } else if(recGunorta.check_in && !recGunorta.check_out) {
+                if(recGunorta.check_in && !recGunorta.check_out) {
                     statusDisplayG = `${checkInG} - Gözlənilir`;
                 } else if(recGunorta.check_in && recGunorta.check_out) {
                     statusDisplayG = `${checkInG} - ${checkOutG}`;
@@ -1828,14 +1831,17 @@
                     if(sDate.startsWith(currentYearPrefix)) yearlySum += price;
                 }
 
-                let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
-                let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
+                let shiftBadge = '';
+                if(s.shift_name === 'SEHER') shiftBadge = '<span class="text-amber-300 font-semibold text-[10px]">☀️ Səhər</span>';
+                else if(s.shift_name === 'GUNORTA') shiftBadge = '<span class="text-blue-300 font-semibold text-[10px]">🌙 Günorta</span>';
+                else shiftBadge = '<span class="text-zinc-400 text-[10px]">Admin/Digər</span>';
+
                 let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Düzənlə</button>`;
                 if(role === 'ADMIN') actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">Sil</button>`;
 
-                logHtml += `<tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400 text-[11px]">${s.date ? getBakuDateTimeString(s.date) : '-'}</td><td class="py-1 font-bold ${s.type === 'MEXARIC' ? 'text-green-400' : 'text-blue-400'}">${s.type}</td><td class="py-1">${pName}</td><td class="py-1">${s.grams_sold}</td><td class="py-1 text-zinc-300">${s.payType || 'Nəğd'}</td><td class="py-1">${s.total_price} AZN</td><td class="py-1 text-center">${adBadge}</td><td class="py-1 text-center">${cashBadge}</td><td class="py-1">${actionCellHtml}</td></tr>`;
+                logHtml += `<tr class="border-b border-zinc-800"><td class="py-1 text-zinc-400 text-[11px]">${s.date ? getBakuDateTimeString(s.date) : '-'}</td><td class="py-1">${shiftBadge}</td><td class="py-1 font-bold ${s.type === 'MEXARIC' ? 'text-green-400' : 'text-blue-400'}">${s.type}</td><td class="py-1">${pName}</td><td class="py-1">${s.grams_sold}</td><td class="py-1 text-zinc-300">${s.payType || 'Nəğd'}</td><td class="py-1">${s.total_price} AZN</td><td class="py-1">${actionCellHtml}</td></tr>`;
             });
-            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="9" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
+            document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="8" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
 
             document.getElementById('salesDaily').textContent = dailySum.toFixed(2) + ' AZN';
             document.getElementById('salesWeekly').textContent = weeklySum.toFixed(2) + ' AZN';
@@ -1891,7 +1897,8 @@
                     totalAmount += price;
                     if(s.fromAd) adAmount += price;
                     if(s.toCashRegister) cashRegisterAmount += price;
-                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) | Reklam: ${s.fromAd ? 'Bəli' : 'Xeyr'} | Kassa: ${s.toCashRegister ? 'Bəli' : 'Xeyr'}</div>`;
+                    let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '');
+                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'})</div>`;
                 });
             }
             
@@ -1982,6 +1989,8 @@
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
 
             let p = products.find(x => x.id == product_id);
+            let currentShiftName = role === 'SATICI' ? shiftType : 'ADMIN';
+
             let opPayload = { 
                 product_id: Number(product_id), 
                 type, 
@@ -1992,6 +2001,7 @@
                 payType, 
                 fromAd, 
                 toCashRegister,
+                shift_name: currentShiftName,
                 date: new Date().toISOString()
             };
 
@@ -2016,4 +2026,3 @@
     </script>
 </body>
 </html>
- 
