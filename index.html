@@ -404,6 +404,19 @@
                     <button onclick="closeCashSheetModal()" class="text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
 
+                <!-- AY SEÇİMİ (HƏM RASİM HƏM ADMİN ÜÇÜN ÜMUMI VƏ YA SEÇİLƏN AY) -->
+                <div class="bg-zinc-800/80 p-3 rounded-xl border border-zinc-700 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs">
+                    <span class="text-amber-400 font-bold">Əməliyyat Aparılan Ay və İl:</span>
+                    <div class="flex space-x-2 w-full sm:w-auto">
+                        <select id="cashSheetMonthSelect" onchange="updateCashSheetView()" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs font-bold">
+                            <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
+                            <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
+                            <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
+                        </select>
+                        <select id="cashSheetYearSelect" onchange="updateCashSheetView()" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs font-bold"></select>
+                    </div>
+                </div>
+
                 <div id="adminCashControls" class="hidden-screen space-y-3 bg-zinc-800/80 p-4 rounded-xl border border-zinc-700">
                     <div class="text-xs text-amber-400 font-bold">Admin İdarəetmə Paneli:</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
@@ -435,9 +448,9 @@
                 </div>
 
                 <div class="bg-zinc-800/50 p-4 rounded-xl space-y-3 text-xs border border-zinc-700">
-                    <div class="font-bold gold-text text-sm">Cari Kassa Vəziyyəti (Ayın 1-dən indiyə):</div>
+                    <div class="font-bold gold-text text-sm" id="selectedMonthSalesTitle">Cari Kassa Vəziyyəti:</div>
                     <div class="flex justify-between border-b border-zinc-700 pb-2">
-                        <span>Toplam Kassa (Ayın 1-dən satışlar):</span>
+                        <span>Seçilmiş Ayın Toplam Satışı:</span>
                         <strong id="kassaTotalSales" class="gold-text text-sm">0.00 AZN</strong>
                     </div>
                     <div class="flex justify-between border-b border-zinc-700 pb-2">
@@ -451,8 +464,8 @@
                 </div>
 
                 <div id="adminResetSection" class="hidden-screen pt-2 space-y-2 border-t border-zinc-800">
-                    <button onclick="resetMonthlyCash()" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2.5 rounded text-xs">Kassanı Sıfırla (Ayın 1-i) 🔄</button>
-                    <button onclick="openYearlyReportModal()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold py-2.5 rounded text-xs">İllik Hesabat 📈</button>
+                    <button onclick="resetMonthlyCash()" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2.5 rounded text-xs">Kassanı Sıfırla (Seçilmiş Ay Üzrə) 🔄</button>
+                    <button onclick="openYearlyReportModal()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold py-2.5 rounded text-xs">İllik Hesabat / Arxiv 📈</button>
                 </div>
             </div>
         </div>
@@ -997,19 +1010,17 @@
 
         function openCashSheetModal(userType) {
             let now = new Date();
-            let monthStartStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-01`;
+            let currentYr = now.getFullYear();
+            let currentMo = now.getMonth() + 1;
 
-            let totalSalesFromMonth = 0;
-            sales.forEach(s => {
-                let sDate = s.date ? getBakuDateString(s.date) : '';
-                if(s.type === 'MEXARIC' && sDate >= monthStartStr) {
-                    totalSalesFromMonth += Number(s.total_price || 0);
-                }
-            });
+            let yearSel = document.getElementById('cashSheetYearSelect');
+            yearSel.innerHTML = '';
+            for(let y = currentYr - 2; y <= currentYr + 3; y++) {
+                yearSel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
+            }
+            document.getElementById('cashSheetMonthSelect').value = currentMo;
 
-            document.getElementById('kassaTotalSales').textContent = totalSalesFromMonth.toFixed(2) + ' AZN';
-            document.getElementById('kassaHomeBalance').textContent = Number(cashState.home_cash || 0).toFixed(2) + ' AZN';
-            document.getElementById('kassaStoreBalance').textContent = Number(cashState.store_cash || 0).toFixed(2) + ' AZN';
+            updateCashSheetView();
 
             let adminControls = document.getElementById('adminCashControls');
             let rasimControls = document.getElementById('rasimCashControls');
@@ -1034,6 +1045,29 @@
             document.getElementById('cashSheetModal').classList.remove('hidden-screen');
         }
 
+        function updateCashSheetView() {
+            let selYear = parseInt(document.getElementById('cashSheetYearSelect').value);
+            let selMonth = parseInt(document.getElementById('cashSheetMonthSelect').value);
+            let monthName = monthNamesAz[selMonth - 1];
+
+            document.getElementById('selectedMonthSalesTitle').textContent = `Cari Kassa Vəziyyəti (${monthName} ${selYear}):`;
+
+            let startStr = `${selYear}-${String(selMonth).padStart(2, '0')}-01`;
+            let endStr = `${selYear}-${String(selMonth).padStart(2, '0')}-31`;
+
+            let totalSalesFromMonth = 0;
+            sales.forEach(s => {
+                let sDate = s.date ? getBakuDateString(s.date) : '';
+                if(s.type === 'MEXARIC' && sDate >= startStr && sDate <= endStr) {
+                    totalSalesFromMonth += Number(s.total_price || 0);
+                }
+            });
+
+            document.getElementById('kassaTotalSales').textContent = totalSalesFromMonth.toFixed(2) + ' AZN';
+            document.getElementById('kassaHomeBalance').textContent = Number(cashState.home_cash || 0).toFixed(2) + ' AZN';
+            document.getElementById('kassaStoreBalance').textContent = Number(cashState.store_cash || 0).toFixed(2) + ' AZN';
+        }
+
         function closeCashSheetModal() {
             document.getElementById('cashSheetModal').classList.add('hidden-screen');
         }
@@ -1049,7 +1083,7 @@
 
             alert('Kassa balansları uğurla yeniləndi!');
             await loadDataFromCloud();
-            openCashSheetModal('ADMIN');
+            updateCashSheetView();
         }
 
         async function rasimSaveDailyCash() {
@@ -1057,7 +1091,7 @@
             let setStore = parseFloat(document.getElementById('rasimStoreInput').value) || 0;
 
             let updatedHome = Number(cashState.home_cash || 0) + addHome;
-            let updatedStore = setStore; // Mağazadakı günlük yenilənən qalıq
+            let updatedStore = setStore; 
 
             let payload = { home_cash: updatedHome, store_cash: updatedStore, updated_at: new Date().toISOString() };
             let query = cashState.id ? _supabase.from('cash_state').update(payload).eq('id', cashState.id) : _supabase.from('cash_state').insert([payload]);
@@ -1070,17 +1104,14 @@
         }
 
         async function resetMonthlyCash() {
-            if(!confirm('Kassanı sıfırlamaq və ayı bağlamaq istədiyinizə əminsiniz? (Xərclər ümumi qazancdan çıxılacaq və arxivə yazılacaq)')) return;
+            let selYear = parseInt(document.getElementById('cashSheetYearSelect').value);
+            let selMonth = parseInt(document.getElementById('cashSheetMonthSelect').value);
+            let monthName = monthNamesAz[selMonth - 1];
 
-            let now = new Date();
-            let currentYear = now.getFullYear();
-            let currentMonthNum = now.getMonth() + 1; // 1-12
-            let prevMonthIndex = currentMonthNum - 1 === 0 ? 11 : currentMonthNum - 2;
-            let prevMonthYear = currentMonthNum - 1 === 0 ? currentYear - 1 : currentYear;
-            let monthName = monthNamesAz[prevMonthIndex];
+            if(!confirm(`${monthName} ${selYear} ayı üzrə kassanı sıfırlamaq və arxivə yazmaq istədiyinizə əminsiniz?`)) return;
 
-            let startStr = `${prevMonthYear}-${String(prevMonthIndex + 1).padStart(2, '0')}-01`;
-            let endStr = `${prevMonthYear}-${String(prevMonthIndex + 1).padStart(2, '0')}-31`;
+            let startStr = `${selYear}-${String(selMonth).padStart(2, '0')}-01`;
+            let endStr = `${selYear}-${String(selMonth).padStart(2, '0')}-31`;
 
             let totalGain = 0;
             sales.forEach(s => {
@@ -1101,8 +1132,8 @@
             let netProfit = totalGain - totalExp;
 
             let archivePayload = {
-                year: prevMonthYear,
-                month_name: `${monthName} ${prevMonthYear}`,
+                year: selYear,
+                month_name: `${monthName} ${selYear}`,
                 total_gain: totalGain,
                 total_expense: totalExp,
                 net_profit: netProfit,
@@ -1122,7 +1153,7 @@
             await loadDataFromCloud();
             closeCashSheetModal();
 
-            alert(`Kassa sıfırlandı!\n\nAy ərzində toplam qazanc: ${totalGain.toFixed(2)} manat\nAy ərzində toplam xərclər: ${totalExp.toFixed(2)} manat\nNet gəlir: ${netProfit.toFixed(2)} manat`);
+            alert(`${monthName} ${selYear} üzrə kassa sıfırlandı!\n\nToplam qazanc: ${totalGain.toFixed(2)} manat\nToplam xərclər: ${totalExp.toFixed(2)} manat\nNet gəlir: ${netProfit.toFixed(2)} manat`);
         }
 
         async function openYearlyReportModal() {
@@ -1131,10 +1162,13 @@
                 container.innerHTML = '<div class="text-zinc-500 text-center py-4">Hələ qeydə alınmış illik arxiv yoxdur.</div>';
             } else {
                 let html = '';
-                yearlyArchive.forEach((item, idx) => {
+                yearlyArchive.forEach((item) => {
                     html += `
-                        <div class="bg-zinc-800/80 p-3 rounded-lg border border-zinc-700 space-y-1">
-                            <div class="font-bold gold-text">${idx + 1}. ${item.month_name}:</div>
+                        <div class="bg-zinc-800/80 p-3 rounded-lg border border-zinc-700 space-y-1 relative">
+                            <div class="flex justify-between items-center font-bold gold-text">
+                                <span>${item.month_name}</span>
+                                <button onclick="deleteYearlyArchive(${item.id})" class="text-red-400 hover:text-red-600 font-bold text-xs bg-zinc-900 px-2 py-0.5 rounded border border-zinc-700">Sil 🗑️</button>
+                            </div>
                             <div class="pl-2 space-y-0.5 text-zinc-300">
                                 <div>Qazanc - ${Number(item.total_gain || 0).toFixed(2)} manat</div>
                                 <div>Xərc - ${Number(item.total_expense || 0).toFixed(2)} manat</div>
@@ -1146,6 +1180,15 @@
                 container.innerHTML = html;
             }
             document.getElementById('yearlyReportModal').classList.remove('hidden-screen');
+        }
+
+        async function deleteYearlyArchive(archiveId) {
+            if(confirm('Bu arxiv qeydini silmək istədiyinizə əminsiniz?')) {
+                let { error } = await _supabase.from('yearly_archive').delete().eq('id', archiveId);
+                if(error) { alert('Xəta: ' + error.message); return; }
+                await loadDataFromCloud();
+                openYearlyReportModal();
+            }
         }
 
         function closeYearlyReportModal() {
