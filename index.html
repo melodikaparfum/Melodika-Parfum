@@ -178,7 +178,7 @@
                     </div>
                 </div>
 
-                <!-- DÖVRİ HESABAT DÜYMƏLƏRİ VƏ DİGƏRLƏRİ (GÜN SONU BURADAN SİLİNDİ) -->
+                <!-- DÖVRİ HESABAT DÜYMƏLƏRİ VƏ DİGƏRLƏRİ -->
                 <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
                     <button onclick="openPeriodicReport('weekly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>📅</span><span>Həftəlik</span>
@@ -1982,7 +1982,12 @@
         function openDayEndModal() {
             let nowStr = getBakuDateString(new Date());
             let todaySales = sales.filter(s => s.date && getBakuDateString(s.date) === nowStr && s.type === 'MEXARIC');
-            let totalAmount = 0, seherTotal = 0, gunortaTotal = 0, adAmount = 0, cashRegisterAmount = 0;
+            let totalAmount = 0;
+            
+            let seherTotal = 0, seherAd = 0, seherCash = 0;
+            let gunortaTotal = 0, gunortaAd = 0, gunortaCash = 0;
+            let adminTotal = 0, adminAd = 0, adminCash = 0;
+
             let listHtml = `<div style="font-weight: bold; margin-bottom: 8px; color: #000;">Tarix (Bakı vaxtı): ${nowStr}</div>`;
             
             if(todaySales.length === 0) {
@@ -1993,24 +1998,53 @@
                     let price = Number(s.total_price || 0);
                     totalAmount += price;
 
-                    if(s.shift_name === 'SEHER') seherTotal += price;
-                    else if(s.shift_name === 'GUNORTA') gunortaTotal += price;
-
-                    if(s.fromAd) adAmount += price;
-                    if(s.toCashRegister) cashRegisterAmount += price;
+                    if(s.shift_name === 'SEHER') {
+                        seherTotal += price;
+                        if(s.fromAd) seherAd += price;
+                        if(s.toCashRegister) seherCash += price;
+                    } else if(s.shift_name === 'GUNORTA') {
+                        gunortaTotal += price;
+                        if(s.fromAd) gunortaAd += price;
+                        if(s.toCashRegister) gunortaCash += price;
+                    } else {
+                        adminTotal += price;
+                        if(s.fromAd) adminAd += price;
+                        if(s.toCashRegister) adminCash += price;
+                    }
 
                     let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
-                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'})</div>`;
+                    let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
+                    let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
+
+                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — <span style="font-size: 11px; color: #333;">${adInfo}, ${cashInfo}</span></div>`;
                 });
             }
             
             let summaryHtml = `
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; text-align: right; font-weight: bold; color: #000;">
-                    <div>Səhər smeni satışı: ${seherTotal.toFixed(2)} AZN</div>
-                    <div>Günorta smeni satışı: ${gunortaTotal.toFixed(2)} AZN</div>
-                    <div style="margin-top: 4px; border-top: 1px solid #999; padding-top: 4px;">Ümumi satış: ${totalAmount.toFixed(2)} AZN</div>
-                    <div>Reklam: ${adAmount.toFixed(2)} AZN</div>
-                    <div>Kassa aparatına vurulan: ${cashRegisterAmount.toFixed(2)} AZN</div>
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; text-align: right; font-weight: bold; color: #000; font-size: 12px; line-height: 1.5;">
+                    <div style="background: #f4f4f4; padding: 4px; margin-bottom: 4px; text-align: left;">
+                        <div>☀️ Səhər smeni:</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Ümumi satış: ${seherTotal.toFixed(2)} AZN</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Reklam: ${seherAd.toFixed(2)} AZN</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Kassa aparatına vurulan: ${seherCash.toFixed(2)} AZN</div>
+                    </div>
+
+                    <div style="background: #f4f4f4; padding: 4px; margin-bottom: 6px; text-align: left;">
+                        <div>🌙 Günorta smeni:</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Ümumi satış: ${gunortaTotal.toFixed(2)} AZN</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Reklam: ${gunortaAd.toFixed(2)} AZN</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Kassa aparatına vurulan: ${gunortaCash.toFixed(2)} AZN</div>
+                    </div>
+
+                    ${adminTotal > 0 ? `
+                    <div style="background: #f4f4f4; padding: 4px; margin-bottom: 6px; text-align: left;">
+                        <div>👑 Admin:</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Ümumi satış: ${adminTotal.toFixed(2)} AZN</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Reklam: ${adminAd.toFixed(2)} AZN</div>
+                        <div style="padding-left: 10px; font-weight: normal;">• Kassa aparatına vurulan: ${adminCash.toFixed(2)} AZN</div>
+                    </div>` : ''}
+
+                    <div style="border-top: 1px solid #000; padding-top: 4px; font-size: 13px;">Ümumi mağaza satışı: ${totalAmount.toFixed(2)} AZN</div>
                 </div>
             `;
             document.getElementById('dayEndContent').innerHTML = listHtml + summaryHtml;
@@ -2099,7 +2133,7 @@
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
 
             let p = products.find(x => x.id == product_id);
-            let currentShiftName = role === 'SATICI' ? shiftType : 'ADMIN';
+            let currentShiftName = role === 'ADMIN' ? 'ADMIN' : shiftType;
 
             let opPayload = { 
                 product_id: Number(product_id), 
@@ -2117,22 +2151,12 @@
 
             if(editingSaleId) {
                 let { error } = await _supabase.from('sales').update(opPayload).eq('id', editingSaleId);
-                if(error) { 
-                    // Fallback to avoid shift_name column error if not migrated
-                    delete opPayload.shift_name;
-                    let { error: err2 } = await _supabase.from('sales').update(opPayload).eq('id', editingSaleId);
-                    if(err2) { alert('Xəta: ' + err2.message); return; }
-                }
+                if(error) { alert('Xəta: ' + error.message); return; }
                 alert('Əməliyyat yeniləndi!');
                 cancelEditSale();
             } else {
                 let { error } = await _supabase.from('sales').insert([opPayload]);
-                if(error) { 
-                    // Fallback to avoid shift_name column error if not migrated
-                    delete opPayload.shift_name;
-                    let { error: err2 } = await _supabase.from('sales').insert([opPayload]);
-                    if(err2) { alert('Xəta: ' + err2.message); return; }
-                }
+                if(error) { alert('Xəta: ' + error.message); return; }
                 alert('Əməliyyat yadda saxlanıldı!');
             }
 
