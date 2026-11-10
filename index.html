@@ -152,7 +152,9 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Sheeti 🗂️</button>
+                    <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Sheet 🗂️</button>
+                    <button id="adminTopCashBtn" onclick="openCashPinModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Kassa Mərkəzi 💰</button>
+                    <button id="adminTopReportsBtn" onclick="openTopReportsModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Hesabatlar Sheeti 📊</button>
                     <button onclick="openOperationsLogModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
                     <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
                     <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
@@ -160,58 +162,6 @@
                     <button onclick="logout()" class="text-xs bg-red-900 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
                 </div>
             </header>
-
-            <!-- KASSA SHEETE GİRİŞ BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN - ƏSAS SƏHİFƏDƏ) -->
-            <div id="adminCashSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
-                <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
-                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">💰 KASSA MƏRKƏZİ (ADMIN)</h2>
-                    <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Kassa Sheet</span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-xs text-zinc-300">Evdəki və Mağazadakı kassa balanslarını idarə edin, ay sonu sıfırlayın.</span>
-                    <button onclick="openCashPinModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs shadow-md">Kassa Sheet-i Aç 💼</button>
-                </div>
-            </div>
-
-            <!-- HESABATLAR SHEETS BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN - ƏSAS SƏHİFƏDƏ) -->
-            <div id="adminReportsSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
-                <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
-                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">📊 HESABATLAR SHEETİ (ADMİN MƏRKƏZİ)</h2>
-                    <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Bütün Hesabatlar</span>
-                </div>
-                
-                <div class="bg-zinc-800/80 p-3 rounded-lg border border-zinc-700 grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
-                    <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1">Başlanğıc Tarix</label>
-                        <input type="date" id="startDate" onchange="renderUI()" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-zinc-400 block mb-1">Son Tarix</label>
-                        <input type="date" id="endDate" onchange="renderUI()" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 sm:grid-cols-6 gap-2">
-                    <button onclick="openPeriodicReport('weekly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>📅</span><span>Həftəlik</span>
-                    </button>
-                    <button onclick="openPeriodicReport('monthly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>📊</span><span>Aylıq</span>
-                    </button>
-                    <button onclick="openPeriodicReport('yearly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>📈</span><span>İllik</span>
-                    </button>
-                    <button onclick="openRangeReportModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>🔍</span><span>Aralıq</span>
-                    </button>
-                    <button onclick="openExpensesModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>💸</span><span>Xərclər</span>
-                    </button>
-                    <button onclick="openAttendanceModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>🕒</span><span>İş Saatları</span>
-                    </button>
-                </div>
-            </div>
 
             <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ -->
             <div id="shiftControlBox" class="bg-zinc-900 border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
@@ -283,6 +233,48 @@
                         <div class="bg-zinc-800/30 p-2 rounded">POS: <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
                         <div class="bg-zinc-800/30 p-2 rounded">Karta: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- HESABATLAR MƏRKƏZİ MODALI (YUXARIDAKI DÜYMƏ ÜÇÜN) -->
+        <div id="topReportsModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-xl w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
+                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">📊 HESABATLAR MƏRKƏZİ (ADMİN)</h2>
+                    <button onclick="closeTopReportsModal()" class="text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
+                </div>
+                
+                <div class="bg-zinc-800/80 p-3 rounded-lg border border-zinc-700 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Başlanğıc Tarix</label>
+                        <input type="date" id="startDate" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-zinc-400 block mb-1">Son Tarix</label>
+                        <input type="date" id="endDate" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                    <button onclick="openPeriodicReport('weekly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>📅</span><span>Həftəlik</span>
+                    </button>
+                    <button onclick="openPeriodicReport('monthly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>📊</span><span>Aylıq</span>
+                    </button>
+                    <button onclick="openPeriodicReport('yearly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>📈</span><span>İllik</span>
+                    </button>
+                    <button onclick="openRangeReportModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>🔍</span><span>Aralıq</span>
+                    </button>
+                    <button onclick="openExpensesModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>💸</span><span>Xərclər</span>
+                    </button>
+                    <button onclick="openAttendanceModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>🕒</span><span>İş Saatları</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -465,19 +457,6 @@
                         <button onclick="saveOp()" id="saveOpBtn" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
                         <button onclick="cancelEditSale()" id="cancelOpBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2.5 rounded text-xs">Ləğv Et</button>
                     </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- KASSA PİN MODALI -->
-        <div id="cashPinModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
-            <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
-                <h2 class="text-base font-bold gold-text">Kassa Paneli Girişi</h2>
-                <p class="text-xs text-zinc-400">Admin (000) və ya Rasim (111) PIN kodunu daxil edin:</p>
-                <input type="password" id="cashPinInput" placeholder="PIN Kod" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
-                <div class="flex space-x-2">
-                    <button onclick="closeCashPinModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina</button>
-                    <button onclick="verifyCashPin()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Daxil Ol</button>
                 </div>
             </div>
         </div>
@@ -1054,8 +1033,8 @@
                 document.getElementById('mainApp').classList.remove('hidden-screen');
                 
                 let shiftBox = document.getElementById('shiftControlBox');
-                let adminReportsSheet = document.getElementById('adminReportsSheetSection');
-                let adminCashSheet = document.getElementById('adminCashSheetSection');
+                let adminTopCashBtn = document.getElementById('adminTopCashBtn');
+                let adminTopReportsBtn = document.getElementById('adminTopReportsBtn');
                 let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
                 let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
                 let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
@@ -1064,8 +1043,8 @@
                 if(role === 'ADMIN') {
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
-                    if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
-                    if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
+                    if(adminTopCashBtn) adminTopCashBtn.classList.remove('hidden-screen');
+                    if(adminTopReportsBtn) adminTopReportsBtn.classList.remove('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
                     if(adminYesterdayBtn) adminYesterdayBtn.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
@@ -1074,8 +1053,8 @@
                 } else {
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
-                    if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
-                    if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
+                    if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
+                    if(adminTopReportsBtn) adminTopReportsBtn.classList.add('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                     if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
@@ -1164,6 +1143,17 @@
 
         function closeOperationsLogModal() {
             document.getElementById('operationsLogModal').classList.add('hidden-screen');
+        }
+
+        function openTopReportsModal() {
+            let today = getBakuDateString();
+            if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
+            if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
+            document.getElementById('topReportsModal').classList.remove('hidden-screen');
+        }
+
+        function closeTopReportsModal() {
+            document.getElementById('topReportsModal').classList.add('hidden-screen');
         }
 
         function openSalesFormModal() {
@@ -1415,7 +1405,7 @@
                 let foundArchive = dayEndArchive.find(item => String(item.report_date) === dateKey);
                 let badgeIndicator = foundArchive ? '🟢' : '⚪';
 
-                let checkboxHtml = foundArchive ? `<input type="checkbox" value="${foundArchive.id}" class="archive-checkbox w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700 ml-2">` : '';
+                let checkboxHtml = foundArchive ? `<input type="checkbox" value="${foundArchive.id}" class="archive-checkbox w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700 ml-2">` : `<input type="checkbox" disabled class="w-4 h-4 opacity-30 rounded bg-zinc-800 border-zinc-700 ml-2">`;
 
                 html += `
                     <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-700/60 hover:bg-zinc-800 transition-colors">
@@ -2001,6 +1991,7 @@
         }
 
         function openPeriodicReport(type) {
+            closeTopReportsModal();
             if(role !== 'ADMIN') { alert('Bu hesabat yalnız admindir.'); return; }
             let now = new Date();
             let startStr = '', endStr = '', titleStr = '';
@@ -2093,6 +2084,7 @@
         }
 
         function openRangeReportModal() {
+            closeTopReportsModal();
             if(role !== 'ADMIN') { alert('Bu hesabat yalnız admindir.'); return; }
             let start = document.getElementById('startDate').value;
             let end = document.getElementById('endDate').value;
@@ -2201,8 +2193,8 @@
             document.getElementById('mainApp').classList.remove('hidden-screen');
             
             let shiftBox = document.getElementById('shiftControlBox');
-            let adminReportsSheet = document.getElementById('adminReportsSheetSection');
-            let adminCashSheet = document.getElementById('adminCashSheetSection');
+            let adminTopCashBtn = document.getElementById('adminTopCashBtn');
+            let adminTopReportsBtn = document.getElementById('adminTopReportsBtn');
             let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
             let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
             let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
@@ -2211,8 +2203,8 @@
             if(role === 'ADMIN') {
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
-                if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
-                if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
+                if(adminTopCashBtn) adminTopCashBtn.classList.remove('hidden-screen');
+                if(adminTopReportsBtn) adminTopReportsBtn.classList.remove('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
                 if(adminYesterdayBtn) adminYesterdayBtn.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
@@ -2221,8 +2213,8 @@
             } else {
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
-                if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
-                if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
+                if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
+                if(adminTopReportsBtn) adminTopReportsBtn.classList.add('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                 if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
