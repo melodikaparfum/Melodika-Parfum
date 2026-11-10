@@ -51,7 +51,6 @@
         <div id="loginScreen" class="bg-zinc-900 border border-zinc-800 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-2xl no-print space-y-4">
             <h1 class="text-2xl font-bold gold-text">MELODİKA PARFUM</h1>
             
-            <!-- XÜSUSİ KAMPANİYA ELANLARI -->
             <div class="space-y-2">
                 <div class="bg-amber-500/10 border border-amber-500/40 p-3 rounded-lg text-xs text-amber-300 font-medium leading-relaxed">
                     💥 <strong>Xüsusi Kampaniya:</strong> 2 ədəd hazır (upakovka) ətir alana, 1 ədəd və 3 ədəd ətir qablaşdırılması hədiyyə!
@@ -79,7 +78,6 @@
                 <button onclick="closeCustomerCatalog()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded">Girişə Qayıt</button>
             </header>
 
-            <!-- XÜSUSİ KAMPANİYA ELANLARI (MÜŞTƏRİ ÜÇÜN) -->
             <div class="space-y-2">
                 <div class="bg-amber-500/15 border-2 border-amber-500 p-3 rounded-xl text-center text-xs text-amber-300 font-bold shadow-md">
                     💥 2 ədəd hazır (upakovka) ətir alana, 1 ədəd və 3 ədəd ətir qablaşdırılması hədiyyə!
@@ -89,7 +87,6 @@
                 </div>
             </div>
 
-            <!-- İLİN ƏN SEÇİLƏN ƏTİRLƏRİ SHEET / CƏDVƏL BÖLGƏSİ -->
             <div class="bg-zinc-900 border-2 border-amber-500 p-4 rounded-xl space-y-3 shadow-xl">
                 <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">🌟 İlin Top 3 Seçilən Ətri (Xüsusi Seçim)</h2>
@@ -181,22 +178,28 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                    <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
-                        <span class="text-base">📝</span>
-                        <span>Gün Sonu Hesabatı</span>
+                <!-- DÖVRİ HESABAT DÜYMƏLƏRİ VƏ DİGƏrləri -->
+                <div class="grid grid-cols-2 sm:grid-cols-7 gap-2">
+                    <button onclick="openPeriodicReport('weekly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>📅</span><span>Həftəlik</span>
                     </button>
-                    <button onclick="openRangeReportModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
-                        <span class="text-base">📅</span>
-                        <span>Tarixlər üzrə Hesabat</span>
+                    <button onclick="openPeriodicReport('monthly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>📊</span><span>Aylıq</span>
                     </button>
-                    <button onclick="openExpensesModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
-                        <span class="text-base">📊</span>
-                        <span>Xərclər Sheeti (PNG)</span>
+                    <button onclick="openPeriodicReport('yearly')" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>📈</span><span>İllik</span>
                     </button>
-                    <button onclick="openAttendanceModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
-                        <span class="text-base">🕒</span>
-                        <span>İş Saatları Sheeti (PDF)</span>
+                    <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>📝</span><span>Gün Sonu</span>
+                    </button>
+                    <button onclick="openRangeReportModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>🔍</span><span>Aralıq</span>
+                    </button>
+                    <button onclick="openExpensesModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>💸</span><span>Xərclər</span>
+                    </button>
+                    <button onclick="openAttendanceModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                        <span>🕒</span><span>İş Saatları</span>
                     </button>
                 </div>
             </div>
@@ -390,13 +393,13 @@
             </div>
         </div>
 
-        <!-- SATICI İŞ SAATLARI SHEET (PDF) -->
+        <!-- İŞÇİLƏRİN İŞ SAATLARI SHEET (PDF - NÜMUNƏYƏ UYĞUN) -->
         <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                     <div>
-                        <h2 class="text-lg font-bold gold-text">🕒 SATICI İŞ SAATLARI SHEETİ</h2>
-                        <div class="text-xs text-zinc-400">İş saatları hesabatı (Səhər və Günorta smenləri ayrılmışdır).</div>
+                        <h2 class="text-lg font-bold gold-text">🕒 İŞÇİLƏRİN GƏLİB-GETMƏ VAXTLARI (PDF ŞƏKLİNDƏ)</h2>
+                        <div class="text-xs text-zinc-400">Səhər və Günorta smenləri dəftər nümunəsinə uyğun olaraq eyni cədvəldə göstərilir.</div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <select id="attYearSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
@@ -409,24 +412,21 @@
                     </div>
                 </div>
 
-                <div id="attendancePrintArea" class="bg-white text-black p-6 rounded-lg space-y-6 font-sans shadow-lg">
-                    <div id="attendancePrintHeader" class="text-base font-bold text-black border-b-2 border-black pb-2">Noyabr 2026 cı il üzrə İş Saatları Hesabatı:</div>
+                <div id="attendancePrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg text-xs">
+                    <div id="attendancePrintHeader" class="text-sm font-bold text-black border-b-2 border-black pb-2">Noyabr ayı üzrə işçinin gəlib-getmə vaxtları</div>
                     
-                    <div class="space-y-6">
-                        <!-- SƏHƏR SMENİ BÖLMƏSİ -->
-                        <div class="space-y-2">
-                            <h3 class="text-sm font-extrabold text-black uppercase border-b border-gray-400 pb-1">☀️ Səhər Smeni (10:00 - 15:00)</h3>
-                            <div id="attendanceRowsListMorning" class="space-y-2 text-sm"></div>
-                        </div>
+                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;" border="1">
+                        <thead>
+                            <tr style="background-color: #f0f0f0;">
+                                <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 25%;">Tarix</th>
+                                <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 37.5%;">Səhər smeni</th>
+                                <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 37.5%;">Günorta smeni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="attendanceTableBody"></tbody>
+                    </table>
 
-                        <!-- GÜNORTA SMENİ BÖLMƏSİ -->
-                        <div class="space-y-2 pt-2">
-                            <h3 class="text-sm font-extrabold text-black uppercase border-b border-gray-400 pb-1">🌙 Günorta Smeni (15:00 - 22:00)</h3>
-                            <div id="attendanceRowsListAfternoon" class="space-y-2 text-sm"></div>
-                        </div>
-                    </div>
-
-                    <div class="pt-4 border-t-2 border-black flex justify-between items-center text-xs font-bold text-black">
+                    <div class="pt-4 border-t-2 border-black flex justify-between items-center font-bold text-black text-xs">
                         <span>Melodika Parfum</span>
                         <span>Yerinə yetirildi</span>
                     </div>
@@ -452,6 +452,36 @@
             </div>
         </div>
 
+        <!-- DÖVRİ HESABAT MODALI (HƏFTƏLİK / AYLıQ / İLLİK) -->
+        <div id="periodicReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                    <h2 id="periodicReportTitle" class="text-sm font-bold gold-text">Dövri Hesabat</h2>
+                    <button onclick="closePeriodicReportModal()" class="text-xs bg-zinc-800 px-2.5 py-1 rounded">X</button>
+                </div>
+                <div id="periodicReportPrintArea" class="bg-white text-black p-6 rounded-lg space-y-3 font-sans text-left text-sm shadow-lg">
+                    <div id="periodicReportHeader" class="font-bold text-black text-center border-b-2 border-black pb-2">Hesabat</div>
+                    <div class="space-y-2 pt-1 text-black font-medium text-xs">
+                        <div>Dövr: <span id="repPeriodRange" class="font-bold float-right">--</span></div>
+                        <div>Ümumi satış: <span id="repPeriodTotal" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Səhər smeni satışı: <span id="repPeriodSeher" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Günorta smeni satışı: <span id="repPeriodGunorta" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Xalis gəlir: <span id="repPeriodProfit" class="font-bold float-right text-green-700">0.00 AZN</span></div>
+                        <div>Reklamdan: <span id="repPeriodAd" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Pos terminal: <span id="repPeriodPos" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Kartdan karta: <span id="repPeriodCard" class="font-bold float-right">0.00 AZN</span></div>
+                    </div>
+                    <div class="pt-4 border-t-2 border-black flex justify-between items-center text-xs font-bold text-black">
+                        <span>Melodika Parfum</span>
+                        <span>Yerinə yetirildi</span>
+                    </div>
+                </div>
+                <div class="pt-2 no-print">
+                    <button onclick="downloadPeriodicReportAsImage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs">Şəkil Kimi Yüklə (PNG) 📥</button>
+                </div>
+            </div>
+        </div>
+
         <!-- ARALIQ HESABAT (XALİS GƏLİR) ŞƏKİL MODALI -->
         <div id="rangeReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
@@ -461,7 +491,7 @@
                 </div>
                 <div id="rangeReportPrintArea" class="bg-white text-black p-6 rounded-lg space-y-3 font-sans text-left text-sm shadow-lg">
                     <div id="rangeReportHeader" class="font-bold text-black text-center border-b-2 border-black pb-2">Hesabat</div>
-                    <div class="space-y-2 pt-1 text-black font-medium">
+                    <div class="space-y-2 pt-1 text-black font-medium text-xs">
                         <div>Ümumi satış: <span id="repModalTotal" class="font-bold float-right">0.00 AZN</span></div>
                         <div>Xalis gəlir: <span id="repModalProfit" class="font-bold float-right text-green-700">0.00 AZN</span></div>
                         <div>Reklamdan: <span id="repModalAd" class="font-bold float-right">0.00 AZN</span></div>
@@ -943,12 +973,10 @@
             let monthName = monthNamesAz[month - 1];
             let monthStr = String(month).padStart(2, '0');
 
-            document.getElementById('attendancePrintHeader').textContent = `${monthName} ${year} cı il üzrə İş Saatları Hesabatı:`;
+            document.getElementById('attendancePrintHeader').textContent = `${monthName} ayı üzrə işçinin gəlib-getmə vaxtları`;
 
-            let containerMorning = document.getElementById('attendanceRowsListMorning');
-            let containerAfternoon = document.getElementById('attendanceRowsListAfternoon');
-            let htmlMorning = '';
-            let htmlAfternoon = '';
+            let tableBody = document.getElementById('attendanceTableBody');
+            let html = '';
 
             let firstDayIndex = new Date(year, month - 1, 1).getDay();
             let currentDayOfWeek = firstDayIndex === 0 ? 7 : firstDayIndex;
@@ -962,34 +990,20 @@
                 let checkOutS = recSeher.check_out ? new Date(recSeher.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let noteTextS = recSeher.note ? String(recSeher.note).trim() : '';
 
-                let statusDisplayS = '';
-                let reasonBtnHtmlS = '';
+                let cellSeher = '';
+                let actionBtnS = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-1.5 py-0.5 rounded text-[10px] ml-1">✏️</button>`;
 
                 if(recSeher.check_in && !recSeher.check_out) {
-                    statusDisplayS = `${checkInS} - Gözlənilir`;
+                    cellSeher = `${checkInS} - Gözlənilir ${actionBtnS}`;
                 } else if(recSeher.check_in && recSeher.check_out) {
-                    statusDisplayS = `${checkInS} - ${checkOutS}`;
+                    cellSeher = `${checkInS} - ${checkOutS} ${actionBtnS}`;
                 } else {
                     if(noteTextS !== '') {
-                        statusDisplayS = `<span onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənləmək üçün kliklə"><span class="reason-text">${noteTextS}</span> <span class="no-print">✏️</span></span>`;
-                        reasonBtnHtmlS = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="no-print bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] ml-2">Düzənlə</button>`;
+                        cellSeher = `Gəlməyib - ${noteTextS} ${actionBtnS}`;
                     } else {
-                        statusDisplayS = `<span class="reason-text">Gəlməyib</span>`;
-                        reasonBtnHtmlS = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2.5 py-1 rounded text-xs ml-2">Səbəb yaz</button>`;
+                        cellSeher = `Gəlməyib ${actionBtnS}`;
                     }
                 }
-
-                htmlMorning += `
-                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 6px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px;">
-                            <span>${currentDayOfWeek}-ci gün (${day}.${monthStr})</span>
-                            <div style="display: flex; align-items: center;">
-                                <span>${statusDisplayS}</span>
-                                ${reasonBtnHtmlS}
-                            </div>
-                        </div>
-                    </div>
-                `;
 
                 // Günorta smeni
                 let recGunorta = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_GUNORTA') || {};
@@ -997,40 +1011,33 @@
                 let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let noteTextG = recGunorta.note ? String(recGunorta.note).trim() : '';
 
-                let statusDisplayG = '';
-                let reasonBtnHtmlG = '';
+                let cellGunorta = '';
+                let actionBtnG = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-1.5 py-0.5 rounded text-[10px] ml-1">✏️</button>`;
 
                 if(recGunorta.check_in && !recGunorta.check_out) {
-                    statusDisplayG = `${checkInG} - Gözlənilir`;
+                    cellGunorta = `${checkInG} - Gözlənilir ${actionBtnG}`;
                 } else if(recGunorta.check_in && recGunorta.check_out) {
-                    statusDisplayG = `${checkInG} - ${checkOutG}`;
+                    cellGunorta = `${checkInG} - ${checkOutG} ${actionBtnG}`;
                 } else {
                     if(noteTextG !== '') {
-                        statusDisplayG = `<span onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənləmək üçün kliklə"><span class="reason-text">${noteTextG}</span> <span class="no-print">✏️</span></span>`;
-                        reasonBtnHtmlG = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="no-print bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] ml-2">Düzənlə</button>`;
+                        cellGunorta = `Gəlməyib - ${noteTextG} ${actionBtnG}`;
                     } else {
-                        statusDisplayG = `<span class="reason-text">Gəlməyib</span>`;
-                        reasonBtnHtmlG = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2.5 py-1 rounded text-xs ml-2">Səbəb yaz</button>`;
+                        cellGunorta = `Gəlməyib ${actionBtnG}`;
                     }
                 }
 
-                htmlAfternoon += `
-                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 6px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px;">
-                            <span>${currentDayOfWeek}-ci gün (${day}.${monthStr})</span>
-                            <div style="display: flex; align-items: center;">
-                                <span>${statusDisplayG}</span>
-                                ${reasonBtnHtmlG}
-                            </div>
-                        </div>
-                    </div>
+                html += `
+                    <tr>
+                        <td style="padding: 5px; border: 1px solid #000; text-align: center; font-weight: bold;">${day} (${currentDayOfWeek}-ci gün)</td>
+                        <td style="padding: 5px; border: 1px solid #000; text-align: center;">${cellSeher}</td>
+                        <td style="padding: 5px; border: 1px solid #000; text-align: center;">${cellGunorta}</td>
+                    </tr>
                 `;
 
                 currentDayOfWeek++;
                 if(currentDayOfWeek > 7) currentDayOfWeek = 1;
             }
-            containerMorning.innerHTML = htmlMorning;
-            containerAfternoon.innerHTML = htmlAfternoon;
+            tableBody.innerHTML = html;
         }
 
         function openReasonModalPopup(dateKey, roleName, existingNote = '') {
@@ -1100,6 +1107,95 @@
                 width: 190,
                 windowWidth: 700,
                 autoPaging: 'text'
+            });
+        }
+
+        function openPeriodicReport(type) {
+            if(role !== 'ADMIN') { alert('Bu hesabat yalnız admindir.'); return; }
+            let now = new Date();
+            let startStr = '', endStr = '', titleStr = '';
+            let startDate = new Date(), endDate = new Date();
+
+            if(type === 'weekly') {
+                let dayOfWeek = now.getDay() || 7;
+                startDate = new Date(now);
+                startDate.setDate(now.getDate() - dayOfWeek + 1);
+                startDate.setHours(0,0,0,0);
+
+                endDate = new Date(startDate);
+                endDate.setDate(startDate.getDate() + 6);
+                endDate.setHours(23,59,59,999);
+
+                startStr = getBakuDateString(startDate);
+                endStr = getBakuDateString(endDate);
+                titleStr = `Həftəlik Hesabat (${startStr} - ${endStr})`;
+            } else if(type === 'monthly') {
+                startDate = new Date(now.getFullYear(), now.getMonth(), 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+                startStr = getBakuDateString(startDate);
+                endStr = getBakuDateString(endDate);
+                titleStr = `Aylıq Hesabat (${monthNamesAz[now.getMonth()]}, ${now.getFullYear()})`;
+            } else if(type === 'yearly') {
+                startDate = new Date(now.getFullYear(), 0, 1);
+                endDate = new Date(now.getFullYear(), 11, 31, 23, 59, 59);
+                startStr = getBakuDateString(startDate);
+                endStr = getBakuDateString(endDate);
+                titleStr = `İllik Hesabat (${now.getFullYear()})`;
+            }
+
+            document.getElementById('periodicReportTitle').textContent = titleStr;
+            document.getElementById('periodicReportHeader').textContent = titleStr;
+            document.getElementById('repPeriodRange').textContent = `${startStr} / ${endStr}`;
+
+            let totalSalesSum = 0, seherSum = 0, gunortaSum = 0;
+            let totalGrossProfitSum = 0;
+            let rAd = 0, rPos = 0, rCard = 0;
+
+            sales.forEach(s => {
+                let sDate = s.date ? getBakuDateString(s.date) : '';
+                if(s.type === 'MEXARIC' && sDate >= startStr && sDate <= endStr) {
+                    let p = Number(s.total_price || 0);
+                    totalSalesSum += p;
+                    totalGrossProfitSum += Number(s.profit || 0);
+
+                    if(s.shift_name === 'SEHER') seherSum += p;
+                    else if(s.shift_name === 'GUNORTA') gunortaSum += p;
+
+                    if(s.fromAd) rAd += p;
+                    if(s.payType === 'POS Terminal') rPos += p;
+                    if(s.payType === 'Karta göndərmə') rCard += p;
+                }
+            });
+
+            let rangeExpensesTotal = 0;
+            expenses.forEach(e => {
+                let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+                if(eDate >= startStr && eDate <= endStr) {
+                    rangeExpensesTotal += Number(e.amount || 0);
+                }
+            });
+
+            let netProfitFinal = totalGrossProfitSum - rangeExpensesTotal;
+
+            document.getElementById('repPeriodTotal').textContent = totalSalesSum.toFixed(2) + ' AZN';
+            document.getElementById('repPeriodSeher').textContent = seherSum.toFixed(2) + ' AZN';
+            document.getElementById('repPeriodGunorta').textContent = gunortaSum.toFixed(2) + ' AZN';
+            document.getElementById('repPeriodProfit').textContent = netProfitFinal.toFixed(2) + ' AZN';
+            document.getElementById('repPeriodAd').textContent = rAd.toFixed(2) + ' AZN';
+            document.getElementById('repPeriodPos').textContent = rPos.toFixed(2) + ' AZN';
+            document.getElementById('repPeriodCard').textContent = rCard.toFixed(2) + ' AZN';
+
+            document.getElementById('periodicReportModal').classList.remove('hidden-screen');
+        }
+
+        function closePeriodicReportModal() { document.getElementById('periodicReportModal').classList.add('hidden-screen'); }
+
+        function downloadPeriodicReportAsImage() {
+            html2canvas(document.getElementById('periodicReportPrintArea'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = `DovriHesabat_${getBakuDateString()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
             });
         }
 
@@ -1834,7 +1930,7 @@
                 let shiftBadge = '';
                 if(s.shift_name === 'SEHER') shiftBadge = '<span class="text-amber-300 font-semibold text-[10px]">☀️ Səhər</span>';
                 else if(s.shift_name === 'GUNORTA') shiftBadge = '<span class="text-blue-300 font-semibold text-[10px]">🌙 Günorta</span>';
-                else shiftBadge = '<span class="text-zinc-400 text-[10px]">Admin/Digər</span>';
+                else shiftBadge = '<span class="text-purple-300 font-semibold text-[10px]">👑 Admin</span>';
 
                 let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Düzənlə</button>`;
                 if(role === 'ADMIN') actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">Sil</button>`;
@@ -1885,7 +1981,7 @@
         function openDayEndModal() {
             let nowStr = getBakuDateString(new Date());
             let todaySales = sales.filter(s => s.date && getBakuDateString(s.date) === nowStr && s.type === 'MEXARIC');
-            let totalAmount = 0, adAmount = 0, cashRegisterAmount = 0;
+            let totalAmount = 0, seherTotal = 0, gunortaTotal = 0, adAmount = 0, cashRegisterAmount = 0;
             let listHtml = `<div style="font-weight: bold; margin-bottom: 8px; color: #000;">Tarix (Bakı vaxtı): ${nowStr}</div>`;
             
             if(todaySales.length === 0) {
@@ -1895,14 +1991,27 @@
                     let p = products.find(x => x.id == s.product_id);
                     let price = Number(s.total_price || 0);
                     totalAmount += price;
+
+                    if(s.shift_name === 'SEHER') seherTotal += price;
+                    else if(s.shift_name === 'GUNORTA') gunortaTotal += price;
+
                     if(s.fromAd) adAmount += price;
                     if(s.toCashRegister) cashRegisterAmount += price;
-                    let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '');
+
+                    let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
                     listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'})</div>`;
                 });
             }
             
-            let summaryHtml = `<div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; text-align: right; font-weight: bold; color: #000;"><div>Ümumi satış: ${totalAmount.toFixed(2)} AZN</div><div>Reklam: ${adAmount.toFixed(2)} AZN</div><div>Kassa aparatına vurulan: ${cashRegisterAmount.toFixed(2)} AZN</div></div>`;
+            let summaryHtml = `
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; text-align: right; font-weight: bold; color: #000;">
+                    <div>Səhər smeni satışı: ${seherTotal.toFixed(2)} AZN</div>
+                    <div>Günorta smeni satışı: ${gunortaTotal.toFixed(2)} AZN</div>
+                    <div style="margin-top: 4px; border-top: 1px solid #999; padding-top: 4px;">Ümumi satış: ${totalAmount.toFixed(2)} AZN</div>
+                    <div>Reklam: ${adAmount.toFixed(2)} AZN</div>
+                    <div>Kassa aparatına vurulan: ${cashRegisterAmount.toFixed(2)} AZN</div>
+                </div>
+            `;
             document.getElementById('dayEndContent').innerHTML = listHtml + summaryHtml;
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
