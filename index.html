@@ -911,14 +911,8 @@
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans"></div>
                 </div>
 
-                <div id="adminArchiveSaveSection" class="pt-2 no-print">
-                    <button onclick="confirmAndSaveDayEndArchive()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-lg text-sm shadow-lg flex items-center justify-center space-x-2">
-                        <span>📥 Arxivə Təsdiq Et və Yadda Saxla</span>
-                    </button>
-                </div>
-
                 <div class="pt-2 border-t border-zinc-800 flex justify-end space-x-2 no-print">
-                    <button onclick="downloadDayEndAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
+                    <button onclick="downloadDayEndAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs w-full">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
                 </div>
             </div>
         </div>
@@ -1581,7 +1575,6 @@
             }
             currentDayEndSummaryHtml = found.content_summary;
             document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
-            document.getElementById('adminArchiveSaveSection').classList.add('hidden-screen');
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
@@ -2189,7 +2182,22 @@
             });
         }
 
-        function downloadDayEndAsImage() {
+        async function downloadDayEndAsImage() {
+            // Şəkil yüklənərkən avtomatik arxivə də yazırıq
+            try {
+                await _supabase.rpc('save_day_end_archive', {
+                    p_report_date: currentDayEndReportDate,
+                    p_content_summary: currentDayEndSummaryHtml
+                });
+            } catch(e) {
+                try {
+                    await _supabase.from('day_end_archive').insert([{ 
+                        report_date: currentDayEndReportDate, 
+                        content_summary: currentDayEndSummaryHtml 
+                    }]);
+                } catch(err) {}
+            }
+
             html2canvas(document.getElementById('dayEndPrintArea'), { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
                 let link = document.createElement('a');
                 link.download = `GunSonu_${currentDayEndReportDate}.png`;
@@ -2237,6 +2245,7 @@
         function finalizeLogin() {
             localStorage.setItem('melodika_current_role', role);
             localStorage.setItem('melodika_current_shift', shiftType);
+            localStorage.setItem('melodika_admin_name', adminName);
 
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
@@ -3087,33 +3096,6 @@
 
             currentDayEndSummaryHtml = listHtml + summaryHtml;
             document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
-        }
-
-        async function confirmAndSaveDayEndArchive() {
-            try {
-                let { error } = await _supabase.rpc('save_day_end_archive', {
-                    p_report_date: currentDayEndReportDate,
-                    p_content_summary: currentDayEndSummaryHtml
-                });
-                
-                if (error) {
-                    let { error: insertErr } = await _supabase.from('day_end_archive').insert([{ 
-                        report_date: currentDayEndReportDate, 
-                        content_summary: currentDayEndSummaryHtml 
-                    }]);
-                    
-                    if (insertErr) {
-                        alert('Xəta baş verdi: ' + insertErr.message);
-                        return;
-                    }
-                }
-
-                alert(`(${currentDayEndReportDate}) tarixi üzrə hesabat arxivə uğurla təsdiq edildi!`);
-                await loadDataFromCloud();
-                closeDayEndModal();
-            } catch(e) {
-                alert('Xəta: ' + e.message);
-            }
         }
 
         function closeDayEndModal() { document.getElementById('dayEndModal').classList.add('hidden-screen'); }
