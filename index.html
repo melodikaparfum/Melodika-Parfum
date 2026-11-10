@@ -316,7 +316,7 @@
                     <table class="w-full text-left text-xs text-zinc-300 border-collapse">
                         <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
                             <tr>
-                                <th class="py-2 px-2 w-24">Tarix / Gün</th>
+                                <th class="py-2 px-2 w-12 text-center">Gün</th>
                                 <th class="py-2 px-2">Xərcin Adı (Qeyd)</th>
                                 <th class="py-2 px-2 w-32 text-right">Məbləğ (AZN)</th>
                                 <th class="py-2 px-2 w-20 text-center">Əməliyyat</th>
@@ -360,7 +360,7 @@
                     <h2 class="text-lg font-bold gold-text">MÜŞTƏRİ KATALOQU MƏLUMATLARI (Tərkib, Notlar və Şəkil)</h2>
                     <button onclick="closeCatalogDetailsModal()" class="no-print text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
-                <div class="text-xs text-zinc-400">Hər bir ətir üçün müştəri səhifəsində görünəcək tərkibi, notları və şəkli buradan seçib yadda saxlayın.</div>
+                <div class="text-xs text-zinc-400">Yalnız 'A' kodu ilə olan ətirlərin tərkibi, notları və şəkli buradan idarə olunur.</div>
                 
                 <div id="catalogDetailsList" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
             </div>
@@ -518,7 +518,6 @@
             }
         }
 
-        // Yeni sifariş gələndə yanıb-sönmə effektini yoxlayan funksiya
         function checkNewOrdersBlinking() {
             if(!role) return;
             let ordersBtn = document.getElementById('ordersBtn');
@@ -527,7 +526,6 @@
             let lastSeenKey = `melodika_last_seen_order_${role}`;
             let lastSeenId = parseInt(localStorage.getItem(lastSeenKey) || '0');
 
-            // Əgər bazada ən son sifarişin ID-si istifadəçinin baxdığı son ID-dən böyükdürsə yanıb-sön
             let maxId = 0;
             orders.forEach(o => {
                 if(o.id > maxId) maxId = o.id;
@@ -573,7 +571,6 @@
             location.reload(); 
         }
 
-        // BAXIŞ SAYI İZLƏMƏ FUNKSİYASI
         async function trackVisit() {
             try {
                 await _supabase.from('site_visits').insert([{}]);
@@ -582,7 +579,6 @@
             }
         }
 
-        // MÜŞTƏRİ EKRANI
         function openCustomerCatalog() {
             trackVisit(); 
             document.getElementById('loginScreen').classList.add('hidden-screen');
@@ -819,16 +815,13 @@
             await loadDataFromCloud();
         }
 
-        // SİFARİŞLƏR SHEET - AÇILDIQDA YANIQ-SÖNMƏ DAYANIR
         function openOrdersModal() {
-            // Həmin rol üçün son görülən sifariş ID-sini yeniləyirik ki, yanıb-sönmə dayansın
             let maxId = 0;
             orders.forEach(o => { if(o.id > maxId) maxId = o.id; });
             if(maxId > 0 && role) {
                 localStorage.setItem(`melodika_last_seen_order_${role}`, maxId);
             }
             
-            // Yanıb-sönmə effektini dərhal söndürürük
             let ordersBtn = document.getElementById('ordersBtn');
             if(ordersBtn) ordersBtn.classList.remove('blinking-btn');
 
@@ -903,7 +896,6 @@
             }
         }
 
-        // AYLIQ/İLLİK XƏRCLƏR SHEETİ (YALNIZ ADMİN)
         function initExpenseYearOptions() {
             let sel = document.getElementById('expenseYearSelect');
             let currentYr = new Date().getFullYear();
@@ -953,7 +945,7 @@
 
                 html += `
                     <tr class="border-b border-zinc-800 hover:bg-zinc-800/30">
-                        <td class="py-2 px-2 font-mono text-amber-400/90 font-bold">${dayStr}.${monthStr}.${year}</td>
+                        <td class="py-2 px-2 font-mono text-amber-400/90 font-bold text-center">${day}</td>
                         <td class="py-2 px-2">
                             <input type="text" id="exp_title_${dateKey}" value="${title}" placeholder="Xərcin adını yazın..." class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs focus:outline-none focus:border-amber-500">
                         </td>
@@ -1008,36 +1000,43 @@
             renderExpenseSheet();
         }
 
-        // KATALOQ MƏLUMATLARI (ŞƏKİL, TƏRKİB, NOTLAR) SHEET
+        // KATALOQ MƏLUMATLARI (YALNIZ 'A' KODLU MƏHSULLAR) SHEET
         function openCatalogDetailsModal() {
             let listHtml = '';
-            products.forEach(p => {
-                let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-700">` : '<div class="w-12 h-12 bg-zinc-800 rounded border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
-                
-                listHtml += `
-                    <div class="bg-zinc-800/50 p-3 rounded-lg space-y-2 border border-zinc-700">
-                        <div class="font-bold gold-text text-sm">${p.name} (${p.code})</div>
-                        <div class="flex items-center space-x-3">
-                            ${imgPreview}
-                            <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                                <div class="flex flex-col">
-                                    <label class="text-[10px] text-zinc-400 mb-0.5">Şəkil Seçin</label>
-                                    <input type="file" id="det_img_${p.id}" accept="image/*" class="bg-zinc-800 border border-zinc-700 p-1 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black hover:file:bg-amber-600">
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-[10px] text-zinc-400 mb-0.5">Tərkibi</label>
-                                    <input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" placeholder="Tərkibi" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
-                                </div>
-                                <div class="flex flex-col">
-                                    <label class="text-[10px] text-zinc-400 mb-0.5">İç notları</label>
-                                    <input type="text" id="det_note_${p.id}" value="${p.notes || ''}" placeholder="İç notları" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
+            // Yalnız 'A' hərfi ilə başlayan məhsulları filter edirik
+            let aProducts = products.filter(p => p.code && p.code.toUpperCase().startsWith('A'));
+
+            if(aProducts.length === 0) {
+                listHtml = '<div class="text-zinc-500 text-xs">A kodu ilə başlayan məhsul tapılmadı.</div>';
+            } else {
+                aProducts.forEach(p => {
+                    let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-700">` : '<div class="w-12 h-12 bg-zinc-800 rounded border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
+                    
+                    listHtml += `
+                        <div class="bg-zinc-800/50 p-3 rounded-lg space-y-2 border border-zinc-700">
+                            <div class="font-bold gold-text text-sm">${p.name} (${p.code})</div>
+                            <div class="flex items-center space-x-3">
+                                ${imgPreview}
+                                <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
+                                    <div class="flex flex-col">
+                                        <label class="text-[10px] text-zinc-400 mb-0.5">Şəkil Seçin</label>
+                                        <input type="file" id="det_img_${p.id}" accept="image/*" class="bg-zinc-800 border border-zinc-700 p-1 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black hover:file:bg-amber-600">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-[10px] text-zinc-400 mb-0.5">Tərkibi</label>
+                                        <input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" placeholder="Tərkibi" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
+                                    </div>
+                                    <div class="flex flex-col">
+                                        <label class="text-[10px] text-zinc-400 mb-0.5">İç notları</label>
+                                        <input type="text" id="det_note_${p.id}" value="${p.notes || ''}" placeholder="İç notları" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-xs">
+                                    </div>
                                 </div>
                             </div>
+                            <button onclick="saveCatalogDetails(${p.id})" class="gold-bg font-bold px-3 py-1 rounded text-xs">Yadda Saxla</button>
                         </div>
-                        <button onclick="saveCatalogDetails(${p.id})" class="gold-bg font-bold px-3 py-1 rounded text-xs">Yadda Saxla</button>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            }
             document.getElementById('catalogDetailsList').innerHTML = listHtml;
             document.getElementById('catalogDetailsModal').classList.remove('hidden-screen');
         }
@@ -1090,7 +1089,6 @@
             openCatalogDetailsModal();
         }
 
-        // ANALİTİKA HESABLAYICISI
         async function loadAnalytics(period = 'day') {
             const now = new Date();
             let startDate = new Date();
@@ -1128,7 +1126,6 @@
             }
         }
 
-        // ADMIN / SATICI PANELİ
         function renderUI() {
             let searchQuery = (document.getElementById('productSearch').value || '').toLowerCase();
             let sel = document.getElementById('opProduct');
