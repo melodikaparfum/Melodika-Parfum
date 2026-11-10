@@ -152,7 +152,9 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <button onclick="openGlobalMasterArchiveModal()" class="bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Sheeti 🗂️</button>
+                    <!-- ARXİV SHEET BUTTONU - YALNIZ ADMIN ÜÇÜN -->
+                    <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Sheeti 🗂️</button>
+                    
                     <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
                     <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
                     <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
@@ -741,7 +743,7 @@
             </div>
         </div>
 
-        <!-- GÜN SONU HESABAT EKRANI (DÜZƏLİŞ EDİLDİ) -->
+        <!-- GÜN SONU HESABAT EKRANI -->
         <div id="dayEndModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
@@ -867,7 +869,6 @@
         let role = localStorage.getItem('melodika_current_role') || '';
         let shiftType = localStorage.getItem('melodika_current_shift') || ''; 
 
-        // Təsdiləmə üçün müvəqqəti saxlanılan məlumatlar
         let currentDayEndSummaryHtml = '';
         let currentDayEndReportDate = '';
 
@@ -914,18 +915,21 @@
                 let shiftBox = document.getElementById('shiftControlBox');
                 let adminReportsSheet = document.getElementById('adminReportsSheetSection');
                 let adminCashSheet = document.getElementById('adminCashSheetSection');
+                let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
 
                 if(role === 'ADMIN') {
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
+                    if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen'); // Yalnız Admin üçün görünür
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
                     document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                     setOperationalState(true);
                 } else {
                     if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
+                    if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen'); // Satıcılardan qəti şəkildə gizlədilir
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
                     let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                     document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -1815,18 +1819,21 @@
             let shiftBox = document.getElementById('shiftControlBox');
             let adminReportsSheet = document.getElementById('adminReportsSheetSection');
             let adminCashSheet = document.getElementById('adminCashSheetSection');
+            let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
 
             if(role === 'ADMIN') {
                 document.getElementById('adminBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                 if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
+                if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen'); // Yalnız Admin üçün görünür
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                 setOperationalState(true);
             } else {
                 if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
+                if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen'); // Satıcılardan qəti şəkildə gizlədilir
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
                 let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                 document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -2491,7 +2498,7 @@
 
         async function openDayEndModal() {
             let nowStr = getBakuDateString(new Date());
-            currentDayEndReportDate = nowStr; // Tarixi qeyd edirik
+            currentDayEndReportDate = nowStr;
             let todaySales = sales.filter(s => s.date && getBakuDateString(s.date) === nowStr && s.type === 'MEXARIC');
             let totalAmount = 0;
             
@@ -2574,7 +2581,6 @@
             currentDayEndSummaryHtml = listHtml + summaryHtml;
             document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
 
-            // Əgər rol ADMIN-dirsə, "Arxivə Təsdiq Et" düyməsini göstəririk
             let saveSec = document.getElementById('adminArchiveSaveSection');
             if(role === 'ADMIN') {
                 saveSec.classList.remove('hidden-screen');
@@ -2585,17 +2591,14 @@
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
-        // TƏSDİQLƏMƏ DÜYMƏSİ ÜÇÜN DÜZƏLDİLMİŞ FUNKSİYA (RPC ILE)
         async function confirmAndSaveDayEndArchive() {
             try {
-                // Doğrudan Supabase RPC vasitəsilə icazə bloklamasını dolanırıq
                 let { error } = await _supabase.rpc('save_day_end_archive', {
                     p_report_date: currentDayEndReportDate,
                     p_content_summary: currentDayEndSummaryHtml
                 });
                 
                 if (error) {
-                    // Əgər RPC hələ yaradılmayıbsa, fallback kimi adi insert edirik
                     let { error: insertErr } = await _supabase.from('day_end_archive').insert([{ 
                         report_date: currentDayEndReportDate, 
                         content_summary: currentDayEndSummaryHtml 
