@@ -497,7 +497,7 @@
                 <div class="bg-zinc-800/50 p-4 rounded-xl space-y-3 text-xs border border-zinc-700">
                     <div class="font-bold gold-text text-sm border-b border-zinc-700 pb-2" id="selectedMonthSalesTitle">Cari Kassa Vəziyyəti:</div>
                     
-                    <!-- ƏN ÜSTDƏKİ ÜMUMİ KASSA CƏMİ -->
+                    <!-- ƏN ÜSTDƏKİ ÜMUMİ KASSA CəMİ -->
                     <div class="flex justify-between items-center bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/30">
                         <span class="font-bold text-amber-300">Evdəki + Mağazadakı Kassa Cəmi:</span>
                         <strong id="kassaCombinedTotal" class="text-amber-400 font-extrabold text-base">0.00 AZN</strong>
@@ -922,14 +922,14 @@
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
-                    if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen'); // Yalnız Admin üçün görünür
+                    if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
                     document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                     setOperationalState(true);
                 } else {
                     if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
-                    if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen'); // Satıcılardan qəti şəkildə gizlədilir
+                    if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
                     let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                     document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -1005,6 +1005,20 @@
                 console.error(err);
                 document.getElementById('debugBox').textContent = "Status Xətası: " + err.message;
                 document.getElementById('debugBox').className = "bg-zinc-900 border border-red-600 p-3 rounded-xl text-xs text-red-400 font-mono no-print";
+            }
+        }
+
+        // KATALOGDA MƏHSUL KODUNA KLİKLƏYƏNDƏ AVTOMATİK SEÇİLMƏ FUNKSİYASI
+        function selectProductFromCatalog(productId) {
+            let opProdSelect = document.getElementById('opProduct');
+            if(opProdSelect) {
+                opProdSelect.value = productId;
+                calcPrice(); // Qiyməti avtomatik hesablayır
+                // Səhifəni əməliyyat formasının üzərinə yüngülcə sürüşdürürük
+                opProdSelect.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Qısa parıltı effekti veririk ki, seçildiyi görөнmək üçün
+                opProdSelect.classList.add('border-blue-500');
+                setTimeout(() => { opProdSelect.classList.remove('border-blue-500'); }, 1500);
             }
         }
 
@@ -1826,14 +1840,14 @@
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                 if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
-                if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen'); // Yalnız Admin üçün görünür
+                if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                 setOperationalState(true);
             } else {
                 if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
-                if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen'); // Satıcılardan qəti şəkildə gizlədilir
+                if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
                 let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                 document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -2412,7 +2426,20 @@
                 if(p.code.toLowerCase().includes(searchQuery) || p.name.toLowerCase().includes(searchQuery)) {
                     let actionBtns = role === 'ADMIN' ? `<div class="flex space-x-2"><button onclick="editProduct(${p.id})" class="text-amber-400 font-bold">Düzənlə</button><button onclick="deleteProduct(${p.id})" class="text-red-400 font-bold">X</button></div>` : '-';
                     let buyPriceTd = role === 'ADMIN' ? `<td class="py-1 text-zinc-400">${p.buy_price || 0} AZN</td>` : '';
-                    prodHtml += `<tr class="border-b border-zinc-800"><td class="py-1 font-mono">${p.code}</td><td class="py-1">${p.name}</td><td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>${buyPriceTd}<td class="py-1 font-semibold gold-text">${p.sell_price || 0} AZN</td><td class="py-1">${actionBtns}</td></tr>`;
+                    
+                    // Məhsul kodu göy rəngli yazı və kliklənə bilən formada qeyd edildi
+                    prodHtml += `
+                        <tr class="border-b border-zinc-800">
+                            <td class="py-1 font-mono">
+                                <span onclick="selectProductFromCatalog(${p.id})" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək satışa əlavə et">${p.code}</span>
+                            </td>
+                            <td class="py-1">${p.name}</td>
+                            <td class="py-1 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>
+                            ${buyPriceTd}
+                            <td class="py-1 font-semibold gold-text">${p.sell_price || 0} AZN</td>
+                            <td class="py-1">${actionBtns}</td>
+                        </tr>
+                    `;
                 }
             });
             document.getElementById('prodTable').innerHTML = prodHtml || `<tr><td colspan="${role === 'ADMIN' ? 6 : 5}" class="py-1 text-zinc-500">Məhsul tapılmadı</td></tr>`;
