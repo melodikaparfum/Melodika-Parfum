@@ -354,13 +354,8 @@
         <!-- SƏBƏB QEYD ETMƏK ÜÇÜN POPUP MODAL -->
         <div id="reasonModal" class="hidden-screen fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
-                <h3 class="text-sm font-bold gold-text">İşə gəlməmə səbəbi (Üzürlü / Üzürsüz)</h3>
+                <h3 class="text-sm font-bold gold-text">İşə gəlməmə səbəbi</h3>
                 <input type="hidden" id="modalDateKey">
-                <div class="flex space-x-2">
-                    <button onclick="selectAttendanceType('Üzürlü')" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/50 font-bold py-2 rounded text-xs">Üzürlü</button>
-                    <button onclick="selectAttendanceType('Üzürsüz')" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/50 font-bold py-2 rounded text-xs">Üzürsüz</button>
-                </div>
-                <input type="hidden" id="modalSelectedType" value="Üzürsüz">
                 <textarea id="modalReasonInput" placeholder="Səbəbi ətraflı qeyd edin (məs: yatıb qalıb)..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs h-24 focus:outline-none gold-border"></textarea>
                 <div class="flex space-x-2">
                     <button onclick="closeReasonModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina Et</button>
@@ -527,7 +522,7 @@
         <div class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print">
             <div class="text-xs text-zinc-300 font-medium">Suallarınız və ya əlavə sifarişlər üçün:</div>
             <a href="https://wa.me/994559703829" target="_blank" class="inline-flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition-all w-full">
-                <span>💬 Bizə WhatsApp ilə yazın</span>
+                <span>💬 WhatsApp ilə yazın</span>
             </a>
             <div class="text-xs font-mono gold-text font-bold pt-1">+994 55 970 38 29</div>
         </div>
@@ -782,12 +777,9 @@
                 } else if(rec.check_in && rec.check_out) {
                     statusDisplay = `${checkIn} - ${checkOut}`;
                 } else {
-                    // İşçi gəlməyib
                     if(noteText !== '') {
-                        // Səbəb yazılıbsa, "Gəlməyib" silinir, paralel olaraq səbəb yazılır, düymə yoxa çıxır
                         statusDisplay = `<span class="font-semibold text-zinc-900">${noteText}</span>`;
                     } else {
-                        // Səbəb hələ yazılmayıbsa
                         statusDisplay = `Gəlməyib`;
                         reasonBtnHtml = `<button onclick="openReasonModalPopup('${dateKey}')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2.5 py-1 rounded text-xs ml-2">Səbəb yaz / Düzənlə</button>`;
                     }
@@ -813,28 +805,18 @@
 
         function openReasonModalPopup(dateKey) {
             document.getElementById('modalDateKey').value = dateKey;
-            document.getElementById('modalSelectedType').value = 'Üzürsüz';
             document.getElementById('modalReasonInput').value = '';
             document.getElementById('reasonModal').classList.remove('hidden-screen');
         }
 
-        function selectAttendanceType(type) {
-            document.getElementById('modalSelectedType').value = type;
-        }
-
         async function saveAttendanceReason() {
             let dateKey = document.getElementById('modalDateKey').value;
-            let type = document.getElementById('modalSelectedType').value;
             let reason = document.getElementById('modalReasonInput').value.trim();
 
             if(!reason) { alert('Zəhmət olmasa səbəbi qeyd edin!'); return; }
 
-            let isExcused = (type === 'Üzürlü');
-            let isUnexcused = (type === 'Üzürsüz');
-            let fullNote = `${type} - ${reason}`;
-
             let rec = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI');
-            let payload = { is_excused: isExcused, is_unexcused: isUnexcused, note: fullNote };
+            let payload = { note: reason };
 
             if(rec && rec.id) {
                 let { error } = await _supabase.from('attendance').update(payload).eq('id', rec.id);
@@ -1491,7 +1473,7 @@
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
             document.getElementById('payPos').textContent = payPos.toFixed(2) + ' AZN';
-            document.getElementById('payCard').textContent = payCard.toFixed(2) + ' AZN';
+            document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
 
             if(role === 'ADMIN') {
                 document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
