@@ -137,14 +137,37 @@
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
-                    <button onclick="openAttendanceModal()" id="attendanceBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Satıcı İş Saatları Sheeti 🕒</button>
-                    <button onclick="openExpensesModal()" id="expensesBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Xərclər Sheeti 📊</button>
                     <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
                     <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
-                    <button onclick="openDayEndModal()" class="gold-bg font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu</button>
                     <button onclick="logout()" class="text-xs bg-red-900 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
                 </div>
             </header>
+
+            <!-- HESABATLAR SHEETS BÖLGƏSİ (YALNIZ ADMİN ÜÇÜN) -->
+            <div id="adminReportsSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
+                <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
+                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">📊 HESABATLAR SHEETİ (ADMİN MƏRKƏZİ)</h2>
+                    <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Bütün Hesabatlar</span>
+                </div>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
+                        <span class="text-base">📝</span>
+                        <span>Gün Sonu Hesabatı</span>
+                    </button>
+                    <button onclick="openRangeReportModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
+                        <span class="text-base">📅</span>
+                        <span>Tarixlər üzrə Hesabat</span>
+                    </button>
+                    <button onclick="openExpensesModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
+                        <span class="text-base">📊</span>
+                        <span>Xərclər Sheeti (PNG)</span>
+                    </button>
+                    <button onclick="openAttendanceModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-2.5 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 transition-all">
+                        <span class="text-base">🕒</span>
+                        <span>İş Saatları Sheeti (PDF)</span>
+                    </button>
+                </div>
+            </div>
 
             <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ -->
             <div id="shiftControlBox" class="bg-zinc-900 border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
@@ -337,9 +360,6 @@
                             <div id="reportNetProfit" class="text-lg font-bold text-green-400">0.00 AZN</div>
                         </div>
                     </div>
-                    <div class="pt-2 text-right">
-                        <button onclick="openRangeReportModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Aralıq Hesabatı Şəkil Kimi Çıxart 📥</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -418,7 +438,7 @@
         <div id="rangeReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                    <h2 class="text-sm font-bold gold-text">Aralıq Hesabatı Şəkil</h2>
+                    <h2 class="text-sm font-bold gold-text">Tarixlər Üzrə / Aralıq Hesabat</h2>
                     <button onclick="closeRangeReportModal()" class="text-xs bg-zinc-800 px-2.5 py-1 rounded">X</button>
                 </div>
                 <div id="rangeReportPrintArea" class="bg-white text-black p-6 rounded-lg space-y-3 font-sans text-left text-sm shadow-lg">
@@ -650,18 +670,17 @@
                 document.getElementById('mainApp').classList.remove('hidden-screen');
                 
                 let shiftBox = document.getElementById('shiftControlBox');
-                let attBtn = document.getElementById('attendanceBtn');
+                let adminReportsSheet = document.getElementById('adminReportsSheetSection');
 
                 if(role === 'ADMIN') {
                     document.getElementById('adminBox').classList.remove('hidden-screen');
                     document.getElementById('adminReportBox').classList.remove('hidden-screen');
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
-                    document.getElementById('expensesBtn').classList.remove('hidden-screen');
-                    if(attBtn) attBtn.classList.remove('hidden-screen');
+                    if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
                 } else {
+                    if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
-                    if(attBtn) attBtn.classList.add('hidden-screen');
                 }
 
                 loadAnalytics('day'); 
@@ -1017,6 +1036,7 @@
         }
 
         function openRangeReportModal() {
+            if(role !== 'ADMIN') { alert('Bu hesabat yalnız admindir.'); return; }
             let start = document.getElementById('startDate').value;
             let end = document.getElementById('endDate').value;
             if(!start || !end) { alert('Başlanğıc və son tarixi seçin!'); return; }
@@ -1094,19 +1114,18 @@
             document.getElementById('mainApp').classList.remove('hidden-screen');
             
             let shiftBox = document.getElementById('shiftControlBox');
-            let attBtn = document.getElementById('attendanceBtn');
+            let adminReportsSheet = document.getElementById('adminReportsSheetSection');
 
             if(role === 'ADMIN') {
                 document.getElementById('adminBox').classList.remove('hidden-screen');
                 document.getElementById('adminReportBox').classList.remove('hidden-screen');
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
-                document.getElementById('expensesBtn').classList.remove('hidden-screen');
-                if(attBtn) attBtn.classList.remove('hidden-screen');
+                if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 setOperationalState(true);
             } else {
+                if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
-                if(attBtn) attBtn.classList.add('hidden-screen');
                 checkTodayShiftStatus();
             }
 
