@@ -68,6 +68,49 @@
                 <button onclick="closeCustomerCatalog()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded">Girişə Qayıt</button>
             </header>
 
+            <!-- İLİN ƏN SEÇİLƏN ƏTİRLƏRİ BÖLGƏSİ -->
+            <div class="bg-zinc-900 border border-amber-500/50 p-4 rounded-xl space-y-3">
+                <h2 class="text-sm font-bold gold-text uppercase">✨ İlin Ən Seçilən Ətirləri</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    <!-- Afnan 9 pm -->
+                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
+                        <div>
+                            <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
+                            <div class="font-bold text-white text-xs">Afnan 9 pm</div>
+                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Alma, darçın, vanil, kəhrəba</div>
+                        </div>
+                        <button onclick="addFeaturedToCart('Afnan 9 pm', 45)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At (45 AZN)</button>
+                    </div>
+                    <!-- Afnan Tribute -->
+                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
+                        <div>
+                            <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
+                            <div class="font-bold text-white text-xs">Afnan Tribute</div>
+                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Ədviyyatlı sitrus, odunsu notlar, müşk</div>
+                        </div>
+                        <button onclick="addFeaturedToCart('Afnan Tribute', 50)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At (50 AZN)</button>
+                    </div>
+                    <!-- Sospiro Accento -->
+                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
+                        <div>
+                            <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
+                            <div class="font-bold text-white text-xs">Sospiro Accento</div>
+                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Ananas, süs qızılgülü, jasmin, paçuli</div>
+                        </div>
+                        <button onclick="addFeaturedToCart('Sospiro Accento', 75)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At (75 AZN)</button>
+                    </div>
+                    <!-- Al Rehab Dalal -->
+                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
+                        <div>
+                            <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
+                            <div class="font-bold text-white text-xs">Al Rehab Dalal</div>
+                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Karamelli vanil, portağal, səndəl ağacı</div>
+                        </div>
+                        <button onclick="addFeaturedToCart('Al Rehab Dalal', 25)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At (25 AZN)</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="md:col-span-2 space-y-3">
                     <h2 class="text-sm font-semibold gold-text">Ətirlər və Notlar</h2>
@@ -575,6 +618,7 @@
         let expenses = [];
         let attendances = [];
         let chatMessages = [];
+        let productRatings = [];
         let cart = [];
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
@@ -664,6 +708,11 @@
 
                 let eRes = await _supabase.from('expenses').select('*');
                 if(!eRes.error) expenses = eRes.data || [];
+
+                try {
+                    let rRes = await _supabase.from('product_ratings').select('*');
+                    if(!rRes.error) productRatings = rRes.data || [];
+                } catch(e) { productRatings = []; }
 
                 try {
                     let aRes = await _supabase.from('attendance').select('*');
@@ -863,7 +912,6 @@
             let container = document.getElementById('attendanceRowsList');
             let html = '';
 
-            // Ayın 1-ci gününün həftənin hansı gününə düşdüyünü dəqiq hesablayırıq
             let firstDayIndex = new Date(year, month - 1, 1).getDay();
             let currentDayOfWeek = firstDayIndex === 0 ? 7 : firstDayIndex;
 
@@ -1116,6 +1164,29 @@
             filtered.forEach(p => {
                 let sellPrice = Number(p.sell_price || 0);
                 let imgTag = p.image_url ? `<img src="${p.image_url}" class="w-16 h-16 object-cover rounded border border-zinc-700 mb-2">` : '';
+                
+                // Reytinq hesablanması
+                let pRatings = productRatings.filter(r => r.product_id === p.id);
+                let avgRating = 0;
+                if(pRatings.length > 0) {
+                    let sum = pRatings.reduce((acc, curr) => acc + curr.rating, 0);
+                    avgRating = (sum / pRatings.length).toFixed(1);
+                }
+
+                // Ortalama ulduzların yaradılması (sarı ulduzlar)
+                let avgStarsHtml = '';
+                let roundedAvg = Math.round(avgRating);
+                for(let i = 1; i <= 5; i++) {
+                    let color = i <= roundedAvg ? 'text-amber-400' : 'text-zinc-600';
+                    avgStarsHtml += `<span class="${color}">★</span>`;
+                }
+
+                // İstifadəçinin qiymətləndirməsi üçün interaktiv 5 ulduz
+                let interactiveStarsHtml = '';
+                for(let i = 1; i <= 5; i++) {
+                    interactiveStarsHtml += `<span onclick="rateProduct(${p.id}, ${i})" class="cursor-pointer text-zinc-500 hover:text-amber-400 text-base transition-colors" title="${i} ulduz ver">★</span>`;
+                }
+
                 listHtml += `
                     <div class="bg-zinc-900 border border-zinc-800 p-3 rounded-xl space-y-2">
                         <div class="flex items-start space-x-3">
@@ -1129,6 +1200,17 @@
                                     <div><strong class="text-zinc-300">Tərkibi:</strong> ${p.ingredients || 'Qeyd olunmayıb'}</div>
                                     <div><strong class="text-zinc-300">İç notları:</strong> ${p.notes || 'Qeyd olunmayıb'}</div>
                                 </div>
+                                <!-- Ortalama Ulduz Göstəricisi -->
+                                <div class="flex items-center space-x-2 mt-2 text-xs">
+                                    <span class="text-zinc-400">Ortalama Reytinq:</span>
+                                    <div class="flex text-sm">${avgStarsHtml}</div>
+                                    <span class="text-amber-400 font-bold">${avgRating > 0 ? avgRating : '0.0'} (${pRatings.length} səs)</span>
+                                </div>
+                                <!-- İstifadəçinin Ulduz Vermə Paneli -->
+                                <div class="flex items-center space-x-1 mt-1 text-xs">
+                                    <span class="text-zinc-400 mr-1">Dəyərləndir:</span>
+                                    <div class="flex space-x-0.5" id="stars_container_${p.id}">${interactiveStarsHtml}</div>
+                                </div>
                             </div>
                         </div>
                         <div class="flex items-center space-x-2 pt-2 border-t border-zinc-800">
@@ -1140,6 +1222,22 @@
                 `;
             });
             document.getElementById('customerProductsList').innerHTML = listHtml;
+        }
+
+        async function rateProduct(productId, ratingValue) {
+            let { error } = await _supabase.from('product_ratings').insert([{ product_id: productId, rating: ratingValue }]);
+            if(error) { alert('Xəta: ' + error.message); return; }
+            alert('Qiymətləndirmeniz üçün təşəkkür edirik!');
+            await loadDataFromCloud();
+            renderCustomerCatalog();
+        }
+
+        function addFeaturedToCart(name, price) {
+            let existing = cart.find(x => x.name === name);
+            if(existing) { existing.grams += 1; existing.total += price; }
+            else { cart.push({ id: Date.now(), name, grams: 1, total: price }); }
+            renderCart();
+            alert(`${name} səbətə əlavə olundu!`);
         }
 
         function calcCustItemPrice(id, pricePerGram) {
@@ -1177,7 +1275,7 @@
                 grandTotal += item.total;
                 html += `
                     <div class="flex justify-between items-center border-b border-zinc-800/50 pb-1">
-                        <div>${item.name} (${item.grams} qr)</div>
+                        <div>${item.name} (${item.grams} qr/ədəd)</div>
                         <div class="flex items-center space-x-2">
                             <span class="gold-text font-bold">${item.total.toFixed(2)} AZN</span>
                             <button onclick="removeFromCart(${idx})" class="text-red-400 font-bold hover:text-red-600">✕</button>
@@ -1290,7 +1388,7 @@
                 let formattedDate = o.created_at ? getBakuDateTimeString(o.created_at) : '';
                 let itemsStr = '';
                 if(Array.isArray(o.items)) {
-                    o.items.forEach(i => { itemsStr += `<div>• ${i.name} - ${i.grams} qr (${i.total.toFixed(2)} AZN)</div>`; });
+                    o.items.forEach(i => { itemsStr += `<div>• ${i.name} - ${i.grams} qr/ədəd (${i.total.toFixed(2)} AZN)</div>`; });
                 }
                 let statusColor = o.status === 'Qəbul edildi' ? 'text-green-400' : (o.status === 'Ləğv edildi' ? 'text-red-400' : 'text-amber-400');
                 let deliveryInfoStr = o.is_delivery ? ` | Çatdırılma: ${o.delivery_fee ? o.delivery_fee + ' AZN' : 'Pulsuz'}` : '';
