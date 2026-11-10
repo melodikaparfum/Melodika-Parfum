@@ -161,7 +161,7 @@
                 </div>
             </header>
 
-            <!-- KASSA SHEETE GİRİŞ BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN) -->
+            <!-- KASSA SHEETE GİRİŞ BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN - ƏSAS SƏHİFƏDƏ) -->
             <div id="adminCashSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
                 <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">💰 KASSA MƏRKƏZİ (ADMIN)</h2>
@@ -173,7 +173,7 @@
                 </div>
             </div>
 
-            <!-- HESABATLAR SHEETS BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN) -->
+            <!-- HESABATLAR SHEETS BÖLGƏSİ (YALNIZ ADMIN ÜÇÜN - ƏSAS SƏHİFƏDƏ) -->
             <div id="adminReportsSheetSection" class="hidden-screen bg-zinc-900 border-2 border-amber-500/70 p-4 rounded-xl space-y-3 shadow-xl no-print">
                 <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">📊 HESABATLAR SHEETİ (ADMİN MƏRKƏZİ)</h2>
@@ -303,7 +303,7 @@
                     <button id="logCatalogDetailsBtn" onclick="openCatalogDetailsModal()" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Kataloq Məlumatları (Şəkil və Notlar) 🖼️</button>
                 </div>
 
-                <!-- MƏHSUL ƏLAVƏ / DÜZƏNLƏ FORM BLOKU -->
+                <!-- MƏHSUL ƏLƏVƏ / DÜZƏNLƏ FORM BLOKU -->
                 <div id="adminBox" class="bg-zinc-800/90 border border-amber-500/40 p-4 rounded-xl space-y-3 hidden-screen">
                     <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
                     <input type="hidden" id="editingProductId">
@@ -495,7 +495,7 @@
             </div>
         </div>
 
-        <!-- BÜTÜN ARXİVLƏRİN GÖSTƏRİLDİYİ MASTER ARXİV MODALI -->
+        <!-- BÜTÜN ARXİVLƏRİN GÖSTƏRİLDİYİ MASTER ARXİV MODALI (SİL DÜYMƏSİ VƏ QUŞ QOYMA İLƏ) -->
         <div id="globalMasterArchiveModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-3xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -507,7 +507,10 @@
                     <div class="text-xs text-zinc-400 font-medium">Bütün vaxtlar üzrə qeydə alınmış Gün Sonu Hesabatları və Aylıq Arxivlər burada saxlanılır.</div>
                     
                     <div class="space-y-3 bg-zinc-800/80 p-3 rounded-xl border border-zinc-700">
-                        <h3 class="text-sm font-bold gold-text border-b border-zinc-800 pb-1">📅 Gün Sonu Hesabatları Arxivi (İl və Ay Seçimi):</h3>
+                        <div class="flex justify-between items-center border-b border-zinc-800 pb-1">
+                            <h3 class="text-sm font-bold gold-text">📅 Gün Sonu Hesabatları Arxivi (İl və Ay Seçimi):</h3>
+                            <button onclick="deleteSelectedDayEndArchives()" class="bg-red-800 hover:bg-red-700 text-white font-bold px-3 py-1 rounded text-xs shadow">Seçilmişləri Sil 🗑️</button>
+                        </div>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
@@ -529,7 +532,7 @@
                         </div>
                     </div>
 
-                    <!-- AYLIQ / İLLİK ARXİVLƏR (İSTƏDİYİN GÖY RƏNGLİ DÜYMƏLƏR) -->
+                    <!-- AYLIQ / İLLİK ARXİVLƏR (GÖY RƏNGLİ DÜYMƏLƏR) -->
                     <div class="space-y-3 pt-2">
                         <h3 class="text-sm font-bold gold-text border-b border-zinc-800 pb-1">📈 Aylıq / İllik Arxivlər:</h3>
                         
@@ -758,7 +761,7 @@
             </div>
         </div>
 
-        <!-- SƏBƏB QEYD ETMƏK ÜÇÜN POPUP MODAL -->
+        <!-- SƏBƏB QEYD ETDİKÇƏ POPUP MODAL -->
         <div id="reasonModal" class="hidden-screen fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
                 <h3 id="modalTitleText" class="text-sm font-bold gold-text">İşə gəlməmə səbəbi yaz / redaktə et</h3>
@@ -1412,9 +1415,14 @@
                 let foundArchive = dayEndArchive.find(item => String(item.report_date) === dateKey);
                 let badgeIndicator = foundArchive ? '🟢' : '⚪';
 
+                let checkboxHtml = foundArchive ? `<input type="checkbox" value="${foundArchive.id}" class="archive-checkbox w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700 ml-2">` : '';
+
                 html += `
                     <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-700/60 hover:bg-zinc-800 transition-colors">
-                        <span onclick="openSpecificDayArchive('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək hesabatı aç">${d} ${monthName}</span>
+                        <div class="flex items-center space-x-2">
+                            ${checkboxHtml}
+                            <span onclick="openSpecificDayArchive('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək hesabatı aç">${d} ${monthName}</span>
+                        </div>
                         <span class="text-[10px] text-zinc-400">${badgeIndicator} ${foundArchive ? 'Hesabat mövcuddur' : 'Hesabat yoxdur'}</span>
                     </div>
                 `;
@@ -1422,7 +1430,26 @@
             container.innerHTML = html;
         }
 
-        // YENİ: Göy rəngli düymələrə kliklədikdə açılan arxiv bölməsi modalı
+        async function deleteSelectedDayEndArchives() {
+            let checkboxes = document.querySelectorAll('.archive-checkbox:checked');
+            if(checkboxes.length === 0) {
+                alert('Zəhmət olmasa silmək üçün ən azı bir gün seçin (quş qoyun)!');
+                return;
+            }
+
+            if(!confirm(`Seçilmiş ${checkboxes.length} ədəd gün sonu arxivini silmək istədiyinizə əminsiniz?`)) return;
+
+            let idsToDelete = Array.from(checkboxes).map(cb => parseInt(cb.value));
+
+            for(let id of idsToDelete) {
+                await _supabase.from('day_end_archive').delete().eq('id', id);
+            }
+
+            alert('Seçilmiş arxivlər uğurla silindi!');
+            await loadDataFromCloud();
+            renderArchiveCalendar();
+        }
+
         function openArchiveSectionModal(sectionType) {
             currentActiveArchiveSection = sectionType;
             initArchiveSelectors();
