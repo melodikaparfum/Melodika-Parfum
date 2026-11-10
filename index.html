@@ -568,11 +568,8 @@
                 let oRes = await _supabase.from('orders').select('*');
                 if(!oRes.error) orders = oRes.data || [];
 
-                // Qoruyucu try-catch ilə expenses və attendance sorğuları (cədvəl olmasa belə xəta verməyəcək)
-                try {
-                    let eRes = await _supabase.from('expenses').select('*');
-                    if(!eRes.error) expenses = eRes.data || [];
-                } catch(e) { expenses = []; }
+                let eRes = await _supabase.from('expenses').select('*');
+                if(!eRes.error) expenses = eRes.data || [];
 
                 try {
                     let aRes = await _supabase.from('attendance').select('*');
@@ -628,10 +625,10 @@
             let existing = attendances.find(a => a.work_date === todayStr && a.role_name === 'SATICI');
             if(existing) {
                 let { error } = await _supabase.from('attendance').update({ check_in: nowIso, check_out: null }).eq('id', existing.id);
-                if(error) { alert('Xəta (Cədvəl mövcud olmaya bilər): ' + error.message); return; }
+                if(error) { alert('Xəta: ' + error.message); return; }
             } else {
                 let { error } = await _supabase.from('attendance').insert([{ work_date: todayStr, role_name: 'SATICI', check_in: nowIso }]);
-                if(error) { alert('Xəta (Cədvəl mövcud olmaya bilər): ' + error.message); return; }
+                if(error) { alert('Xəta: ' + error.message); return; }
             }
             alert('Növbə uğurla başlandı! Əməliyyatlar aktivləşdirildi.');
             await loadDataFromCloud();
@@ -993,15 +990,6 @@
                 if(error) { alert('Xəta: ' + error.message); return; }
                 await loadDataFromCloud(); renderOrdersList(); loadAnalytics('day');
             }
-        }
-
-        function initExpenseYearOptions() {
-            let currentYr = new Date().getFullYear();
-            let sel = document.getElementById('expenseYearSelect');
-            if(!sel) return;
-            sel.innerHTML = '';
-            for(let y = currentYr - 2; y <= currentYr + 3; y++) sel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
-            document.getElementById('expenseMonthSelect').value = new Date().getMonth() + 1;
         }
 
         function openExpensesModal() { if(role !== 'ADMIN') return; renderExpenseSheet(); document.getElementById('expensesModal').classList.remove('hidden-screen'); }
