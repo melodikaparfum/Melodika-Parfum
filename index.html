@@ -937,10 +937,8 @@
             if(!role) return;
             let ordersBtn = document.getElementById('ordersBtn');
             if(!ordersBtn) return;
-            let lastSeenId = parseInt(localStorage.getItem(`melodika_last_seen_order_${role}`) || '0');
-            let maxId = 0;
-            orders.forEach(o => { if(o.id > maxId) maxId = o.id; });
-            if(maxId > lastSeenId) ordersBtn.classList.add('blinking-btn');
+            let unreadExists = orders.some(o => !o.is_read);
+            if(unreadExists) ordersBtn.classList.add('blinking-btn');
             else ordersBtn.classList.remove('blinking-btn');
         }
 
@@ -1147,7 +1145,7 @@
                 customer_name: name, customer_phone: phone, is_delivery: isDelivery,
                 delivery_fee: deliveryFee, total_amount: finalAmount,
                 address: isDelivery ? address : 'Yerindən götürmə', items: cart,
-                status: 'Gözləmədə', created_at: new Date().toISOString()
+                status: 'Gözləmədə', is_read: false, created_at: new Date().toISOString()
             };
 
             let { error } = await _supabase.from('orders').insert([orderData]);
@@ -1163,10 +1161,12 @@
             await loadDataFromCloud();
         }
 
-        function openOrdersModal() {
-            let maxId = 0;
-            orders.forEach(o => { if(o.id > maxId) maxId = o.id; });
-            if(maxId > 0 && role) localStorage.setItem(`melodika_last_seen_order_${role}`, maxId);
+        async function openOrdersModal() {
+            let unreadIds = orders.filter(o => !o.is_read).map(o => o.id);
+            if(unreadIds.length > 0) {
+                await _supabase.from('orders').update({ is_read: true }).in('id', unreadIds);
+                await loadDataFromCloud();
+            }
             let ordersBtn = document.getElementById('ordersBtn');
             if(ordersBtn) ordersBtn.classList.remove('blinking-btn');
             renderOrdersList();
@@ -1188,10 +1188,17 @@
                 let statusColor = o.status === 'Qəbul edildi' ? 'text-green-400' : (o.status === 'Ləğv edildi' ? 'text-red-400' : 'text-amber-400');
                 let deliveryInfoStr = o.is_delivery ? ` | Çatdırılma: ${o.delivery_fee ? o.delivery_fee + ' AZN' : 'Pulsuz'}` : '';
 
+                let readStatusIcon = o.is_read 
+                    ? `<span style="color: #3b82f6; font-weight: bold; font-size: 14px;" title="Oxundu">✓✓</span>` 
+                    : `<span style="color: #9ca3af; font-weight: bold; font-size: 14px;" title="Göndərildi (Oxunmayıb)">✓✓</span>`;
+
                 html += `
                     <div class="bg-zinc-800/50 p-3 rounded-lg border border-zinc-700 space-y-2 text-xs">
                         <div class="flex justify-between items-center border-b border-zinc-700 pb-1">
-                            <span class="font-bold gold-text">${o.customer_name} (${o.customer_phone})</span>
+                            <div class="flex items-center space-x-2">
+                                <span class="font-bold gold-text">${o.customer_name} (${o.customer_phone})</span>
+                                <span>${readStatusIcon}</span>
+                            </div>
                             <span class="font-bold ${statusColor}">${o.status}</span>
                         </div>
                         <div><strong>Ünvan:</strong> ${o.address}${deliveryInfoStr}</div>
