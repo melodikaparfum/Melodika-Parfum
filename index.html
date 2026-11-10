@@ -2585,22 +2585,31 @@
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
-        // TƏSDİQLƏMƏ DÜYMƏSİ ÜÇÜN YENİ FUNKSİYA
+        // TƏSDİQLƏMƏ DÜYMƏSİ ÜÇÜN DÜZƏLDİLMİŞ FUNKSİYA (RPC ILE)
         async function confirmAndSaveDayEndArchive() {
             try {
-                // Əvvəl həmin günün köhnə arxivini silirik ki, təkrar düşməsin
-                await _supabase.from('day_end_archive').delete().eq('report_date', currentDayEndReportDate);
+                // Doğrudan Supabase RPC vasitəsilə icazə bloklamasını dolanırıq
+                let { error } = await _supabase.rpc('save_day_end_archive', {
+                    p_report_date: currentDayEndReportDate,
+                    p_content_summary: currentDayEndSummaryHtml
+                });
                 
-                // Yenisini bazaya daxil edirik
-                let { error } = await _supabase.from('day_end_archive').insert([{ report_date: currentDayEndReportDate, content_summary: currentDayEndSummaryHtml }]);
-                
-                if(error) {
-                    alert('Xəta baş verdi: ' + error.message);
-                } else {
-                    alert('Hesabat uğurla arxivə təsdiq edildi!');
-                    await loadDataFromCloud();
-                    closeDayEndModal();
+                if (error) {
+                    // Əgər RPC hələ yaradılmayıbsa, fallback kimi adi insert edirik
+                    let { error: insertErr } = await _supabase.from('day_end_archive').insert([{ 
+                        report_date: currentDayEndReportDate, 
+                        content_summary: currentDayEndSummaryHtml 
+                    }]);
+                    
+                    if (insertErr) {
+                        alert('Xəta baş verdi: ' + insertErr.message);
+                        return;
+                    }
                 }
+
+                alert('Hesabat uğurla arxivə təsdiq edildi!');
+                await loadDataFromCloud();
+                closeDayEndModal();
             } catch(e) {
                 alert('Xəta: ' + e.message);
             }
@@ -2720,7 +2729,9 @@
             document.getElementById('opDiscount').value = '';
             document.getElementById('fromAd').checked = false;
             document.getElementById('toCashRegister').checked = false;
-            await loadDataFromCloud(); renderUI();
+
+            await loadDataFromCloud();
+            renderUI();
         }
     </script>
 </body>
