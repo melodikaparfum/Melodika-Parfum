@@ -71,10 +71,10 @@
             <!-- İLİN ƏN SEÇİLƏN ƏTİRLƏRİ SHEET / CƏDVƏL BÖLGƏSİ -->
             <div class="bg-zinc-900 border-2 border-amber-500 p-4 rounded-xl space-y-3 shadow-xl">
                 <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
-                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">🌟 İlin Top 4 Seçilən Ətri (Xüsusi Seçim)</h2>
+                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">🌟 İlin Top 3 Seçilən Ətri (Xüsusi Seçim)</h2>
                     <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Top Hit</span>
                 </div>
-                <div id="topFeaturedContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div id="topFeaturedContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <!-- Dinamik olaraq aşağıdakı bazadan doldurulacaq -->
                 </div>
             </div>
@@ -1181,8 +1181,8 @@
             let container = document.getElementById('topFeaturedContainer');
             if(!container) return;
             
-            // Top 4 seçilən ətirlərin kodları və ya adları üzrə süzgəc (məsələn: Afnan Tribute, Afnan 9 PM, Sospiro Accento, Al Rehab Dalal)
-            let featuredNames = ["Afnan Tribute", "Afnan 9 PM", "Sospiro Accento", "Al Rehab Dalal"];
+            // Top 3 seçilən ətirlər (Afnan Tribute, Afnan 9 PM, Sospiro Accento)
+            let featuredNames = ["Afnan Tribute", "Afnan 9 PM", "Sospiro Accento"];
             let html = '';
 
             featuredNames.forEach(fName => {
@@ -1205,7 +1205,7 @@
                 }
             });
 
-            container.innerHTML = html || '<div class="text-zinc-500 text-xs col-span-4 text-center">Top ətirlər yüklənir...</div>';
+            container.innerHTML = html || '<div class="text-zinc-500 text-xs col-span-3 text-center">Top ətirlər yüklənir...</div>';
         }
 
         function renderCustomerCatalog() {
