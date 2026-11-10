@@ -399,7 +399,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                     <div>
                         <h2 class="text-lg font-bold gold-text">🕒 SATICI İŞ SAATLARI SHEETİ</h2>
-                        <div class="text-xs text-zinc-400">İş saatları hesabatı.</div>
+                        <div class="text-xs text-zinc-400">İş saatları hesabatı (Səhər və Günorta smenləri ayrılmışdır).</div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <select id="attYearSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
@@ -412,11 +412,21 @@
                     </div>
                 </div>
 
-                <div id="attendancePrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
+                <div id="attendancePrintArea" class="bg-white text-black p-6 rounded-lg space-y-6 font-sans shadow-lg">
                     <div id="attendancePrintHeader" class="text-base font-bold text-black border-b-2 border-black pb-2">Noyabr 2026 cı il üzrə İş Saatları Hesabatı:</div>
                     
-                    <div class="space-y-3">
-                        <div id="attendanceRowsList" class="space-y-3 text-sm"></div>
+                    <div class="space-y-6">
+                        <!-- SƏHƏR SMENİ BÖLMƏSİ -->
+                        <div class="space-y-2">
+                            <h3 class="text-sm font-extrabold text-black uppercase border-b border-gray-400 pb-1">☀️ Səhər Smeni (10:00 - 15:00)</h3>
+                            <div id="attendanceRowsListMorning" class="space-y-2 text-sm"></div>
+                        </div>
+
+                        <!-- GÜNORTA SMENİ BÖLMƏSİ -->
+                        <div class="space-y-2 pt-2">
+                            <h3 class="text-sm font-extrabold text-black uppercase border-b border-gray-400 pb-1">🌙 Günorta Smeni (15:00 - 22:00)</h3>
+                            <div id="attendanceRowsListAfternoon" class="space-y-2 text-sm"></div>
+                        </div>
                     </div>
 
                     <div class="pt-4 border-t-2 border-black flex justify-between items-center text-xs font-bold text-black">
@@ -436,6 +446,7 @@
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
                 <h3 id="modalTitleText" class="text-sm font-bold gold-text">İşə gəlməmə səbəbi yaz / redaktə et</h3>
                 <input type="hidden" id="modalDateKey">
+                <input type="hidden" id="modalRoleName">
                 <textarea id="modalReasonInput" placeholder="Səbəbi ətraflı qeyd edin (məs: yatıb qalıb)..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs h-24 focus:outline-none gold-border"></textarea>
                 <div class="flex space-x-2">
                     <button onclick="closeReasonModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina Et</button>
@@ -639,6 +650,7 @@
         let cart = [];
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
+        let shiftType = localStorage.getItem('melodika_current_shift') || ''; // 'SEHER' və ya 'GUNORTA'
 
         const monthNamesAz = [
             "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
@@ -688,23 +700,21 @@
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
+                    document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
+                    setOperationalState(true);
                 } else {
                     if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
+                    let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
+                    document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
+                    checkTodayShiftStatus();
                 }
 
                 loadAnalytics('day'); 
                 let today = getBakuDateString();
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
                 if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
-                document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
                 
-                if(role === 'SATICI') {
-                    checkTodayShiftStatus();
-                } else {
-                    setOperationalState(true);
-                }
-
                 renderUI();
                 checkNewOrdersBlinking();
                 checkNewChatBlinking();
@@ -757,7 +767,8 @@
 
         function checkTodayShiftStatus() {
             let todayStr = getBakuDateString();
-            let rec = attendances.find(a => String(a.work_date).startsWith(todayStr) && a.role_name === 'SATICI');
+            let roleDbName = shiftType === 'GUNORTA' ? 'SATICI_GUNORTA' : 'SATICI_SEHER';
+            let rec = attendances.find(a => String(a.work_date).startsWith(todayStr) && a.role_name === roleDbName);
             let statusTextElem = document.getElementById('shiftStatusText');
             if(!statusTextElem) return;
             
@@ -786,13 +797,14 @@
         async function startShift() {
             let todayStr = getBakuDateString();
             let nowIso = new Date().toISOString();
+            let roleDbName = shiftType === 'GUNORTA' ? 'SATICI_GUNORTA' : 'SATICI_SEHER';
 
-            let existing = attendances.find(a => String(a.work_date).startsWith(todayStr) && a.role_name === 'SATICI');
+            let existing = attendances.find(a => String(a.work_date).startsWith(todayStr) && a.role_name === roleDbName);
             if(existing) {
                 let { error } = await _supabase.from('attendance').update({ check_in: nowIso, check_out: null }).eq('id', existing.id);
                 if(error) { alert('Xəta: ' + error.message); return; }
             } else {
-                let { error } = await _supabase.from('attendance').insert([{ work_date: todayStr, role_name: 'SATICI', check_in: nowIso }]);
+                let { error } = await _supabase.from('attendance').insert([{ work_date: todayStr, role_name: roleDbName, check_in: nowIso }]);
                 if(error) { alert('Xəta: ' + error.message); return; }
             }
             alert('Növbə uğurla başlandı! Əməliyyatlar aktivləşdirildi.');
@@ -803,8 +815,9 @@
         async function endShift() {
             let todayStr = getBakuDateString();
             let nowIso = new Date().toISOString();
+            let roleDbName = shiftType === 'GUNORTA' ? 'SATICI_GUNORTA' : 'SATICI_SEHER';
 
-            let existing = attendances.find(a => String(a.work_date).startsWith(todayStr) && a.role_name === 'SATICI');
+            let existing = attendances.find(a => String(a.work_date).startsWith(todayStr) && a.role_name === roleDbName);
             if(!existing || !existing.check_in) {
                 alert('Əvvəlcə növbəni başlamalısınız!');
                 return;
@@ -925,47 +938,86 @@
 
             document.getElementById('attendancePrintHeader').textContent = `${monthName} ${year} cı il üzrə İş Saatları Hesabatı:`;
 
-            let container = document.getElementById('attendanceRowsList');
-            let html = '';
+            let containerMorning = document.getElementById('attendanceRowsListMorning');
+            let containerAfternoon = document.getElementById('attendanceRowsListAfternoon');
+            let htmlMorning = '';
+            let htmlAfternoon = '';
 
             let firstDayIndex = new Date(year, month - 1, 1).getDay();
             let currentDayOfWeek = firstDayIndex === 0 ? 7 : firstDayIndex;
 
             for(let day = 1; day <= daysCount; day++) {
                 let dateKey = `${year}-${monthStr}-${String(day).padStart(2, '0')}`;
-                let rec = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI') || {};
-
-                let checkIn = rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
-                let checkOut = rec.check_out ? new Date(rec.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 
-                let noteText = rec.note ? String(rec.note).trim() : '';
+                // Səhər smeni qeydi
+                let recSeher = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_SEHER') || {};
+                let checkInS = recSeher.check_in ? new Date(recSeher.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let checkOutS = recSeher.check_out ? new Date(recSeher.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let noteTextS = recSeher.note ? String(recSeher.note).trim() : '';
 
-                let statusDisplay = '';
-                let reasonBtnHtml = '';
+                let statusDisplayS = '';
+                let reasonBtnHtmlS = '';
 
                 if(currentDayOfWeek === 6) {
-                    statusDisplay = `İSTİRAHƏT GÜNÜ`;
-                } else if(rec.check_in && !rec.check_out) {
-                    statusDisplay = `${checkIn} - Gözlənilir`;
-                } else if(rec.check_in && rec.check_out) {
-                    statusDisplay = `${checkIn} - ${checkOut}`;
+                    statusDisplayS = `İSTİRAHƏT GÜNÜ`;
+                } else if(recSeher.check_in && !recSeher.check_out) {
+                    statusDisplayS = `${checkInS} - Gözlənilir`;
+                } else if(recSeher.check_in && recSeher.check_out) {
+                    statusDisplayS = `${checkInS} - ${checkOutS}`;
                 } else {
-                    if(noteText !== '') {
-                        statusDisplay = `<span onclick="openReasonModalPopup('${dateKey}', '${noteText}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənləmək üçün kliklə"><span class="reason-text">${noteText}</span> <span class="no-print">✏️</span></span>`;
-                        reasonBtnHtml = `<button onclick="openReasonModalPopup('${dateKey}', '${noteText}')" class="no-print bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] ml-2">Düzənlə</button>`;
+                    if(noteTextS !== '') {
+                        statusDisplayS = `<span onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənləmək üçün kliklə"><span class="reason-text">${noteTextS}</span> <span class="no-print">✏️</span></span>`;
+                        reasonBtnHtmlS = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="no-print bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] ml-2">Düzənlə</button>`;
                     } else {
-                        statusDisplay = `<span class="reason-text">Gəlməyib</span>`;
-                        reasonBtnHtml = `<button onclick="openReasonModalPopup('${dateKey}', '')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2.5 py-1 rounded text-xs ml-2">Səbəb yaz / Düzənlə</button>`;
+                        statusDisplayS = `<span class="reason-text">Gəlməyib</span>`;
+                        reasonBtnHtmlS = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2.5 py-1 rounded text-xs ml-2">Səbəb yaz</button>`;
                     }
                 }
 
-                html += `
-                    <div style="border-bottom: 1px solid #ccc; padding-bottom: 8px; margin-bottom: 8px;">
+                htmlMorning += `
+                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 6px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px;">
                             <span>${currentDayOfWeek}-ci gün (${day}.${monthStr})</span>
                             <div style="display: flex; align-items: center;">
-                                <span>${statusDisplay}</span>
-                                ${reasonBtnHtml}
+                                <span>${statusDisplayS}</span>
+                                ${reasonBtnHtmlS}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Günorta smeni qeydi
+                let recGunorta = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_GUNORTA') || {};
+                let checkInG = recGunorta.check_in ? new Date(recGunorta.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let noteTextG = recGunorta.note ? String(recGunorta.note).trim() : '';
+
+                let statusDisplayG = '';
+                let reasonBtnHtmlG = '';
+
+                if(currentDayOfWeek === 6) {
+                    statusDisplayG = `İSTİRAHƏT GÜNÜ`;
+                } else if(recGunorta.check_in && !recGunorta.check_out) {
+                    statusDisplayG = `${checkInG} - Gözlənilir`;
+                } else if(recGunorta.check_in && recGunorta.check_out) {
+                    statusDisplayG = `${checkInG} - ${checkOutG}`;
+                } else {
+                    if(noteTextG !== '') {
+                        statusDisplayG = `<span onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənləmək üçün kliklə"><span class="reason-text">${noteTextG}</span> <span class="no-print">✏️</span></span>`;
+                        reasonBtnHtmlG = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="no-print bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] ml-2">Düzənlə</button>`;
+                    } else {
+                        statusDisplayG = `<span class="reason-text">Gəlməyib</span>`;
+                        reasonBtnHtmlG = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '')" class="no-print bg-amber-500 hover:bg-amber-600 text-black font-bold px-2.5 py-1 rounded text-xs ml-2">Səbəb yaz</button>`;
+                    }
+                }
+
+                htmlAfternoon += `
+                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 6px; margin-bottom: 6px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-weight: bold; font-size: 13px;">
+                            <span>${currentDayOfWeek}-ci gün (${day}.${monthStr})</span>
+                            <div style="display: flex; align-items: center;">
+                                <span>${statusDisplayG}</span>
+                                ${reasonBtnHtmlG}
                             </div>
                         </div>
                     </div>
@@ -974,22 +1026,25 @@
                 currentDayOfWeek++;
                 if(currentDayOfWeek > 7) currentDayOfWeek = 1;
             }
-            container.innerHTML = html;
+            containerMorning.innerHTML = htmlMorning;
+            containerAfternoon.innerHTML = htmlAfternoon;
         }
 
-        function openReasonModalPopup(dateKey, existingNote = '') {
+        function openReasonModalPopup(dateKey, roleName, existingNote = '') {
             document.getElementById('modalDateKey').value = dateKey;
+            document.getElementById('modalRoleName').value = roleName;
             document.getElementById('modalReasonInput').value = existingNote;
             document.getElementById('reasonModal').classList.remove('hidden-screen');
         }
 
         async function saveAttendanceReason() {
             let dateKey = document.getElementById('modalDateKey').value;
+            let roleName = document.getElementById('modalRoleName').value;
             let reason = document.getElementById('modalReasonInput').value.trim();
 
             if(!reason) { alert('Zəhmət olmasa səbəbi qeyd edin!'); return; }
 
-            let rec = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI');
+            let rec = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === roleName);
             let payload = { note: reason };
 
             if(rec && rec.id) {
@@ -997,7 +1052,7 @@
                 if(error) { alert('Xəta: ' + error.message); return; }
             } else {
                 payload.work_date = dateKey;
-                payload.role_name = 'SATICI';
+                payload.role_name = roleName;
                 let { error } = await _supabase.from('attendance').insert([payload]);
                 if(error) { alert('Xəta: ' + error.message); return; }
             }
@@ -1130,11 +1185,23 @@
 
         function login() {
             let pin = document.getElementById('pinInput').value;
-            if(pin === '08102000') role = 'ADMIN';
-            else if(pin === '112233') role = 'SATICI';
-            else { document.getElementById('loginError').classList.remove('hidden-screen'); return; }
+            if(pin === '08102000') {
+                role = 'ADMIN';
+                shiftType = '';
+            } else if(pin === '112233') {
+                role = 'SATICI';
+                shiftType = 'SEHER';
+            } else if(pin === '123123') {
+                role = 'SATICI';
+                shiftType = 'GUNORTA';
+            } else {
+                document.getElementById('loginError').classList.remove('hidden-screen');
+                return;
+            }
 
             localStorage.setItem('melodika_current_role', role);
+            localStorage.setItem('melodika_current_shift', shiftType);
+
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
             
@@ -1146,10 +1213,13 @@
                 document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                 if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
+                document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                 setOperationalState(true);
             } else {
                 if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
+                let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
+                document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
                 checkTodayShiftStatus();
             }
 
@@ -1157,13 +1227,17 @@
             let today = getBakuDateString();
             if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
             if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
-            document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
+            
             renderUI();
             checkNewOrdersBlinking();
             checkNewChatBlinking();
         }
 
-        function logout() { localStorage.removeItem('melodika_current_role'); location.reload(); }
+        function logout() { 
+            localStorage.removeItem('melodika_current_role'); 
+            localStorage.removeItem('melodika_current_shift'); 
+            location.reload(); 
+        }
 
         async function trackVisit() {
             try { await _supabase.from('site_visits').insert([{}]); } catch(e) {}
@@ -1942,3 +2016,4 @@
     </script>
 </body>
 </html>
+ 
