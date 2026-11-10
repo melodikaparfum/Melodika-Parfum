@@ -306,6 +306,10 @@
                             <div id="reportNetProfit" class="text-lg font-bold text-green-400">0.00 AZN</div>
                         </div>
                     </div>
+                    <!-- Aralıq Hesabatı Şəkil Çıxarma Düyməsi -->
+                    <div class="pt-2 text-right">
+                        <button onclick="openRangeReportModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Aralıq Hesabatı Şəkil Kimi Çıxart 📥</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -313,10 +317,10 @@
         <!-- SATICI İŞ SAATLARI SHEET (YALNIZ ADMIN) -->
         <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                     <div>
                         <h2 class="text-lg font-bold gold-text">🕒 SATICI İŞ SAATLARI SHEETİ</h2>
-                        <div class="text-xs text-zinc-400">Satıcının ayın günləri üzrə gəliş və gediş saatları.</div>
+                        <div class="text-xs text-zinc-400">Satıcının ayın günləri üzrə gəliş, gediş və səbəb qeydləri.</div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <select id="attYearSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
@@ -329,17 +333,49 @@
                     </div>
                 </div>
 
-                <div class="overflow-x-auto max-h-[60vh] overflow-y-auto pr-1">
-                    <table class="w-full text-left text-xs text-zinc-300 border-collapse">
-                        <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                            <tr>
-                                <th class="py-2 px-2 w-20 text-center">Tarix</th>
-                                <th class="py-2 px-2">Gəliş Saatı</th>
-                                <th class="py-2 px-2">Gediş Saatı</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceRowsList"></tbody>
-                    </table>
+                <!-- Şəkil Kimi Çıxarılacaq İş Saatları Bloku -->
+                <div id="attendancePrintArea" class="bg-zinc-900 p-3 rounded-lg space-y-4 font-mono">
+                    <div id="attendancePrintHeader" class="text-sm font-bold gold-text border-b border-zinc-800 pb-2">Noyabr ayı üzrə İş Saatları Hesabatı</div>
+                    
+                    <div class="overflow-x-auto max-h-[55vh] overflow-y-auto pr-1">
+                        <table class="w-full text-left text-xs text-zinc-300 border-collapse">
+                            <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
+                                <tr>
+                                    <th class="py-2 px-2 w-24 text-center">Gün / Tarix</th>
+                                    <th class="py-2 px-2 w-40">Giriş - Çıxış</th>
+                                    <th class="py-2 px-2 no-print w-32">Üzürlü / Üzürsüz</th>
+                                    <th class="py-2 px-2">Səbəb / Qeyd</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attendanceRowsList"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
+                    <button onclick="downloadAttendanceAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ARALIQ HESABAT (XALİS GƏLİR) ŞƏKİL MODALI -->
+        <div id="rangeReportModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                    <h2 class="text-sm font-bold gold-text">Aralıq Hesabatı Şəkil</h2>
+                    <button onclick="closeRangeReportModal()" class="text-xs bg-zinc-800 px-2.5 py-1 rounded">X</button>
+                </div>
+                <div id="rangeReportPrintArea" class="bg-zinc-900 p-4 rounded-lg space-y-3 font-mono text-left text-xs border border-zinc-700">
+                    <div id="rangeReportHeader" class="font-bold gold-text text-center border-b border-zinc-800 pb-2">Hesabat</div>
+                    <div class="space-y-2 pt-1 text-zinc-300">
+                        <div>Ümumi satış: <span id="repModalTotal" class="gold-text font-bold float-right">0.00 AZN</span></div>
+                        <div>Reklamdan: <span id="repModalAd" class="gold-text font-bold float-right">0.00 AZN</span></div>
+                        <div>Pos terminal: <span id="repModalPos" class="gold-text font-bold float-right">0.00 AZN</span></div>
+                        <div>Kartdan karta: <span id="repModalCard" class="gold-text font-bold float-right">0.00 AZN</span></div>
+                    </div>
+                </div>
+                <div class="pt-2 no-print">
+                    <button onclick="downloadRangeReportAsImage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs">Şəkil Kimi Yüklə (PNG) 📥</button>
                 </div>
             </div>
         </div>
@@ -347,7 +383,7 @@
         <!-- AYLIQ/İLLİK XƏRCLƏR SHEET (YALNIZ ADMIN) -->
         <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                     <div>
                         <h2 class="text-lg font-bold gold-text" id="expenseHeaderTitle">XƏRCLƏR SHEETİ</h2>
                         <div class="text-xs text-zinc-400">İl və ay seçərək xərcləri günlər üzrə daxil edin.</div>
@@ -366,21 +402,34 @@
                 <!-- Şəkil kimi çıxarılacaq hissə -->
                 <div id="expensesPrintArea" class="bg-zinc-900 p-3 rounded-lg space-y-4 font-mono">
                     <div id="expensesPrintHeader" class="text-sm font-bold gold-text border-b border-zinc-800 pb-2">Melodika Parfum — Xərclər Hesabatı</div>
+                    
+                    <div class="no-print space-y-2 border-b border-zinc-800 pb-3">
+                        <div class="text-xs text-amber-400 font-bold">Yeni Xərc Əlavə Et / Düzənlə:</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                            <select id="expInputDay" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                                <option value="">Gün seçin...</option>
+                            </select>
+                            <input type="text" id="expInputTitle" placeholder="Xərcin Adı (Qeyd)" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs sm:col-span-2">
+                            <input type="number" step="0.01" id="expInputAmount" placeholder="Məbləğ (AZN)" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                        </div>
+                        <button onclick="saveNewOrUpdateExpense()" class="gold-bg font-bold px-3 py-1.5 rounded text-xs w-full">Yadda Saxla</button>
+                    </div>
+
                     <div class="overflow-x-auto max-h-[50vh] overflow-y-auto pr-1">
                         <table class="w-full text-left text-xs text-zinc-300 border-collapse table-fixed">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
                                 <tr>
-                                    <th class="py-2 px-1 w-10 text-center">Gün</th>
-                                    <th class="py-2 px-1 w-[55%]">Xərcin Adı (Qeyd)</th>
-                                    <th class="py-2 px-1 w-28 text-right">Məbləğ</th>
-                                    <th class="py-2 px-1 w-16 text-center no-print">Əməliyyat</th>
+                                    <th class="py-2 px-1 w-24 text-center">Tarix</th>
+                                    <th class="py-2 px-1 w-[60%]">Xərcin Adı (Qeyd)</th>
+                                    <th class="py-2 px-1 w-24 text-right">Məbləği</th>
+                                    <th class="py-2 px-1 w-16 text-center no-print">Sil</th>
                                 </tr>
                             </thead>
                             <tbody id="expenseRowsList"></tbody>
                         </table>
                     </div>
+                    
                     <div class="pt-3 border-t border-zinc-800 flex justify-between items-center text-xs">
-                        <div class="text-zinc-400 no-print">Dəyişikliklər "Yadda" düyməsinə basdıqda avtomatik yenilənir.</div>
                         <div class="text-right w-full">
                             <span class="text-zinc-400 uppercase tracking-wider">Aylıq Xərc Məbləği: </span>
                             <span id="monthlyExpenseTotal" class="text-base font-bold gold-text ml-2">0.00 AZN</span>
@@ -687,7 +736,10 @@
             let year = parseInt(document.getElementById('attYearSelect').value);
             let month = parseInt(document.getElementById('attMonthSelect').value);
             let daysCount = getDaysInMonth(year, month);
+            let monthName = monthNamesAz[month - 1];
             let monthStr = String(month).padStart(2, '0');
+
+            document.getElementById('attendancePrintHeader').textContent = `${monthName} ${year} ayı üzrə İş Saatları Hesabatı`;
 
             let tbody = document.getElementById('attendanceRowsList');
             let html = '';
@@ -696,18 +748,130 @@
                 let dateKey = `${year}-${monthStr}-${String(day).padStart(2, '0')}`;
                 let rec = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI') || {};
 
+                // Həftənin gününü tapırıq (0: Bazar, 6: Şənbə)
+                let dayOfWeek = new Date(year, month - 1, day).getDay();
+                let isSaturday = (dayOfWeek === 6);
+
                 let checkIn = rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let checkOut = rec.check_out ? new Date(rec.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                
+                let isExcused = !!rec.is_excused;
+                let isUnexcused = !!rec.is_unexcused;
+                let noteText = rec.note || '';
+
+                let timeDisplay = '';
+                if(isSaturday) {
+                    timeDisplay = `<span class="text-amber-400 font-bold">İSTİRAHƏT GÜNÜ</span>`;
+                } else if(!rec.check_in && !rec.check_out) {
+                    timeDisplay = `<span class="text-red-400">Gəlməyib</span>`;
+                } else {
+                    timeDisplay = `${checkIn} - ${checkOut}`;
+                }
+
+                let reasonBadge = '';
+                if(isExcused) reasonBadge = '<span class="text-blue-400 font-bold">[Üzürlü]</span> ';
+                if(isUnexcused) reasonBadge = '<span class="text-red-400 font-bold">[Üzürsüz]</span> ';
 
                 html += `
-                    <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 font-mono">
-                        <td class="py-2 px-2 text-center text-amber-400 font-bold">${day}</td>
-                        <td class="py-2 px-2">${rec.check_in ? checkIn : '<span class="text-zinc-600">--:--</span>'}</td>
-                        <td class="py-2 px-2">${rec.check_out ? checkOut : '<span class="text-zinc-600">--:--</span>'}</td>
+                    <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 font-mono text-xs">
+                        <td class="py-2.5 px-2 text-center text-amber-400 font-bold">${day}-ci gün (${day}.${monthStr})</td>
+                        <td class="py-2.5 px-2">${timeDisplay}</td>
+                        <td class="py-2.5 px-2 no-print space-y-1">
+                            <label class="flex items-center space-x-1 cursor-pointer text-[11px]">
+                                <input type="checkbox" ${isExcused ? 'checked' : ''} onchange="updateAttendanceStatus('${dateKey}', 'excused', this.checked)" class="accent-amber-500">
+                                <span>Üzürlü</span>
+                            </label>
+                            <label class="flex items-center space-x-1 cursor-pointer text-[11px]">
+                                <input type="checkbox" ${isUnexcused ? 'checked' : ''} onchange="updateAttendanceStatus('${dateKey}', 'unexcused', this.checked)" class="accent-amber-500">
+                                <span>Üzürsüz</span>
+                            </label>
+                        </td>
+                        <td class="py-2.5 px-2">
+                            <div class="no-print">
+                                <input type="text" value="${noteText}" onchange="updateAttendanceNote('${dateKey}', this.value)" placeholder="Səbəbi daxil et..." class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                            </div>
+                            <div class="print-only hidden text-zinc-300">
+                                ${reasonBadge}${noteText}
+                            </div>
+                        </td>
                     </tr>
                 `;
             }
             tbody.innerHTML = html;
+        }
+
+        async function updateAttendanceStatus(dateKey, type, isChecked) {
+            let rec = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI');
+            let payload = type === 'excused' ? { is_excused: isChecked, is_unexcused: isChecked ? false : (rec ? rec.is_unexcused : false) } : { is_unexcused: isChecked, is_excused: isChecked ? false : (rec ? rec.is_excused : false) };
+
+            if(rec && rec.id) {
+                await _supabase.from('attendance').update(payload).eq('id', rec.id);
+            } else {
+                payload.work_date = dateKey;
+                payload.role_name = 'SATICI';
+                await _supabase.from('attendance').insert([payload]);
+            }
+            await loadDataFromCloud();
+            renderAttendanceSheet();
+        }
+
+        async function updateAttendanceNote(dateKey, note) {
+            let rec = attendances.find(a => a.work_date === dateKey && a.role_name === 'SATICI');
+            if(rec && rec.id) {
+                await _supabase.from('attendance').update({ note }).eq('id', rec.id);
+            } else {
+                await _supabase.from('attendance').insert([{ work_date: dateKey, role_name: 'SATICI', note }]);
+            }
+            await loadDataFromCloud();
+        }
+
+        function downloadAttendanceAsImage() {
+            html2canvas(document.getElementById('attendancePrintArea'), { backgroundColor: '#18181b', scale: 2 }).then(canvas => {
+                let link = document.createElement('a');
+                let year = document.getElementById('attYearSelect').value;
+                let month = document.getElementById('attMonthSelect').value;
+                link.download = `IsSaatlari_${year}_${month}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+
+        function openRangeReportModal() {
+            let start = document.getElementById('startDate').value;
+            let end = document.getElementById('endDate').value;
+            if(!start || !end) { alert('Başlanğıc və son tarixi seçin!'); return; }
+
+            document.getElementById('rangeReportHeader').textContent = `${start}-dən - ${end}-dək hesabat:`;
+            document.getElementById('repModalTotal').textContent = document.getElementById('reportTotalSales').textContent;
+            
+            // Seçilmiş aralıq üçün reklam və ödəniş növlərini hesablayaq
+            let rAd = 0, rPos = 0, rCard = 0;
+            sales.forEach(s => {
+                let sDate = s.date ? getBakuDateString(s.date) : '';
+                if(s.type === 'MEXARIC' && sDate >= start && sDate <= end) {
+                    let p = Number(s.total_price || 0);
+                    if(s.fromAd) rAd += p;
+                    if(s.payType === 'POS Terminal') rPos += p;
+                    if(s.payType === 'Karta göndərmə') rCard += p;
+                }
+            });
+
+            document.getElementById('repModalAd').textContent = rAd.toFixed(2) + ' AZN';
+            document.getElementById('repModalPos').textContent = rPos.toFixed(2) + ' AZN';
+            document.getElementById('repModalCard').textContent = rCard.toFixed(2) + ' AZN';
+
+            document.getElementById('rangeReportModal').classList.remove('hidden-screen');
+        }
+
+        function closeRangeReportModal() { document.getElementById('rangeReportModal').classList.add('hidden-screen'); }
+
+        function downloadRangeReportAsImage() {
+            html2canvas(document.getElementById('rangeReportPrintArea'), { backgroundColor: '#18181b', scale: 2 }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = `AraliqHesabat_${getBakuDateString()}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
         }
 
         function checkNewOrdersBlinking() {
@@ -999,8 +1163,26 @@
             }
         }
 
-        function openExpensesModal() { if(role !== 'ADMIN') return; renderExpenseSheet(); document.getElementById('expensesModal').classList.remove('hidden-screen'); }
+        function openExpensesModal() {
+            if(role !== 'ADMIN') return;
+            initExpenseDaySelect();
+            renderExpenseSheet();
+            document.getElementById('expensesModal').classList.remove('hidden-screen');
+        }
+
         function closeExpensesModal() { document.getElementById('expensesModal').classList.add('hidden-screen'); }
+
+        function initExpenseDaySelect() {
+            let year = parseInt(document.getElementById('expenseYearSelect').value);
+            let month = parseInt(document.getElementById('expenseMonthSelect').value);
+            let daysCount = getDaysInMonth(year, month);
+            let sel = document.getElementById('expInputDay');
+            if(!sel) return;
+            sel.innerHTML = '<option value="">Gün seçin...</option>';
+            for(let d = 1; d <= daysCount; d++) {
+                sel.innerHTML += `<option value="${d}">${d} ${monthNamesAz[month - 1]}</option>`;
+            }
+        }
 
         function renderExpenseSheet() {
             let year = parseInt(document.getElementById('expenseYearSelect').value);
@@ -1009,48 +1191,55 @@
             let monthName = monthNamesAz[month - 1];
             
             document.getElementById('expenseHeaderTitle').textContent = `${monthName} ${year} ayı üzrə xərclər`;
-            document.getElementById('expensesPrintHeader').textContent = `Melodika Parfum — ${monthName} ${year} Xərclər Hesabatı`;
+            document.getElementById('expensesPrintHeader').textContent = `${monthName} ay 2026 cı il üzrə Xərclər:`;
+            initExpenseDaySelect();
 
             let tbody = document.getElementById('expenseRowsList');
             let html = '';
             let monthTotal = 0;
+            let activeCount = 0;
 
             for(let day = 1; day <= daysCount; day++) {
                 let dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                let existing = expenses.find(e => e.expense_date === dateKey) || {};
-                let title = existing.title || '';
-                let amount = existing.amount || 0;
-                monthTotal += Number(amount);
+                let existing = expenses.find(e => e.expense_date === dateKey);
+                
+                if(existing && existing.amount > 0) {
+                    activeCount++;
+                    monthTotal += Number(existing.amount);
+                    let displayDate = `${day} ${monthName}`;
 
-                html += `
-                    <tr class="border-b border-zinc-800 hover:bg-zinc-800/30">
-                        <td class="py-2 px-1 font-mono text-amber-400/90 font-bold text-center">${day}</td>
-                        <td class="py-2 px-1"><input type="text" id="exp_title_${dateKey}" value="${title}" placeholder="Xərcin adını yazın..." class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs"></td>
-                        <td class="py-2 px-1"><input type="number" step="0.01" id="exp_amt_${dateKey}" value="${amount ? amount : ''}" oninput="updateTempExpenseTotal()" placeholder="0.00" class="w-full bg-zinc-800 border border-zinc-700 p-1.5 rounded text-white text-xs text-right font-bold gold-text"></td>
-                        <td class="py-2 px-1 text-center no-print"><button onclick="saveSingleExpense('${dateKey}')" class="gold-bg font-bold px-2 py-1 rounded text-[10px]">Yadda</button></td>
-                    </tr>
-                `;
+                    html += `
+                        <tr class="border-b border-zinc-800 hover:bg-zinc-800/30">
+                            <td class="py-2.5 px-1 font-mono text-amber-400 font-bold text-center">${displayDate}</td>
+                            <td class="py-2.5 px-1 text-zinc-200">${existing.title || '-'}</td>
+                            <td class="py-2.5 px-1 text-right font-bold gold-text">${Number(existing.amount).toFixed(2)} AZN</td>
+                            <td class="py-2.5 px-1 text-center no-print">
+                                <button onclick="deleteExpenseRecord('${dateKey}')" class="text-red-400 hover:text-red-300 font-bold text-xs">Sil</button>
+                            </td>
+                        </tr>
+                    `;
+                }
             }
+
+            if(activeCount === 0) {
+                html = `<tr><td colspan="4" class="py-4 text-center text-zinc-500 text-xs">Bu ay üzrə qeydə alınmış xərc yoxdur.</td></tr>`;
+            }
+
             tbody.innerHTML = html;
             document.getElementById('monthlyExpenseTotal').textContent = monthTotal.toFixed(2) + ' AZN';
         }
 
-        function updateTempExpenseTotal() {
-            let year = parseInt(document.getElementById('expenseYearSelect').value);
-            let month = parseInt(document.getElementById('expenseMonthSelect').value);
-            let daysCount = getDaysInMonth(year, month);
-            let tempSum = 0;
-            for(let day = 1; day <= daysCount; day++) {
-                let dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                let amtInput = document.getElementById(`exp_amt_${dateKey}`);
-                if(amtInput) tempSum += parseFloat(amtInput.value) || 0;
-            }
-            document.getElementById('monthlyExpenseTotal').textContent = tempSum.toFixed(2) + ' AZN';
-        }
+        async function saveNewOrUpdateExpense() {
+            let year = document.getElementById('expenseYearSelect').value;
+            let month = String(document.getElementById('expenseMonthSelect').value).padStart(2, '0');
+            let day = document.getElementById('expInputDay').value;
+            let title = document.getElementById('expInputTitle').value.trim();
+            let amount = parseFloat(document.getElementById('expInputAmount').value) || 0;
 
-        async function saveSingleExpense(dateKey) {
-            let title = document.getElementById(`exp_title_${dateKey}`).value.trim();
-            let amount = parseFloat(document.getElementById(`exp_amt_${dateKey}`).value) || 0;
+            if(!day) { alert('Zəhmət olmasa günü seçin!'); return; }
+            if(!title || amount <= 0) { alert('Zəhmət olmasa xərcin adını və düzgün məbləğ daxil edin!'); return; }
+
+            let dateKey = `${year}-${month}-${String(day).padStart(2, '0')}`;
             let existing = expenses.find(e => e.expense_date === dateKey);
 
             if(existing && existing.id) {
@@ -1060,9 +1249,23 @@
                 let { error } = await _supabase.from('expenses').insert([{ expense_date: dateKey, title, amount }]);
                 if(error) { alert('Xəta: ' + error.message); return; }
             }
-            alert('Xərc yadda saxlanıldı!');
+
+            document.getElementById('expInputDay').value = '';
+            document.getElementById('expInputTitle').value = '';
+            document.getElementById('expInputAmount').value = '';
+
+            alert('Xərc uğurla yadda saxlanıldı!');
             await loadDataFromCloud();
             renderExpenseSheet();
+        }
+
+        async function deleteExpenseRecord(dateKey) {
+            if(confirm('Bu xərc qeydini silmək istədiyinizə əminsiniz?')) {
+                let { error } = await _supabase.from('expenses').delete().eq('expense_date', dateKey);
+                if(error) { alert('Xəta: ' + error.message); return; }
+                await loadDataFromCloud();
+                renderExpenseSheet();
+            }
         }
 
         function downloadExpensesAsImage() {
