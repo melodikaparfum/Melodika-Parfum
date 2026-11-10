@@ -15,6 +15,13 @@
         .gold-bg:hover { background-color: #b9972a; }
         .hidden-screen { display: none !important; }
         
+        /* Deaktiv (qaramtıl) elementlər üçün */
+        .disabled-section {
+            opacity: 0.35;
+            pointer-events: none;
+            filter: grayscale(80%);
+        }
+
         @keyframes pulse-glow {
             0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7); }
             50% { opacity: 0.5; transform: scale(1.02); box-shadow: 0 0 10px 2px rgba(212, 175, 55, 0.9); }
@@ -120,186 +127,190 @@
                 </div>
             </div>
 
-            <!-- MAĞAZA ANALİTİKASI -->
-            <div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
-                    <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
+            <!-- BÜTÜN ƏMƏLİYYAT VƏ İDARƏETMƏ BLOKU (NÖVBƏ BAŞLANMAYANA QƏDƏR QARAMTIL OLacaq) -->
+            <div id="operationalContainer" class="space-y-4">
+
+                <!-- MAĞAZA ANALİTİKASI -->
+                <div id="adminAnalyticsSection" class="bg-zinc-900 border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
+                        <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
+                        
+                        <div class="flex bg-zinc-800 p-1 rounded-lg text-xs space-x-1">
+                            <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
+                            <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
+                            <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
+                            <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-3 text-center">
+                        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+                            <div class="text-xs text-zinc-400">👀 Baxış Sayı</div>
+                            <div id="stat-visits" class="text-lg font-bold text-white mt-1">0</div>
+                        </div>
+                        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+                            <div class="text-xs text-zinc-400">🛒 Sifarişlər</div>
+                            <div id="stat-orders" class="text-lg font-bold text-amber-400 mt-1">0</div>
+                        </div>
+                        <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
+                            <div class="text-xs text-zinc-400">🎯 Sifariş %-i</div>
+                            <div id="stat-conversion" class="text-lg font-bold text-green-400 mt-1">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Əməliyyat Forması -->
+                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
+                    <h2 id="opFormTitle" class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
+                    <input type="hidden" id="editingSaleId">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                        <select id="opType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                            <option value="MEXARIC">Məxaric (Satış)</option>
+                            <option value="MEDAXIL">Mədaxil (Artırma)</option>
+                            <option value="ITKI">İtki</option>
+                        </select>
+                        <select id="opProduct" onchange="calcPrice()" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                            <option value="">Məhsul seçin...</option>
+                        </select>
+                        <input type="number" id="opGram" oninput="calcPrice()" placeholder="Miqdar (qr/ədəd)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                        <select id="payType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                            <option value="Nəğd">Nəğd</option>
+                            <option value="POS Terminal">POS Terminal</option>
+                            <option value="Karta göndərmə">Karta göndərmə</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="number" step="0.01" id="opPrice" placeholder="Yekun Qiymət (AZN)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                        <input type="number" id="opDiscount" oninput="calcPrice()" placeholder="Endirim %" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
+                    </div>
                     
-                    <div class="flex bg-zinc-800 p-1 rounded-lg text-xs space-x-1">
-                        <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
-                        <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
-                        <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
-                        <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
+                    <div class="flex flex-wrap gap-4 pt-1 text-xs text-zinc-300">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="fromAd" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
+                            <span>Reklamdan gəldi (flaşur / qapı önü)</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="toCashRegister" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
+                            <span>Kassa aparatına vuruldu</span>
+                        </label>
+                    </div>
+
+                    <div class="flex space-x-2">
+                        <button onclick="saveOp()" id="saveOpBtn" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
+                        <button onclick="cancelEditSale()" id="cancelOpBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2.5 rounded text-xs">Ləğv Et</button>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-3 gap-3 text-center">
-                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
-                        <div class="text-xs text-zinc-400">👀 Baxış Sayı</div>
-                        <div id="stat-visits" class="text-lg font-bold text-white mt-1">0</div>
+                <!-- Məhsul Əlavə / Düzənlə (Admin) -->
+                <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
+                    <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
+                    <input type="hidden" id="editingProductId">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                        <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                        <input type="text" id="pName" placeholder="Ad (məs: Megamare)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                        <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                        <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                        <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
                     </div>
-                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
-                        <div class="text-xs text-zinc-400">🛒 Sifarişlər</div>
-                        <div id="stat-orders" class="text-lg font-bold text-amber-400 mt-1">0</div>
+                    <div class="flex space-x-2">
+                        <button onclick="saveProduct()" id="saveProdBtn" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
+                        <button onclick="cancelEdit()" id="cancelEditBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2 rounded text-xs">Ləğv Et</button>
                     </div>
-                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700/50">
-                        <div class="text-xs text-zinc-400">🎯 Sifariş %-i</div>
-                        <div id="stat-conversion" class="text-lg font-bold text-green-400 mt-1">0%</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Əməliyyat Forması -->
-            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
-                <h2 id="opFormTitle" class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
-                <input type="hidden" id="editingSaleId">
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                    <select id="opType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
-                        <option value="MEXARIC">Məxaric (Satış)</option>
-                        <option value="MEDAXIL">Mədaxil (Artırma)</option>
-                        <option value="ITKI">İtki</option>
-                    </select>
-                    <select id="opProduct" onchange="calcPrice()" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
-                        <option value="">Məhsul seçin...</option>
-                    </select>
-                    <input type="number" id="opGram" oninput="calcPrice()" placeholder="Miqdar (qr/ədəd)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
-                    <select id="payType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
-                        <option value="Nəğd">Nəğd</option>
-                        <option value="POS Terminal">POS Terminal</option>
-                        <option value="Karta göndərmə">Karta göndərmə</option>
-                    </select>
-                </div>
-                <div class="grid grid-cols-2 gap-2">
-                    <input type="number" step="0.01" id="opPrice" placeholder="Yekun Qiymət (AZN)" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
-                    <input type="number" id="opDiscount" oninput="calcPrice()" placeholder="Endirim %" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
-                </div>
-                
-                <div class="flex flex-wrap gap-4 pt-1 text-xs text-zinc-300">
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" id="fromAd" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
-                        <span>Reklamdan gəldi (flaşur / qapı önü)</span>
-                    </label>
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="checkbox" id="toCashRegister" class="w-4 h-4 accent-amber-500 rounded bg-zinc-800 border-zinc-700">
-                        <span>Kassa aparatına vuruldu</span>
-                    </label>
                 </div>
 
-                <div class="flex space-x-2">
-                    <button onclick="saveOp()" id="saveOpBtn" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
-                    <button onclick="cancelEditSale()" id="cancelOpBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2.5 rounded text-xs">Ləğv Et</button>
+                <!-- Cədvəllər -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
+                    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-2">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-sm font-semibold gold-text">Məhsul Kataloqu</h3>
+                            <input type="text" id="productSearch" oninput="renderUI()" placeholder="Ətir axtar..." class="bg-zinc-800 border border-zinc-700 px-2 py-1 rounded text-white text-xs w-36">
+                        </div>
+                        <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                            <table class="w-full text-left text-xs text-zinc-300">
+                                <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
+                                    <tr>
+                                        <th>Kod</th>
+                                        <th>Ad</th>
+                                        <th>Qalıq</th>
+                                        <th id="thBuyPrice">Alış</th>
+                                        <th>Satış</th>
+                                        <th>Əməliyyat</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="prodTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
+                        <h3 class="text-sm font-semibold gold-text mb-2">Əməliyyat Jurnalı</h3>
+                        <div class="overflow-x-auto max-h-48 overflow-y-auto">
+                            <table class="w-full text-left text-xs text-zinc-300">
+                                <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
+                                    <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Düzənlə</th></tr>
+                                </thead>
+                                <tbody id="logTable"></tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Məhsul Əlavə / Düzənlə (Admin) -->
-            <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
-                <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
-                <input type="hidden" id="editingProductId">
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                    <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    <input type="text" id="pName" placeholder="Ad (məs: Megamare)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                <!-- Satış İcmalı -->
+                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
+                    <h2 class="text-sm font-semibold gold-text">Satış İcmalı (Dövriyyə)</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
+                        <div class="bg-zinc-800/50 p-3 rounded-lg">
+                            <div class="text-[11px] text-zinc-400">Günlük Satış</div>
+                            <div id="salesDaily" class="text-sm font-bold gold-text">0.00 AZN</div>
+                        </div>
+                        <div class="bg-zinc-800/50 p-3 rounded-lg">
+                            <div class="text-[11px] text-zinc-400">Həftəlik Satış</div>
+                            <div id="salesWeekly" class="text-sm font-bold gold-text">0.00 AZN</div>
+                        </div>
+                        <div class="bg-zinc-800/50 p-3 rounded-lg">
+                            <div class="text-[11px] text-zinc-400">Aylıq Satış</div>
+                            <div id="salesMonthly" class="text-sm font-bold gold-text">0.00 AZN</div>
+                        </div>
+                        <div class="bg-zinc-800/50 p-3 rounded-lg">
+                            <div class="text-[11px] text-zinc-400">İllik Satış</div>
+                            <div id="salesYearly" class="text-sm font-bold gold-text">0.00 AZN</div>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
+                        <div class="bg-zinc-800/30 p-2 rounded">Nəğd: <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="bg-zinc-800/30 p-2 rounded">POS: <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="bg-zinc-800/30 p-2 rounded">Karta: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
+                    </div>
                 </div>
-                <div class="flex space-x-2">
-                    <button onclick="saveProduct()" id="saveProdBtn" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
-                    <button onclick="cancelEdit()" id="cancelEditBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2 rounded text-xs">Ləğv Et</button>
-                </div>
-            </div>
 
-            <!-- Cədvəllər -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
-                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-2">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-sm font-semibold gold-text">Məhsul Kataloqu</h3>
-                        <input type="text" id="productSearch" oninput="renderUI()" placeholder="Ətir axtar..." class="bg-zinc-800 border border-zinc-700 px-2 py-1 rounded text-white text-xs w-36">
+                <!-- Xalis Gəlir (Admin) -->
+                <div id="adminReportBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
+                    <h2 class="text-sm font-semibold gold-text">Xalis Gəlir Hesabatı (Admin)</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[11px] text-zinc-400">Başlanğıc Tarix</label>
+                            <input type="date" id="startDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                        </div>
+                        <div>
+                            <label class="text-[11px] text-zinc-400">Son Tarix</label>
+                            <input type="date" id="endDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
+                        </div>
                     </div>
-                    <div class="overflow-x-auto max-h-48 overflow-y-auto">
-                        <table class="w-full text-left text-xs text-zinc-300">
-                            <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr>
-                                    <th>Kod</th>
-                                    <th>Ad</th>
-                                    <th>Qalıq</th>
-                                    <th id="thBuyPrice">Alış</th>
-                                    <th>Satış</th>
-                                    <th>Əməliyyat</th>
-                                </tr>
-                            </thead>
-                            <tbody id="prodTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
-                    <h3 class="text-sm font-semibold gold-text mb-2">Əməliyyat Jurnalı</h3>
-                    <div class="overflow-x-auto max-h-48 overflow-y-auto">
-                        <table class="w-full text-left text-xs text-zinc-300">
-                            <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Düzənlə</th></tr>
-                            </thead>
-                            <tbody id="logTable"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Satış İcmalı -->
-            <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
-                <h2 class="text-sm font-semibold gold-text">Satış İcmalı (Dövriyyə)</h2>
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                    <div class="bg-zinc-800/50 p-3 rounded-lg">
-                        <div class="text-[11px] text-zinc-400">Günlük Satış</div>
-                        <div id="salesDaily" class="text-sm font-bold gold-text">0.00 AZN</div>
-                    </div>
-                    <div class="bg-zinc-800/50 p-3 rounded-lg">
-                        <div class="text-[11px] text-zinc-400">Həftəlik Satış</div>
-                        <div id="salesWeekly" class="text-sm font-bold gold-text">0.00 AZN</div>
-                    </div>
-                    <div class="bg-zinc-800/50 p-3 rounded-lg">
-                        <div class="text-[11px] text-zinc-400">Aylıq Satış</div>
-                        <div id="salesMonthly" class="text-sm font-bold gold-text">0.00 AZN</div>
-                    </div>
-                    <div class="bg-zinc-800/50 p-3 rounded-lg">
-                        <div class="text-[11px] text-zinc-400">İllik Satış</div>
-                        <div id="salesYearly" class="text-sm font-bold gold-text">0.00 AZN</div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-                    <div class="bg-zinc-800/30 p-2 rounded">Nəğd: <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
-                    <div class="bg-zinc-800/30 p-2 rounded">POS: <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
-                    <div class="bg-zinc-800/30 p-2 rounded">Karta: <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
-                </div>
-            </div>
-
-            <!-- Xalis Gəlir (Admin) -->
-            <div id="adminReportBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
-                <h2 class="text-sm font-semibold gold-text">Xalis Gəlir Hesabatı (Admin)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    <div>
-                        <label class="text-[11px] text-zinc-400">Başlanğıc Tarix</label>
-                        <input type="date" id="startDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    </div>
-                    <div>
-                        <label class="text-[11px] text-zinc-400">Son Tarix</label>
-                        <input type="date" id="endDate" onchange="renderUI()" class="w-full bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    </div>
-                </div>
-                <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-800 text-center">
-                    <div class="bg-zinc-800/50 p-3 rounded-lg">
-                        <div class="text-xs text-zinc-400">Seçilmiş Aralıq Dövriyyə</div>
-                        <div id="reportTotalSales" class="text-lg font-bold gold-text">0.00 AZN</div>
-                    </div>
-                    <div class="bg-zinc-800/50 p-3 rounded-lg">
-                        <div class="text-xs text-zinc-400">Xalis Gəlir</div>
-                        <div id="reportNetProfit" class="text-lg font-bold text-green-400">0.00 AZN</div>
+                    <div class="grid grid-cols-2 gap-3 pt-2 border-t border-zinc-800 text-center">
+                        <div class="bg-zinc-800/50 p-3 rounded-lg">
+                            <div class="text-xs text-zinc-400">Seçilmiş Aralıq Dövriyyə</div>
+                            <div id="reportTotalSales" class="text-lg font-bold gold-text">0.00 AZN</div>
+                        </div>
+                        <div class="bg-zinc-800/50 p-3 rounded-lg">
+                            <div class="text-xs text-zinc-400">Xalis Gəlir</div>
+                            <div id="reportNetProfit" class="text-lg font-bold text-green-400">0.00 AZN</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- SATICI İŞ SAATLARI SHEET (YALNIZ ADMİN) -->
+        <!-- SATICI İŞ SAATLARI SHEET (YALNIZ ADMIN) -->
         <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2">
@@ -333,7 +344,7 @@
             </div>
         </div>
 
-        <!-- AYLIQ/İLLİK XƏRCLƏR SHEET (YALNIZ ADMİN) -->
+        <!-- AYLIQ/İLLİK XƏRCLƏR SHEET (YALNIZ ADMIN) -->
         <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2">
@@ -523,9 +534,9 @@
                     document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
                     document.getElementById('expensesBtn').classList.remove('hidden-screen');
                     if(attBtn) attBtn.classList.remove('hidden-screen');
-                    if(shiftBox) shiftBox.classList.add('hidden-screen'); // Adminin növbə düymələri görünmür
+                    if(shiftBox) shiftBox.classList.add('hidden-screen');
                 } else {
-                    if(shiftBox) shiftBox.classList.remove('hidden-screen'); // Satıcı üçün görünür
+                    if(shiftBox) shiftBox.classList.remove('hidden-screen');
                     if(attBtn) attBtn.classList.add('hidden-screen');
                 }
 
@@ -534,7 +545,14 @@
                 if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
                 if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
                 document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
-                if(role === 'SATICI') checkTodayShiftStatus();
+                
+                if(role === 'SATICI') {
+                    checkTodayShiftStatus();
+                } else {
+                    // Admin üçün həmişə aktivdir
+                    setOperationalState(true);
+                }
+
                 renderUI();
                 checkNewOrdersBlinking();
             }
@@ -579,18 +597,25 @@
             let statusTextElem = document.getElementById('shiftStatusText');
             if(!statusTextElem) return;
             
-            if(!rec) {
-                statusTextElem.textContent = "Növbə başlanmayıb";
+            if(!rec || !rec.check_in || rec.check_out) {
+                statusTextElem.textContent = "Növbə başlanmayıb / Bağlıdır";
                 statusTextElem.className = "text-red-400 font-mono";
+                setOperationalState(false); // Qaramtıl et və icazə vermə
             } else if(rec.check_in && !rec.check_out) {
                 let timeStr = new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 statusTextElem.textContent = `Aktivdir (Gəliş: ${timeStr})`;
                 statusTextElem.className = "text-green-400 font-mono";
-            } else if(rec.check_in && rec.check_out) {
-                let inStr = new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                let outStr = new Date(rec.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                statusTextElem.textContent = `Tamamlanıb (${inStr} — ${outStr})`;
-                statusTextElem.className = "text-amber-400 font-mono";
+                setOperationalState(true); // Aktiv et
+            }
+        }
+
+        function setOperationalState(isActive) {
+            let container = document.getElementById('operationalContainer');
+            if(!container) return;
+            if(isActive) {
+                container.classList.remove('disabled-section');
+            } else {
+                container.classList.add('disabled-section');
             }
         }
 
@@ -600,14 +625,15 @@
 
             let existing = attendances.find(a => a.work_date === todayStr && a.role_name === 'SATICI');
             if(existing) {
-                let { error } = await _supabase.from('attendance').update({ check_in: nowIso }).eq('id', existing.id);
+                let { error } = await _supabase.from('attendance').update({ check_in: nowIso, check_out: null }).eq('id', existing.id);
                 if(error) { alert('Xəta: ' + error.message); return; }
             } else {
                 let { error } = await _supabase.from('attendance').insert([{ work_date: todayStr, role_name: 'SATICI', check_in: nowIso }]);
                 if(error) { alert('Xəta: ' + error.message); return; }
             }
-            alert('Növbə uğurla başlandı!');
+            alert('Növbə uğurla başlandı! Əməliyyatlar aktivləşdirildi.');
             await loadDataFromCloud();
+            checkTodayShiftStatus();
         }
 
         async function endShift() {
@@ -623,8 +649,9 @@
             let { error } = await _supabase.from('attendance').update({ check_out: nowIso }).eq('id', existing.id);
             if(error) { alert('Xəta: ' + error.message); return; }
             
-            alert('Növbə uğurla bağlandı!');
+            alert('Növbə bağlandı! Əməliyyatlar bloklandı.');
             await loadDataFromCloud();
+            checkTodayShiftStatus();
         }
 
         function initYearOptions() {
@@ -665,7 +692,6 @@
 
                 let checkIn = rec.check_in ? new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let checkOut = rec.check_out ? new Date(rec.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
-                let timeText = rec.check_in ? `${checkIn} — ${checkOut}` : '<span class="text-zinc-600">İştirak olmayıb</span>';
 
                 html += `
                     <tr class="border-b border-zinc-800 hover:bg-zinc-800/30 font-mono">
@@ -709,9 +735,11 @@
                 document.getElementById('expensesBtn').classList.remove('hidden-screen');
                 if(attBtn) attBtn.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
+                setOperationalState(true);
             } else {
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
                 if(attBtn) attBtn.classList.add('hidden-screen');
+                checkTodayShiftStatus();
             }
 
             loadAnalytics('day'); 
@@ -719,7 +747,6 @@
             if(document.getElementById('startDate')) document.getElementById('startDate').value = today;
             if(document.getElementById('endDate')) document.getElementById('endDate').value = today;
             document.getElementById('roleTitle').textContent = `MELODİKA — ${role}`;
-            if(role === 'SATICI') checkTodayShiftStatus();
             renderUI();
             checkNewOrdersBlinking();
         }
