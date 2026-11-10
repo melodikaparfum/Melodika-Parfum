@@ -140,7 +140,8 @@
 
             <!-- Əməliyyat Forması -->
             <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
-                <h2 class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
+                <h2 id="opFormTitle" class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
+                <input type="hidden" id="editingSaleId">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
                     <select id="opType" class="bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-sm">
                         <option value="MEXARIC">Məxaric (Satış)</option>
@@ -173,7 +174,10 @@
                     </label>
                 </div>
 
-                <button onclick="saveOp()" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
+                <div class="flex space-x-2">
+                    <button onclick="saveOp()" id="saveOpBtn" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
+                    <button onclick="cancelEditSale()" id="cancelOpBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2.5 rounded text-xs">Ləğv Et</button>
+                </div>
             </div>
 
             <!-- Məhsul Əlavə / Düzənlə (Admin) -->
@@ -222,7 +226,7 @@
                     <div class="overflow-x-auto max-h-48 overflow-y-auto">
                         <table class="w-full text-left text-xs text-zinc-300">
                             <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-zinc-900">
-                                <tr><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Sil</th></tr>
+                                <tr id="logHeaderRow"><th>Tarix</th><th>Növ</th><th>Məhsul</th><th>Miqdar</th><th>Ödəniş</th><th>Məbləğ</th><th>Rek</th><th>Kas</th><th>Düzənlə</th></tr>
                             </thead>
                             <tbody id="logTable"></tbody>
                         </table>
@@ -1240,7 +1244,11 @@
 
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
                 let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
-                let deleteSaleBtn = `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">X</button>`;
+                
+                let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Düzənlə</button>`;
+                if(role === 'ADMIN') {
+                    actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-600 font-bold">Sil</button>`;
+                }
                 
                 let formattedDate = s.date ? getBakuDateTimeString(s.date) : '-';
                 let typeColor = s.type === 'MEXARIC' ? 'text-green-400' : (s.type === 'MEDAXIL' ? 'text-blue-400' : 'text-red-400');
@@ -1254,7 +1262,7 @@
                     <td class="py-1">${s.total_price} AZN</td>
                     <td class="py-1 text-center">${adBadge}</td>
                     <td class="py-1 text-center">${cashBadge}</td>
-                    <td class="py-1">${deleteSaleBtn}</td>
+                    <td class="py-1">${actionCellHtml}</td>
                 </tr>`;
             });
             document.getElementById('logTable').innerHTML = logHtml || '<tr><td colspan="9" class="py-1 text-zinc-500">Əməliyyat yoxdur</td></tr>';
@@ -1272,6 +1280,39 @@
                 document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
                 document.getElementById('reportNetProfit').textContent = totalProfitSum.toFixed(2) + ' AZN';
             }
+        }
+
+        function editSale(id) {
+            let s = sales.find(x => x.id == id);
+            if(!s) return;
+
+            document.getElementById('editingSaleId').value = s.id;
+            document.getElementById('opType').value = s.type;
+            document.getElementById('opProduct').value = s.product_id;
+            document.getElementById('opGram').value = s.grams_sold;
+            document.getElementById('payType').value = s.payType || 'Nəğd';
+            document.getElementById('opPrice').value = s.total_price;
+            document.getElementById('opDiscount').value = '';
+            document.getElementById('fromAd').checked = !!s.fromAd;
+            document.getElementById('toCashRegister').checked = !!s.toCashRegister;
+
+            document.getElementById('opFormTitle').textContent = "Satış / Əməliyyatı Düzənlə";
+            document.getElementById('saveOpBtn').textContent = "Yadda Saxla";
+            document.getElementById('cancelOpBtn').classList.remove('hidden-screen');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cancelEditSale() {
+            document.getElementById('editingSaleId').value = '';
+            document.getElementById('opGram').value = '';
+            document.getElementById('opPrice').value = '';
+            document.getElementById('opDiscount').value = '';
+            document.getElementById('fromAd').checked = false;
+            document.getElementById('toCashRegister').checked = false;
+
+            document.getElementById('opFormTitle').textContent = "Satış / Əməliyyat";
+            document.getElementById('saveOpBtn').textContent = "Təsdiq Et";
+            document.getElementById('cancelOpBtn').classList.add('hidden-screen');
         }
 
         function openDayEndModal() {
@@ -1413,6 +1454,7 @@
         }
 
         async function saveOp() {
+            let editingSaleId = document.getElementById('editingSaleId').value;
             let product_id = document.getElementById('opProduct').value;
             let type = document.getElementById('opType').value;
             let grams_sold = parseFloat(document.getElementById('opGram').value);
@@ -1427,7 +1469,7 @@
             let total_cost = grams_sold * (p.buy_price || 0);
             let profit = total_price - total_cost;
 
-            let newOp = { 
+            let opPayload = { 
                 product_id: Number(product_id), 
                 type, 
                 grams_sold, 
@@ -1436,14 +1478,21 @@
                 profit, 
                 payType, 
                 fromAd, 
-                toCashRegister, 
-                date: new Date().toISOString() 
+                toCashRegister
             };
 
-            let { error } = await _supabase.from('sales').insert([newOp]);
-            if(error) { alert('Xəta: ' + error.message); return; }
+            if(editingSaleId) {
+                let { error } = await _supabase.from('sales').update(opPayload).eq('id', editingSaleId);
+                if(error) { alert('Xəta: ' + error.message); return; }
+                alert('Əməliyyat uğurla yeniləndi!');
+                cancelEditSale();
+            } else {
+                opPayload.date = new Date().toISOString();
+                let { error } = await _supabase.from('sales').insert([opPayload]);
+                if(error) { alert('Xəta: ' + error.message); return; }
+                alert('Əməliyyat uğurla yadda saxlanıldı!');
+            }
 
-            alert('Əməliyyat uğurla yadda saxlanıldı!');
             document.getElementById('opGram').value = '';
             document.getElementById('opPrice').value = '';
             document.getElementById('opDiscount').value = '';
