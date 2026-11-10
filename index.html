@@ -156,7 +156,6 @@
                     <button onclick="openOperationsLogModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
                     <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
                     <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
-                    <button onclick="openCatalogDetailsModal()" id="catalogDetailsBtn" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Kataloq Məlumatları</button>
                     <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
                     <button onclick="logout()" class="text-xs bg-red-900 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
                 </div>
@@ -258,23 +257,6 @@
                     </div>
                 </div>
 
-                <!-- Məhsul Əlavə / Düzənlə (Admin) -->
-                <div id="adminBox" class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 hidden-screen no-print">
-                    <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
-                    <input type="hidden" id="editingProductId">
-                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                        <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                        <input type="text" id="pName" placeholder="Ad (məs: Megamare)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                        <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                        <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                        <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-800 border border-zinc-700 p-2 rounded text-white text-sm">
-                    </div>
-                    <div class="flex space-x-2">
-                        <button onclick="saveProduct()" id="saveProdBtn" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
-                        <button onclick="cancelEdit()" id="cancelEditBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2 rounded text-xs">Ləğv Et</button>
-                    </div>
-                </div>
-
                 <!-- Satış İcmalı -->
                 <div class="bg-zinc-900 border border-zinc-800 p-4 rounded-xl space-y-3 no-print">
                     <h2 class="text-sm font-semibold gold-text">Satış İcmalı (Dövriyyə)</h2>
@@ -313,10 +295,29 @@
                     <button onclick="closeOperationsLogModal()" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded text-white">Bağla</button>
                 </div>
 
-                <!-- ƏLAVƏ EDİLDİ: SATIŞ ET VƏ MƏHSUL KATALOQU DÜYMƏLƏRİ -->
+                <!-- ƏLAVƏ EDİLDİ: BÜTÜN ƏMƏLİYYAT VƏ İDARƏETMƏ DÜYMƏLƏRİ -->
                 <div class="flex flex-wrap gap-2 pt-1 pb-2 border-b border-zinc-800">
                     <button onclick="openSalesFormModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs shadow">Satış Et ➕</button>
                     <button onclick="openProductCatalogModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Məhsul Kataloqu 📦</button>
+                    <button id="logAdminAddProdBtn" onclick="openAdminAddProductModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-4 py-2 rounded text-xs shadow">Məhsul Əlavə Et ➕</button>
+                    <button id="logCatalogDetailsBtn" onclick="openCatalogDetailsModal()" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Kataloq Məlumatları (Şəkil və Notlar) 🖼️</button>
+                </div>
+
+                <!-- MƏHSUL ƏLAVƏ / DÜZƏNLƏ FORM BLOKU (ƏVVƏLKİ ADMIN BOX) -->
+                <div id="adminBox" class="bg-zinc-800/90 border border-amber-500/40 p-4 rounded-xl space-y-3 hidden-screen">
+                    <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
+                    <input type="hidden" id="editingProductId">
+                    <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
+                        <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="text" id="pName" placeholder="Ad (məs: Megamare)" class="bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs">
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="saveProduct()" id="saveProdBtn" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
+                        <button onclick="cancelEdit()" id="cancelEditBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2 rounded text-xs">Ləğv Et</button>
+                    </div>
                 </div>
 
                 <!-- BU GÜNÜN SATIŞLARI QUTUSU (BOX) -->
@@ -360,7 +361,7 @@
             </div>
         </div>
 
-        <!-- MƏHSUL KATALOQU MODALI (ƏLAVƏ EDİLDİ) -->
+        <!-- MƏHSUL KATALOQU MODALI -->
         <div id="productCatalogModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -388,7 +389,7 @@
             </div>
         </div>
 
-        <!-- SATIŞ / ƏMƏLİYYAT FORMASI MODALI (ƏLAVƏ EDİLDİ) -->
+        <!-- SATIŞ / ƏMƏLİYYAT FORMASI MODALI -->
         <div id="salesFormModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
             <div class="max-w-xl w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -985,10 +986,12 @@
                 let adminReportsSheet = document.getElementById('adminReportsSheetSection');
                 let adminCashSheet = document.getElementById('adminCashSheetSection');
                 let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
+                let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
+                let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
 
                 if(role === 'ADMIN') {
-                    document.getElementById('adminBox').classList.remove('hidden-screen');
-                    document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
+                    if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
+                    if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
                     if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
@@ -996,6 +999,8 @@
                     document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                     setOperationalState(true);
                 } else {
+                    if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
+                    if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
                     if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
@@ -1105,6 +1110,13 @@
 
         function closeProductCatalogModal() {
             document.getElementById('productCatalogModal').classList.add('hidden-screen');
+        }
+
+        function openAdminAddProductModal() {
+            let adminBox = document.getElementById('adminBox');
+            if(adminBox) {
+                adminBox.classList.toggle('hidden-screen');
+            }
         }
 
         function populateProductSelect() {
@@ -1989,10 +2001,12 @@
             let adminReportsSheet = document.getElementById('adminReportsSheetSection');
             let adminCashSheet = document.getElementById('adminCashSheetSection');
             let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
+            let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
+            let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
 
             if(role === 'ADMIN') {
-                document.getElementById('adminBox').classList.remove('hidden-screen');
-                document.getElementById('catalogDetailsBtn').classList.remove('hidden-screen');
+                if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
+                if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
                 if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
@@ -2000,6 +2014,8 @@
                 document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                 setOperationalState(true);
             } else {
+                if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
+                if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
                 if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
@@ -2879,7 +2895,8 @@
             document.getElementById('adminFormTitle').textContent = "Məhsulu Düzənlə";
             document.getElementById('saveProdBtn').textContent = "Yadda Saxla";
             document.getElementById('cancelEditBtn').classList.remove('hidden-screen');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            let adminBox = document.getElementById('adminBox');
+            if(adminBox) adminBox.classList.remove('hidden-screen');
         }
 
         function cancelEdit() {
@@ -2984,3 +3001,4 @@
     </script>
 </body>
 </html>
+ 
