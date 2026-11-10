@@ -2563,13 +2563,14 @@
             document.getElementById('dayEndContent').innerHTML = finalContent;
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
 
-            // Avtomatik Gün Sonu Arxivinə Yadda Saxla
+            // Avtomatik Gün Sonu Arxivinə Yadda Saxla (Köhnəni silib yenisini yazır)
             await saveDayEndToArchive(nowStr, finalContent);
         }
 
         async function saveDayEndToArchive(dateStr, contentHtml) {
             try {
-                let { error } = await _supabase.from('day_end_archive').upsert([{ report_date: dateStr, content_summary: contentHtml }], { onConflict: 'report_date' });
+                await _supabase.from('day_end_archive').delete().eq('report_date', dateStr);
+                let { error } = await _supabase.from('day_end_archive').insert([{ report_date: dateStr, content_summary: contentHtml }]);
                 if (error) {
                     console.error("Arxiv yazma xətası:", error.message);
                 } else {
