@@ -295,7 +295,7 @@
                     <button onclick="closeOperationsLogModal()" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded text-white">Bağla</button>
                 </div>
 
-                <!-- ƏLAVƏ EDİLDİ: BÜTÜN ƏMƏLİYYAT VƏ İDARƏETMƏ DÜYMƏLƏRİ -->
+                <!-- BÜTÜN ƏMƏLİYYAT VƏ İDARƏETMƏ DÜYMƏLƏRİ -->
                 <div class="flex flex-wrap gap-2 pt-1 pb-2 border-b border-zinc-800">
                     <button onclick="openSalesFormModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs shadow">Satış Et ➕</button>
                     <button onclick="openProductCatalogModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Məhsul Kataloqu 📦</button>
@@ -303,7 +303,7 @@
                     <button id="logCatalogDetailsBtn" onclick="openCatalogDetailsModal()" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Kataloq Məlumatları (Şəkil və Notlar) 🖼️</button>
                 </div>
 
-                <!-- MƏHSUL ƏLAVƏ / DÜZƏNLƏ FORM BLOKU (ƏVVƏLKİ ADMIN BOX) -->
+                <!-- MƏHSUL ƏLAVƏ / DÜZƏNLƏ FORM BLOKU -->
                 <div id="adminBox" class="bg-zinc-800/90 border border-amber-500/40 p-4 rounded-xl space-y-3 hidden-screen">
                     <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
                     <input type="hidden" id="editingProductId">
@@ -320,7 +320,7 @@
                     </div>
                 </div>
 
-                <!-- BU GÜNÜN SATIŞLARI QUTUSU (BOX) -->
+                <!-- BU GÜNÜN SATIŞLARI QUTUSU -->
                 <div class="bg-zinc-800/90 border border-amber-500/60 p-4 rounded-xl space-y-2 shadow-lg">
                     <div class="flex justify-between items-center border-b border-zinc-700 pb-2">
                         <h3 class="text-sm font-bold gold-text flex items-center space-x-1">
@@ -454,8 +454,9 @@
                             </label>
                         </div>
                         <div>
-                            <button type="button" onclick="shiftSaleOneMinuteBack()" class="bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 text-[11px] font-bold px-2.5 py-1.5 rounded shadow">
-                                ⏳ Vaxtı 1 dəqiqə əvvələ at (Dünənə at)
+                            <!-- YALNIZ ADMİN ÜÇÜN GÖRÜNƏN DÜYMƏ -->
+                            <button type="button" id="adminYesterdayBtn" onclick="shiftSaleToYesterday()" class="hidden-screen bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 text-[11px] font-bold px-2.5 py-1.5 rounded shadow">
+                                ⏳ Dünənə at (23:59)
                             </button>
                         </div>
                     </div>
@@ -828,7 +829,8 @@
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans"></div>
                 </div>
 
-                <div id="adminArchiveSaveSection" class="hidden-screen pt-2 no-print">
+                <!-- ARXİVƏ YADDA SAXLA DÜYMƏSİ (HƏM ADMİN, HƏM SATICILAR ÜÇÜN) -->
+                <div id="adminArchiveSaveSection" class="pt-2 no-print">
                     <button onclick="confirmAndSaveDayEndArchive()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-lg text-sm shadow-lg flex items-center justify-center space-x-2">
                         <span>📥 Arxivə Təsdiq Et və Yadda Saxla</span>
                     </button>
@@ -988,6 +990,7 @@
                 let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
                 let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
                 let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
+                let adminYesterdayBtn = document.getElementById('adminYesterdayBtn');
 
                 if(role === 'ADMIN') {
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
@@ -995,6 +998,7 @@
                     if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
+                    if(adminYesterdayBtn) adminYesterdayBtn.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
                     document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                     setOperationalState(true);
@@ -1004,6 +1008,7 @@
                     if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                     if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
+                    if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
                     let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                     document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -2003,6 +2008,7 @@
             let masterArchiveNavBtn = document.getElementById('masterArchiveNavBtn');
             let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
             let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
+            let adminYesterdayBtn = document.getElementById('adminYesterdayBtn');
 
             if(role === 'ADMIN') {
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
@@ -2010,6 +2016,7 @@
                 if(adminReportsSheet) adminReportsSheet.classList.remove('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.remove('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
+                if(adminYesterdayBtn) adminYesterdayBtn.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 document.getElementById('roleTitle').textContent = `MELODİKA — ADMIN`;
                 setOperationalState(true);
@@ -2019,6 +2026,7 @@
                 if(adminReportsSheet) adminReportsSheet.classList.add('hidden-screen');
                 if(adminCashSheet) adminCashSheet.classList.add('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
+                if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
                 let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                 document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -2728,35 +2736,14 @@
             if(cancelBtn) cancelBtn.classList.add('hidden-screen');
         }
 
-        function shiftSaleOneMinuteBack() {
-            let editingSaleId = document.getElementById('editingSaleId').value;
+        function shiftSaleToYesterday() {
             let baseDate = new Date();
-
-            if (editingSaleId) {
-                let s = sales.find(x => x.id == editingSaleId);
-                if (s && s.date) {
-                    baseDate = new Date(s.date);
-                }
-            } else {
-                let latestSale = sales[sales.length - 1];
-                if (latestSale && latestSale.date) {
-                    baseDate = new Date(latestSale.date);
-                    document.getElementById('editingSaleId').value = latestSale.id;
-                    document.getElementById('opType').value = latestSale.type;
-                    document.getElementById('opProduct').value = latestSale.product_id;
-                    document.getElementById('opGram').value = latestSale.grams_sold;
-                    document.getElementById('payType').value = latestSale.payType || 'Nəğd';
-                    document.getElementById('opPrice').value = latestSale.total_price;
-                    document.getElementById('fromAd').checked = !!latestSale.fromAd;
-                    document.getElementById('toCashRegister').checked = !!latestSale.toCashRegister;
-                }
-            }
-
-            baseDate.setMinutes(baseDate.getMinutes() - 1);
+            baseDate.setDate(baseDate.getDate() - 1);
+            baseDate.setHours(23, 59, 0, 0);
             let newIsoDate = baseDate.toISOString();
             document.getElementById('customSaleDate').value = newIsoDate;
 
-            alert(`Vaxt 1 dəqiqə geri atıldı (${getBakuDateTimeString(newIsoDate)}). İndi "Təsdiq Et" düyməsini sıxın.`);
+            alert(`Vaxt dünənki gün saat 23:59-a təyin edildi (${getBakuDateTimeString(newIsoDate)}). İndi "Təsdiq Et" düyməsini sıxın.`);
         }
 
         async function openDayEndModal() {
@@ -2843,13 +2830,6 @@
 
             currentDayEndSummaryHtml = listHtml + summaryHtml;
             document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
-
-            let saveSec = document.getElementById('adminArchiveSaveSection');
-            if(role === 'ADMIN') {
-                saveSec.classList.remove('hidden-screen');
-            } else {
-                saveSec.classList.add('hidden-screen');
-            }
 
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
@@ -3001,4 +2981,3 @@
     </script>
 </body>
 </html>
- 
