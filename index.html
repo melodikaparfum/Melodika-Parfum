@@ -741,7 +741,7 @@
             </div>
         </div>
 
-        <!-- GÜN SONU HESABAT EKRANI -->
+        <!-- GÜN SONU HESABAT EKRANI (DÜZƏLİŞ EDİLDİ) -->
         <div id="dayEndModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
@@ -753,7 +753,14 @@
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans"></div>
                 </div>
 
-                <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
+                <!-- YALNIZ ADMIN ÜÇÜN GÖRÜNƏN TƏSDİQLƏMƏ DÜYMƏSİ -->
+                <div id="adminArchiveSaveSection" class="hidden-screen pt-2 no-print">
+                    <button onclick="confirmAndSaveDayEndArchive()" class="w-full bg-green-700 hover:bg-green-600 text-white font-bold py-3 rounded-lg text-sm shadow-lg flex items-center justify-center space-x-2">
+                        <span>📥 Arxivə Təsdiq Et və Yadda Saxla</span>
+                    </button>
+                </div>
+
+                <div class="pt-2 border-t border-zinc-800 flex justify-end space-x-2 no-print">
                     <button onclick="downloadDayEndAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
                 </div>
             </div>
@@ -859,6 +866,10 @@
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
         let shiftType = localStorage.getItem('melodika_current_shift') || ''; 
+
+        // Təsdiləmə üçün müvəqqəti saxlanılan məlumatlar
+        let currentDayEndSummaryHtml = '';
+        let currentDayEndReportDate = '';
 
         const monthNamesAz = [
             "Yanvar", "Fevral", "Mart", "Aprel", "May", "İyun",
@@ -1109,7 +1120,7 @@
         function renderGlobalMasterArchiveLists() {
             let dayEndContainer = document.getElementById('masterDayEndArchiveList');
             if(dayEndArchive.length === 0) {
-                dayEndContainer.innerHTML = '<div class="text-zinc-500 text-center py-2">Hələ qeydə alınmış gün sonu arxivi yoxdur.</div>';
+                dayEndContainer.innerHTML = '<div class="text-zinc-500 text-center py-2">Hələ qeydə alınmış gün sonu arxivi yoxdur. "Gün Sonu Hesabatı" bölməsindən təsdiq edib arxivə ata bilərsiniz.</div>';
             } else {
                 let html = '';
                 dayEndArchive.slice().reverse().forEach(item => {
@@ -2480,6 +2491,7 @@
 
         async function openDayEndModal() {
             let nowStr = getBakuDateString(new Date());
+            currentDayEndReportDate = nowStr; // Tarixi qeyd edirik
             let todaySales = sales.filter(s => s.date && getBakuDateString(s.date) === nowStr && s.type === 'MEXARIC');
             let totalAmount = 0;
             
@@ -2559,24 +2571,39 @@
                 </div>
             `;
 
-            let finalContent = listHtml + summaryHtml;
-            document.getElementById('dayEndContent').innerHTML = finalContent;
-            document.getElementById('dayEndModal').classList.remove('hidden-screen');
+            currentDayEndSummaryHtml = listHtml + summaryHtml;
+            document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
 
-            // Avtomatik Gün Sonu Arxivinə Yadda Saxla (Köhnəni silib yenisini yazır)
-            await saveDayEndToArchive(nowStr, finalContent);
+            // Əgər rol ADMIN-dirsə, "Arxivə Təsdiq Et" düyməsini göstəririk
+            let saveSec = document.getElementById('adminArchiveSaveSection');
+            if(role === 'ADMIN') {
+                saveSec.classList.remove('hidden-screen');
+            } else {
+                saveSec.classList.add('hidden-screen');
+            }
+
+            document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
-        async function saveDayEndToArchive(dateStr, contentHtml) {
+        // TƏSDİQLƏMƏ DÜYMƏSİ ÜÇÜN YENİ FUNKSİYA
+        async function confirmAndSaveDayEndArchive() {
             try {
-                await _supabase.from('day_end_archive').delete().eq('report_date', dateStr);
-                let { error } = await _supabase.from('day_end_archive').insert([{ report_date: dateStr, content_summary: contentHtml }]);
-                if (error) {
-                    console.error("Arxiv yazma xətası:", error.message);
+                // Əvvəl həmin günün köhnə arxivini silirik ki, təkrar düşməsin
+                await _supabase.from('day_end_archive').delete().eq('report_date', currentDayEndReportDate);
+                
+                // Yenisini bazaya daxil edirik
+                let { error } = await _supabase.from('day_end_archive').insert([{ report_date: currentDayEndReportDate, content_summary: currentDayEndSummaryHtml }]);
+                
+                if(error) {
+                    alert('Xəta baş verdi: ' + error.message);
                 } else {
+                    alert('Hesabat uğurla arxivə təsdiq edildi!');
                     await loadDataFromCloud();
+                    closeDayEndModal();
                 }
-            } catch(e) { console.error(e); }
+            } catch(e) {
+                alert('Xəta: ' + e.message);
+            }
         }
 
         function closeDayEndModal() { document.getElementById('dayEndModal').classList.add('hidden-screen'); }
