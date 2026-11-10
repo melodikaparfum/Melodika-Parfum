@@ -565,12 +565,14 @@
 
         function getBakuDateString(dateInput = new Date()) {
             let d = new Date(dateInput);
+            if(isNaN(d.getTime())) return '';
             d.setHours(d.getHours() + 4);
             return d.toISOString().split('T')[0];
         }
 
         function getBakuDateTimeString(dateInput = new Date()) {
             let d = new Date(dateInput);
+            if(isNaN(d.getTime())) return '';
             d.setHours(d.getHours() + 4);
             return d.toISOString().replace('T', ' ').substring(0, 16);
         }
@@ -1436,7 +1438,7 @@
             let startDateStr = role === 'ADMIN' ? document.getElementById('startDate').value : '';
             let endDateStr = role === 'ADMIN' ? document.getElementById('endDate').value : '';
             let logHtml = '';
-            let totalSalesSum = 0, totalProfitSum = 0;
+            let totalSalesSum = 0, totalGrossProfitSum = 0;
 
             sales.slice().reverse().forEach((s) => {
                 let p = products.find(x => x.id == s.product_id);
@@ -1459,7 +1461,10 @@
                 let inRange = true;
                 if(startDateStr && sDate < startDateStr) inRange = false;
                 if(endDateStr && sDate > endDateStr) inRange = false;
-                if(inRange && s.type === 'MEXARIC') { totalSalesSum += price; totalProfitSum += Number(s.profit || 0); }
+                if(inRange && s.type === 'MEXARIC') { 
+                    totalSalesSum += price; 
+                    totalGrossProfitSum += Number(s.profit || 0); 
+                }
 
                 let adBadge = s.fromAd ? '<span class="text-amber-400 font-bold">✓</span>' : '-';
                 let cashBadge = s.toCashRegister ? '<span class="text-green-400 font-bold">✓</span>' : '<span class="text-red-400 font-bold">✕</span>';
@@ -1475,12 +1480,23 @@
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
-            document.getElementById('payPos').textContent = payPos.toFixed(2) + ' AZN';
+            document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
             document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
 
             if(role === 'ADMIN') {
+                let rangeExpensesTotal = 0;
+                expenses.forEach(e => {
+                    let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+                    let inExpRange = true;
+                    if(startDateStr && eDate < startDateStr) inExpRange = false;
+                    if(endDateStr && eDate > endDateStr) inExpRange = false;
+                    if(inExpRange) rangeExpensesTotal += Number(e.amount || 0);
+                });
+
+                let netProfitFinal = totalGrossProfitSum - rangeExpensesTotal;
+
                 document.getElementById('reportTotalSales').textContent = totalSalesSum.toFixed(2) + ' AZN';
-                document.getElementById('reportNetProfit').textContent = totalProfitSum.toFixed(2) + ' AZN';
+                document.getElementById('reportNetProfit').textContent = netProfitFinal.toFixed(2) + ' AZN';
             }
         }
 
