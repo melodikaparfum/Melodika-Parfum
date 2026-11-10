@@ -375,6 +375,7 @@
                     <div id="rangeReportHeader" class="font-bold text-black text-center border-b-2 border-black pb-2">Hesabat</div>
                     <div class="space-y-2 pt-1 text-black font-medium">
                         <div>Ümumi satış: <span id="repModalTotal" class="font-bold float-right">0.00 AZN</span></div>
+                        <div>Xalis gəlir: <span id="repModalProfit" class="font-bold float-right text-green-700">0.00 AZN</span></div>
                         <div>Reklamdan: <span id="repModalAd" class="font-bold float-right">0.00 AZN</span></div>
                         <div>Pos terminal: <span id="repModalPos" class="font-bold float-right">0.00 AZN</span></div>
                         <div>Kartdan karta: <span id="repModalCard" class="font-bold float-right">0.00 AZN</span></div>
@@ -422,7 +423,7 @@
                 </div>
 
                 <div id="expensesPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
-                    <div id="expensesPrintHeader" class="text-xl font-bold text-black">Noyabr ay 2026 ci il üzrə</div>
+                    <div id="expensesPrintHeader" class="text-xl font-bold text-black">Noyabr ay 2026 cı il üzrə</div>
                     <div class="text-xl font-bold text-black border-b-2 border-black pb-2">Xərclər:</div>
                     
                     <div class="space-y-2">
@@ -879,6 +880,7 @@
 
             document.getElementById('rangeReportHeader').textContent = `${start}-dən - ${end}-dək hesabat:`;
             document.getElementById('repModalTotal').textContent = document.getElementById('reportTotalSales').textContent;
+            document.getElementById('repModalProfit').textContent = document.getElementById('reportNetProfit').textContent;
             
             let rAd = 0, rPos = 0, rCard = 0;
             sales.forEach(s => {
@@ -1473,7 +1475,7 @@
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
-            document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
+            document.getElementById('payPos').textContent = payPos.toFixed(2) + ' AZN';
             document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
 
             if(role === 'ADMIN') {
