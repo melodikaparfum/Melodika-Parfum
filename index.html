@@ -68,50 +68,14 @@
                 <button onclick="closeCustomerCatalog()" class="text-xs bg-zinc-800 hover:bg-zinc-700 text-white px-3 py-1.5 rounded">Girişə Qayıt</button>
             </header>
 
-            <!-- İLİN ƏN SEÇİLƏN ƏTİRLƏRİ BÖLGƏSİ -->
-            <div class="bg-zinc-900 border border-amber-500/50 p-4 rounded-xl space-y-3">
-                <h2 class="text-sm font-bold gold-text uppercase">✨ İlin Ən Seçilən Ətirləri</h2>
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    <!-- Afnan 9 pm -->
-                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
-                        <div>
-                            <img src="https://images.unsplash.com/photo-1523293182086-7651a899d37f?w=400&q=80" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
-                            <div class="font-bold text-white text-xs">Afnan 9 pm</div>
-                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Alma, darçın, vanil, kəhrəba</div>
-                            <div class="text-xs gold-text font-bold mt-1">Qiymət: 0.80 AZN / qr</div>
-                        </div>
-                        <button onclick="openFeaturedModal('Afnan 9 pm', 0.80)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At</button>
-                    </div>
-                    <!-- Afnan Tribute -->
-                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
-                        <div>
-                            <img src="https://images.unsplash.com/photo-1594035910387-fea47794261f?w=400&q=80" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
-                            <div class="font-bold text-white text-xs">Afnan Tribute</div>
-                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Ədviyyatlı sitrus, odunsu notlar, müşk</div>
-                            <div class="text-xs gold-text font-bold mt-1">Qiymət: 0.90 AZN / qr</div>
-                        </div>
-                        <button onclick="openFeaturedModal('Afnan Tribute', 0.90)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At</button>
-                    </div>
-                    <!-- Sospiro Accento -->
-                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
-                        <div>
-                            <img src="https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?w=400&q=80" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
-                            <div class="font-bold text-white text-xs">Sospiro Accento</div>
-                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Ananas, süs qızılgülü, jasmin, paçuli</div>
-                            <div class="text-xs gold-text font-bold mt-1">Qiymət: 1.20 AZN / qr</div>
-                        </div>
-                        <button onclick="openFeaturedModal('Sospiro Accento', 1.20)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At</button>
-                    </div>
-                    <!-- Al Rehab Dalal -->
-                    <div class="bg-zinc-800/60 p-3 rounded-lg border border-zinc-700 space-y-2 flex flex-col justify-between">
-                        <div>
-                            <img src="https://images.unsplash.com/photo-1615397349754-cfa2066a298e?w=400&q=80" class="w-full h-28 object-cover rounded mb-2 border border-zinc-700">
-                            <div class="font-bold text-white text-xs">Al Rehab Dalal</div>
-                            <div class="text-[11px] text-zinc-400 mt-1"><strong>Notlar:</strong> Karamelli vanil, portağal, səndəl ağacı</div>
-                            <div class="text-xs gold-text font-bold mt-1">Qiymət: 0.60 AZN / qr</div>
-                        </div>
-                        <button onclick="openFeaturedModal('Al Rehab Dalal', 0.60)" class="gold-bg font-bold py-1.5 rounded text-xs w-full">Səbətə At</button>
-                    </div>
+            <!-- İLİN ƏN SEÇİLƏN ƏTİRLƏRİ SHEET / CƏDVƏL BÖLGƏSİ -->
+            <div class="bg-zinc-900 border-2 border-amber-500 p-4 rounded-xl space-y-3 shadow-xl">
+                <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
+                    <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">🌟 İlin Top 4 Seçilən Ətri (Xüsusi Seçim)</h2>
+                    <span class="text-[10px] bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded font-mono">Top Hit</span>
+                </div>
+                <div id="topFeaturedContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    <!-- Dinamik olaraq aşağıdakı bazadan doldurulacaq -->
                 </div>
             </div>
 
@@ -152,6 +116,7 @@
         <div id="featuredModal" class="hidden-screen fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
             <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
                 <h3 id="featuredModalTitle" class="text-sm font-bold gold-text">Ətiri Səbətə At</h3>
+                <input type="hidden" id="featuredPerfumeId">
                 <input type="hidden" id="featuredPerfumeName">
                 <input type="hidden" id="featuredPerfumePrice">
                 <div class="space-y-2 text-xs">
@@ -1173,7 +1138,8 @@
             document.getElementById('loginScreen').classList.remove('hidden-screen');
         }
 
-        function openFeaturedModal(name, pricePerGram) {
+        function openFeaturedModal(id, name, pricePerGram) {
+            document.getElementById('featuredPerfumeId').value = id;
             document.getElementById('featuredPerfumeName').value = name;
             document.getElementById('featuredPerfumePrice').value = pricePerGram;
             document.getElementById('featuredModalTitle').textContent = `${name} (${pricePerGram} AZN / qr)`;
@@ -1194,6 +1160,7 @@
         }
 
         function addFeaturedToCartConfirmed() {
+            let id = parseInt(document.getElementById('featuredPerfumeId').value);
             let name = document.getElementById('featuredPerfumeName').value;
             let price = parseFloat(document.getElementById('featuredPerfumePrice').value) || 0;
             let grams = parseFloat(document.getElementById('featuredGramsInput').value) || 0;
@@ -1201,16 +1168,48 @@
             if(grams <= 0) { alert('Zəhmət olmasa miqdarı (qram) qeyd edin!'); return; }
             let total = price * grams;
 
-            let existing = cart.find(x => x.name === name);
+            let existing = cart.find(x => x.id === id);
             if(existing) { existing.grams += grams; existing.total += total; }
-            else { cart.push({ id: Date.now(), name, grams, total }); }
+            else { cart.push({ id, name, grams, total }); }
 
             renderCart();
             closeFeaturedModal();
             alert(`${name} (${grams} qr) səbətə əlavə olundu!`);
         }
 
+        function renderTopFeatured() {
+            let container = document.getElementById('topFeaturedContainer');
+            if(!container) return;
+            
+            // Top 4 seçilən ətirlərin kodları və ya adları üzrə süzgəc (məsələn: Afnan Tribute, Afnan 9 PM, Sospiro Accento, Al Rehab Dalal)
+            let featuredNames = ["Afnan Tribute", "Afnan 9 PM", "Sospiro Accento", "Al Rehab Dalal"];
+            let html = '';
+
+            featuredNames.forEach(fName => {
+                let p = products.find(item => item.name && item.name.toLowerCase() === fName.toLowerCase());
+                if(p) {
+                    let sellPrice = Number(p.sell_price || 0);
+                    let imgTag = p.image_url ? `<img src="${p.image_url}" class="w-full h-24 object-cover rounded mb-1.5 border border-zinc-700">` : `<div class="w-full h-24 bg-zinc-800 rounded mb-1.5 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>`;
+                    
+                    html += `
+                        <div class="bg-zinc-800/80 p-2.5 rounded-lg border border-amber-500/40 flex flex-col justify-between space-y-1.5">
+                            <div>
+                                ${imgTag}
+                                <div class="font-bold text-white text-xs truncate">${p.name}</div>
+                                <div class="text-[10px] text-zinc-400 truncate"><strong>Notlar:</strong> ${p.notes || p.ingredients || 'Qeyd olunmayıb'}</div>
+                                <div class="text-xs gold-text font-extrabold mt-1">${sellPrice.toFixed(2)} AZN / qr</div>
+                            </div>
+                            <button onclick="openFeaturedModal(${p.id}, '${p.name}', ${sellPrice})" class="gold-bg font-bold py-1 rounded text-[11px] w-full">Səbətə At</button>
+                        </div>
+                    `;
+                }
+            });
+
+            container.innerHTML = html || '<div class="text-zinc-500 text-xs col-span-4 text-center">Top ətirlər yüklənir...</div>';
+        }
+
         function renderCustomerCatalog() {
+            renderTopFeatured();
             let query = (document.getElementById('customerSearch').value || '').toLowerCase();
             let listHtml = '';
             let filtered = products.filter(p => p.code && p.code.toUpperCase().startsWith('A') && (p.code.toLowerCase().includes(query) || p.name.toLowerCase().includes(query)));
