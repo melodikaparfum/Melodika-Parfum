@@ -480,8 +480,8 @@
         <div id="masterArchivePinModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
             <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
                 <h2 class="text-base font-bold gold-text">Arxiv Sheet Girişi</h2>
-                <p class="text-xs text-zinc-400">Admin PIN kodunu (0810) daxil edin:</p>
-                <input type="password" id="masterArchivePinInput" placeholder="PIN Kod (0810)" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
+                <p class="text-xs text-zinc-400">PIN kodunu (000) daxil edin:</p>
+                <input type="password" id="masterArchivePinInput" placeholder="PIN Kod (000)" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
                 <div class="flex space-x-2">
                     <button onclick="closeMasterArchivePinModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina</button>
                     <button onclick="verifyMasterArchivePin()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Daxil Ol</button>
@@ -590,7 +590,7 @@
         <div id="cashPinModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
             <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
                 <h2 class="text-base font-bold gold-text">Kassa Mərkəzi Girişi</h2>
-                <p class="text-xs text-zinc-400">PIN kodunu daxil edin (Admin: 0810, Rasim: 111):</p>
+                <p class="text-xs text-zinc-400">PIN kodunu daxil edin (Admin: 000, Rasim: 111):</p>
                 <input type="password" id="cashPinInput" placeholder="PIN Kod" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
                 <div class="flex space-x-2">
                     <button onclick="closeCashPinModal()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 rounded text-xs">İmtina</button>
@@ -1090,7 +1090,7 @@
                 } else {
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
-                    if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen'); // Satıcıdan kassa mərkəzi çıxarıldı
+                    if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
                     if(adminTopReportsBtn) adminTopReportsBtn.classList.add('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                     if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
@@ -1367,14 +1367,14 @@
 
         async function verifyCashPin() {
             let pin = document.getElementById('cashPinInput').value;
-            if(pin === '000' || pin === '0810') { // 000 da dəstəklənir
+            if(pin === '000') { // Yalnız 000
                 closeCashPinModal();
                 openCashSheetModal('ADMIN');
             } else if(pin === '111') {
                 closeCashPinModal();
                 openCashSheetModal('RASIM');
             } else {
-                alert('Yanlış PIN kod! (Admin üçün 000 / 0810, Rasim üçün 111)');
+                alert('Yanlış PIN kod! (Admin üçün 000, Rasim üçün 111)');
             }
         }
 
@@ -1389,14 +1389,14 @@
 
         async function verifyMasterArchivePin() {
             let pin = document.getElementById('masterArchivePinInput').value;
-            if(pin === '000' || pin === '0810') { // 000 da dəstəklənir
+            if(pin === '000') { // Yalnız 000
                 closeMasterArchivePinModal();
                 await loadDataFromCloud();
                 initArchiveSelectors();
                 renderArchiveCalendar();
                 document.getElementById('globalMasterArchiveModal').classList.remove('hidden-screen');
             } else {
-                alert('Yanlış PIN kod! Arxiv üçün parol 000 (və ya 0810)-dur.');
+                alert('Yanlış PIN kod! Arxiv üçün parol 000-dır.');
             }
         }
 
@@ -2264,7 +2264,7 @@
             } else {
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
-                if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen'); // Satıcıdan kassa mərkəzi çıxarıldı
+                if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
                 if(adminTopReportsBtn) adminTopReportsBtn.classList.add('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                 if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
