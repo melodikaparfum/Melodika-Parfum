@@ -422,7 +422,7 @@
                 </div>
 
                 <div id="expensesPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
-                    <div id="expensesPrintHeader" class="text-xl font-bold text-black">Noyabr ay 2026 cı il üzrə</div>
+                    <div id="expensesPrintHeader" class="text-xl font-bold text-black">Noyabr ay 2026 ci il üzrə</div>
                     <div class="text-xl font-bold text-black border-b-2 border-black pb-2">Xərclər:</div>
                     
                     <div class="space-y-2">
@@ -778,7 +778,6 @@
                     statusDisplay = `${checkIn} - ${checkOut}`;
                 } else {
                     if(noteText !== '') {
-                        // Səbəb artıq yazılıb, üzərinə klikləyib redaktə də etmək olur, paralel olaraq göstərilir
                         statusDisplay = `<span onclick="openReasonModalPopup('${dateKey}', '${noteText}')" class="font-semibold text-zinc-900 cursor-pointer hover:underline" title="Düzənlək üçün kliklə">${noteText} ✏️</span>`;
                         reasonBtnHtml = `<button onclick="openReasonModalPopup('${dateKey}', '${noteText}')" class="no-print bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold px-2 py-0.5 rounded text-[11px] ml-2">Düzənlə</button>`;
                     } else {
@@ -1474,7 +1473,7 @@
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
             document.getElementById('salesYearly').textContent = yearlySum.toFixed(2) + ' AZN';
             document.getElementById('payNagd').textContent = nagdSum.toFixed(2) + ' AZN';
-            document.getElementById('payPos').textContent = payPos.toFixed(2) + ' AZN';
+            document.getElementById('payPos').textContent = posSum.toFixed(2) + ' AZN';
             document.getElementById('payCard').textContent = cardSum.toFixed(2) + ' AZN';
 
             if(role === 'ADMIN') {
@@ -1619,7 +1618,18 @@
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
 
             let p = products.find(x => x.id == product_id);
-            let opPayload = { product_id: Number(product_id), type, grams_sold, total_price, total_cost: grams_sold * (p.buy_price || 0), profit: total_price - (grams_sold * (p.buy_price || 0)), payType, fromAd, toCashRegister };
+            let opPayload = { 
+                product_id: Number(product_id), 
+                type, 
+                grams_sold, 
+                total_price, 
+                total_cost: grams_sold * (p.buy_price || 0), 
+                profit: total_price - (grams_sold * (p.buy_price || 0)), 
+                payType, 
+                fromAd, 
+                toCashRegister,
+                date: new Date().toISOString()
+            };
 
             if(editingSaleId) {
                 let { error } = await _supabase.from('sales').update(opPayload).eq('id', editingSaleId);
@@ -1627,7 +1637,6 @@
                 alert('Əməliyyat yeniləndi!');
                 cancelEditSale();
             } else {
-                opPayload.date = new Date().toISOString();
                 let { error } = await _supabase.from('sales').insert([opPayload]);
                 if(error) { alert('Xəta: ' + error.message); return; }
                 alert('Əməliyyat yadda saxlanıldı!');
