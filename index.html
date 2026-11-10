@@ -1367,14 +1367,14 @@
 
         async function verifyCashPin() {
             let pin = document.getElementById('cashPinInput').value;
-            if(pin === '0810') {
+            if(pin === '000' || pin === '0810') { // 000 da dəstəklənir
                 closeCashPinModal();
                 openCashSheetModal('ADMIN');
             } else if(pin === '111') {
                 closeCashPinModal();
                 openCashSheetModal('RASIM');
             } else {
-                alert('Yanlış PIN kod! (Admin üçün 0810, Rasim üçün 111)');
+                alert('Yanlış PIN kod! (Admin üçün 000 / 0810, Rasim üçün 111)');
             }
         }
 
@@ -1389,14 +1389,14 @@
 
         async function verifyMasterArchivePin() {
             let pin = document.getElementById('masterArchivePinInput').value;
-            if(pin === '0810') {
+            if(pin === '000' || pin === '0810') { // 000 da dəstəklənir
                 closeMasterArchivePinModal();
                 await loadDataFromCloud();
                 initArchiveSelectors();
                 renderArchiveCalendar();
                 document.getElementById('globalMasterArchiveModal').classList.remove('hidden-screen');
             } else {
-                alert('Yanlış PIN kod! Arxiv üçün parol 0810-dur.');
+                alert('Yanlış PIN kod! Arxiv üçün parol 000 (və ya 0810)-dur.');
             }
         }
 
