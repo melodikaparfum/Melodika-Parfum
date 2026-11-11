@@ -996,12 +996,11 @@
                     </div>
                     
                     <div class="border-t border-zinc-800 pt-2 space-y-2">
-                        <div class="text-xs text-zinc-300 font-bold">📖 Dəftər qeydi / şəkli və əlavə məbləğ əlavə et:</div>
+                        <div class="text-xs text-zinc-300 font-bold">📖 Dəftər qeydi / şəkli əlavə et:</div>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <input type="file" id="manualNotebookFile" accept="image/*" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black">
-                            <input type="number" step="0.01" id="manualNotebookAmount" placeholder="Əlavə Dəftər Məbləği (AZN)" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                         </div>
-                        <button onclick="saveManualNotebookReport()" class="w-full gold-bg font-bold py-2 rounded text-xs shadow">Dəftər Məlumatını Əlavə Et və Yadda Saxla 📥</button>
+                        <button onclick="saveManualNotebookReport()" class="w-full gold-bg font-bold py-2 rounded text-xs shadow">Dəftər Şəklini Əlavə Et və Yadda Saxla 📥</button>
                     </div>
                 </div>
 
@@ -2633,7 +2632,6 @@
 
         async function saveManualNotebookReport() {
             let targetDateStr = document.getElementById('dayEndDatePicker').value;
-            let manualAmount = parseFloat(document.getElementById('manualNotebookAmount').value) || 0;
             let fileInput = document.getElementById('manualNotebookFile');
 
             if(!targetDateStr) { alert('Zəhmət olmasa tarixi seçin!'); return; }
@@ -2692,20 +2690,15 @@
                 listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
             });
 
-            if (manualAmount > 0) {
-                totalAmount += manualAmount;
-            }
-
-            if(targetSales.length === 0 && manualAmount === 0) {
+            if(targetSales.length === 0 && !imageUrl) {
                 listHtml += `<div style="color: #666; padding: 10px 0;">Bu tarixə aid satış qeydə alınmayıb.</div>`;
             }
 
-            if(imageUrl || manualAmount > 0) {
+            if(imageUrl) {
                 listHtml += `
                     <div style="background: #f4f4f4; padding: 8px; margin-top: 10px; margin-bottom: 10px; border-left: 3px solid #d4af37; color: #000;">
                         <div>📖 <strong>Dəftər / Şəkil Qeydi</strong></div>
-                        ${manualAmount > 0 ? `<div style="margin-top: 4px; font-weight: bold; font-size: 13px; color: #000;">Əlavə məbləğ: ${manualAmount.toFixed(2)} AZN</div>` : ''}
-                        ${imageUrl ? `<div style="margin-top: 6px;"><img src="${imageUrl}" style="max-height: 250px; border-radius: 4px; border: 1px solid #ccc;" alt="Dəftər şəkli"></div>` : ''}
+                        <div style="margin-top: 6px;"><img src="${imageUrl}" style="max-height: 250px; border-radius: 4px; border: 1px solid #ccc;" alt="Dəftər şəkli"></div>
                     </div>
                 `;
             }
@@ -3610,7 +3603,6 @@
             if(datePicker) datePicker.value = nowStr;
             
             if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
-            if(document.getElementById('manualNotebookAmount')) document.getElementById('manualNotebookAmount').value = '';
 
             buildDayEndReportForDate(nowStr);
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
@@ -3620,7 +3612,6 @@
             let selectedDate = document.getElementById('dayEndDatePicker').value;
             
             if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
-            if(document.getElementById('manualNotebookAmount')) document.getElementById('manualNotebookAmount').value = '';
 
             if(selectedDate) {
                 buildDayEndReportForDate(selectedDate);
