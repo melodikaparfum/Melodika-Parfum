@@ -1288,6 +1288,15 @@
                 }
             });
 
+            // Noyabr ayının 1-dən 9-dək olan məbləğləri yalnız 2026-cı il Noyabr ayı üçün əlavə edirik (618 AZN)
+            // Bu məbləğin maya dəyəri olmadığı üçün birbaşa satışa və net gəlirə əlavə olunur
+            let manualNov1to9Sales = 618;
+            let manualNov1to9MonthStr = '2026-11';
+            
+            // Yalnız 2026-cı il üçün əlavə edirik
+            totalSales2026 += manualNov1to9Sales;
+            totalProfit2026 += manualNov1to9Sales; // Maya dəyəri 0 qəbul olunduğu üçün gəlirə tam əlavə olunur
+
             expenses.forEach(e => {
                 let eDate = e.expense_date ? String(e.expense_date).substring(0, 4) : '';
                 if(eDate === '2026') {
@@ -1318,6 +1327,8 @@
                         let sDate = s.date ? String(s.date).substring(0, 4) : '';
                         if(sDate === '2026' && s.type === 'MEXARIC') grossProfit += Number(s.profit || 0);
                     });
+                    grossProfit += 618; // Noyabr 1-9 əlavəsi
+
                     let totalExp = 0;
                     expenses.forEach(e => {
                         if(String(e.expense_date).substring(0, 4) === '2026') totalExp += Number(e.amount || 0);
@@ -1389,6 +1400,12 @@
                 perfumeSummaryMap[pName].totalCost += cost;
             });
 
+            // Əgər seçilmiş dövr 2026-cı il və ya Noyabr ayını əhatə edirsə, manual daxil edilən 1-9 Noyabr (618 AZN) məbləğini əlavə edirik
+            let isIncludingNov1to9 = (period === 'year' || period === 'month'); 
+            if(isIncludingNov1to9) {
+                totalSalesAmount += 618;
+            }
+
             let listHtml = '';
             for(let pName in perfumeSummaryMap) {
                 let item = perfumeSummaryMap[pName];
@@ -1399,6 +1416,18 @@
                             <div class="text-[11px] text-zinc-400">Satılan: ${item.grams} qr | Maya Dəyəri: <span class="text-amber-400 font-bold">${item.totalCost.toFixed(2)} AZN</span></div>
                         </div>
                         <div class="text-right font-extrabold text-green-400 text-sm">${item.totalPrice.toFixed(2)} AZN</div>
+                    </div>
+                `;
+            }
+
+            if(isIncludingNov1to9) {
+                listHtml += `
+                    <div class="bg-[#1a1a1a] p-2.5 rounded-lg border border-amber-500/40 flex justify-between items-center text-xs">
+                        <div>
+                            <strong class="gold-text text-sm">Noyabr (1-9 Aralığı Əl ilə Qeyd)</strong>
+                            <div class="text-[11px] text-zinc-400">Dəftər qeydləri üzrə toplam</div>
+                        </div>
+                        <div class="text-right font-extrabold text-green-400 text-sm">618.00 AZN</div>
                     </div>
                 `;
             }
@@ -2472,6 +2501,12 @@
                 }
             });
 
+            // Cari dövr Noyabr ayını əhatə edirsə 1-9 Noyabr əlavəsini daxil edirik
+            if(type === 'monthly' || type === 'yearly') {
+                totalSalesSum += 618;
+                totalGrossProfitSum += 618;
+            }
+
             let rangeExpensesTotal = 0;
             expenses.forEach(e => {
                 let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
@@ -2531,6 +2566,12 @@
                     if(s.payType === 'Karta göndərmə') rCard += p;
                 }
             });
+
+            // Əgər aralıq Noyabr ayını əhatə edirsə 618 əlavə olunur
+            if(start <= '2026-11-09' && end >= '2026-11-01') {
+                totalSalesSum += 618;
+                totalGrossProfitSum += 618;
+            }
 
             let rangeExpensesTotal = 0;
             expenses.forEach(e => {
@@ -3424,6 +3465,14 @@
                 }
             });
 
+            // Əgər cari ay Noyabr 2026-dırsa, 1-9 Noyabr üçün qeyd olunan 618 AZN-i aylıq və illik satışa əlavə edirik
+            if(currentMonthPrefix === '2026-11') {
+                monthlySum += 618;
+            }
+            if(currentYearPrefix === '2026') {
+                yearlySum += 618;
+            }
+
             document.getElementById('salesDaily').textContent = dailySum.toFixed(2) + ' AZN';
             document.getElementById('salesWeekly').textContent = weeklySum.toFixed(2) + ' AZN';
             document.getElementById('salesMonthly').textContent = monthlySum.toFixed(2) + ' AZN';
@@ -3484,7 +3533,6 @@
             let datePicker = document.getElementById('dayEndDatePicker');
             if(datePicker) datePicker.value = nowStr;
             
-            // Tarix dəyişəndə xanaları təmizləmək üçün inputları sıfırlayırıq
             if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
             if(document.getElementById('manualNotebookAmount')) document.getElementById('manualNotebookAmount').value = '';
 
@@ -3495,7 +3543,6 @@
         function onDayEndDatePickerChange() {
             let selectedDate = document.getElementById('dayEndDatePicker').value;
             
-            // İstəyinizə görə: Tarixi dəyişəndə şəkil və məbləğ xanaları boş qalsın
             if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
             if(document.getElementById('manualNotebookAmount')) document.getElementById('manualNotebookAmount').value = '';
 
@@ -3651,7 +3698,7 @@
 
         async function deleteSale(id) {
             if(confirm('Bu əməliyyatı jurnaldan silmək istəyirsiniz?')) {
-                let { error } = await _supabase.from('sales').delete().eq('id', id);
+                let { error } = await _supabase.sales.delete().eq('id', id);
                 if(error) { alert('Xəta: ' + error.message); return; }
                 await loadDataFromCloud();
                 renderUI();
@@ -3718,3 +3765,4 @@
         }
     </script>
 </html>
+ 
