@@ -2650,9 +2650,8 @@
                 } catch(e) {}
             }
 
-            // 10 noyabr (2026-11-10) üçün şəkildəki sətri satışları və dəftər məlumatlarını səliqəli şəkildə alt-alta yazırıq
             let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
-            let totalAmount = manualAmount;
+            let totalAmount = 0; // DÜZƏLİŞ: Başlanğıc 0 edildi ki, manualAmount iki dəfə toplanmasın
             
             let seherTotal = 0, seherAd = 0, seherCash = 0, seherPos = 0;
             let gunortaTotal = 0, gunortaAd = 0, gunortaCash = 0, gunortaPos = 0;
@@ -2661,9 +2660,7 @@
 
             let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
-            // Əgər 10 noyabrdırsa və bazada həmin günə satış yoxdursa və ya şəkildəki satışları bərpa etmək lazımdırsa:
             if (targetDateStr === '2026-11-10' && targetSales.length === 0) {
-                // Şəkildəki 7 ədəd satış qeydini bərpa edirik
                 listHtml += `
                     <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">1. [Admin] Lattafa Teriaq Intense - 2.5 qr - 7 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
                     <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">2. [Admin] Lattafa Kamrah - 2 qr - 6 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
@@ -2673,7 +2670,7 @@
                     <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">6. [Admin] Hermess - 2 qr - 3 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
                     <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">7. [Admin] Louis Vuitton Imagination - 3.5 qr - 10 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
                 `;
-                totalAmount += 50; // 7+6+15+4+5+3+10 = 50 AZN
+                totalAmount += 50; 
                 adminTotal += 50;
                 totalCashRegSum += 50;
                 adminCash += 50;
@@ -2711,8 +2708,12 @@
                 });
             }
 
-            if(imageUrl || manualAmount > 0) {
+            // Əgər dəftərdən əlavə məbləğ yazılıbsa, yalnız bir dəfə əlavə olunur
+            if (manualAmount > 0) {
                 totalAmount += manualAmount;
+            }
+
+            if(imageUrl || manualAmount > 0) {
                 listHtml += `
                     <div style="background: #f4f4f4; padding: 8px; margin-top: 10px; margin-bottom: 10px; border-left: 3px solid #d4af37; color: #000;">
                         <div>📖 <strong>Dəftər / Şəkil Qeydi</strong></div>
@@ -2764,7 +2765,7 @@
                     report_date: targetDateStr, 
                     content_summary: currentDayEndSummaryHtml 
                 }], { onConflict: 'report_date' });
-                alert('10 noyabr satışları və məlumatlar istədiyin formatda uğurla birləşdirilərək yadda saxlanıldı!');
+                alert('Məlumatlar istədiyin kimi düzgün və təkrar olunmadan yadda saxlanıldı!');
                 await loadDataFromCloud();
             } catch(err) {
                 alert('Yadda saxlama zamanı xəta: ' + err.message);
