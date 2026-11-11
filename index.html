@@ -988,7 +988,7 @@
                     <button onclick="closeDayEndModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <!-- BURA DƏFTƏRDƏN ŞƏKİL VƏ YEKUN MƏBLƏĞ ƏLAVƏ ETMƏK ÜÇÜN YENİ HİSSƏ ƏLAVƏ OLUNDU -->
+                <!-- BURA DƏFTƏRDƏN ŞƏKİL VƏ YEKUN MƏBLƏĞ ƏLAVƏ ETMƏK ÜÇÜN HİSSƏ -->
                 <div class="no-print bg-[#1a1a1a] p-3 rounded-xl border border-amber-500/40 space-y-2">
                     <div class="flex justify-between items-center gap-2">
                         <label class="text-xs text-amber-400 font-bold">Hesabat Tarixi:</label>
@@ -3484,12 +3484,21 @@
             let datePicker = document.getElementById('dayEndDatePicker');
             if(datePicker) datePicker.value = nowStr;
             
+            // Tarix dəyişəndə xanaları təmizləmək üçün inputları sıfırlayırıq
+            if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
+            if(document.getElementById('manualNotebookAmount')) document.getElementById('manualNotebookAmount').value = '';
+
             buildDayEndReportForDate(nowStr);
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
         function onDayEndDatePickerChange() {
             let selectedDate = document.getElementById('dayEndDatePicker').value;
+            
+            // İstəyinizə görə: Tarixi dəyişəndə şəkil və məbləğ xanaları boş qalsın
+            if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
+            if(document.getElementById('manualNotebookAmount')) document.getElementById('manualNotebookAmount').value = '';
+
             if(selectedDate) {
                 buildDayEndReportForDate(selectedDate);
             }
