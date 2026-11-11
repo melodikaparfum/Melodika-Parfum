@@ -3629,7 +3629,6 @@
             }
 
             let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
-            let totalAmount = 0;
             
             let seherTotal = 0, seherAd = 0, seherCash = 0, seherPos = 0;
             let gunortaTotal = 0, gunortaAd = 0, gunortaCash = 0, gunortaPos = 0;
@@ -3644,7 +3643,6 @@
                 targetSales.forEach((s, idx) => {
                     let p = products.find(x => x.id == s.product_id);
                     let price = Number(s.total_price || 0);
-                    totalAmount += price;
 
                     if(s.payType === 'POS Terminal') totalPosSum += price;
                     if(s.toCashRegister) totalCashRegSum += price;
@@ -3673,6 +3671,9 @@
                     listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
                 });
             }
+
+            // DÜZƏLİŞ: Ümumi mağaza satışı yalnız tək-tək vurulan satışların əsl cəmidir (şəkildəki 150 manat kimi səhv statik dəyərlər ləğv edildi)
+            let totalAmount = seherTotal + gunortaTotal + adminTotal;
             
             let summaryHtml = `
                 <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; color: #000; font-size: 12px; line-height: 1.5;">
@@ -3701,7 +3702,7 @@
                     </div>
 
                     <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
-                        Ümumi mağaza satışlı: ${totalAmount.toFixed(2)} AZN<br>
+                        Ümumi mağaza satışı: ${totalAmount.toFixed(2)} AZN<br>
                         Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN<br>
                         <span style="color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</span>
                     </div>
