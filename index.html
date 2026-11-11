@@ -985,7 +985,7 @@
                     <button onclick="closeDayEndModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <!-- BURA DƏFTƏRDƏN ŞƏKİL VƏ YEKUN MƏBLƏĞ ƏLAVƏ ETMƏK ÜÇÜN HİSSƏ -->
+                <!-- HESABAT TARİXİ SEÇİMİ -->
                 <div class="no-print bg-[#1a1a1a] p-3 rounded-xl border border-amber-500/40 space-y-2">
                     <div class="flex justify-between items-center gap-2">
                         <label class="text-xs text-amber-400 font-bold">Hesabat Tarixi:</label>
@@ -3480,23 +3480,28 @@
             }
         }
 
+        // BURA TAMAMİLƏ DƏYİŞDİRİLDİ: ARTIQ ŞƏKİLDƏKİ VƏ YA 150 AZN KİMİ SABİD QİYMƏTLƏR YOXDUR, SİSTEM TAM AVTOMATİK OLARAQ REAL SATIŞLARI TOPLAYIR
         function buildDayEndReportForDate(targetDateStr) {
             currentDayEndReportDate = targetDateStr;
 
-            let foundArchive = dayEndArchive.find(item => String(item.report_date) === targetDateStr);
-            if(foundArchive && foundArchive.content_summary) {
-                currentDayEndSummaryHtml = foundArchive.content_summary;
-                document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
-                return;
-            }
-
             let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
+            
+            let totalSalesSum = 0;
+            let totalPos = 0;
+            let totalCashReg = 0;
+            let totalAd = 0;
             
             let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
             targetSales.forEach((s, idx) => {
                 let p = products.find(x => x.id == s.product_id);
                 let price = Number(s.total_price || 0);
+                totalSalesSum += price;
+
+                if(s.payType === 'POS Terminal') totalPos += price;
+                if(s.toCashRegister) totalCashReg += price;
+                if(s.fromAd) totalAd += price;
+
                 let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
                 let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
                 let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
@@ -3506,6 +3511,15 @@
 
             if(targetSales.length === 0) {
                 listHtml += `<div style="color: #666; padding: 10px 0;">Bu tarixə aid satış qeydə alınmayıb.</div>`;
+            } else {
+                listHtml += `
+                    <div style="margin-top: 15px; border-top: 2px solid #000; padding-top: 10px; font-size: 13px; color: #000;">
+                        <div><strong>Ümumi mağaza satışı:</strong> ${totalSalesSum.toFixed(2)} AZN</div>
+                        <div><strong>Cəmi POS Terminal:</strong> ${totalPos.toFixed(2)} AZN</div>
+                        <div><strong>Cəmi Kassa Aparatına Vurulan:</strong> ${totalCashReg.toFixed(2)} AZN</div>
+                        <div><strong>Cəmi Reklam:</strong> ${totalAd.toFixed(2)} AZN</div>
+                    </div>
+                `;
             }
 
             currentDayEndSummaryHtml = listHtml;
@@ -3633,3 +3647,4 @@
         }
     </script>
 </html>
+ 
