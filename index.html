@@ -988,12 +988,24 @@
                     <button onclick="closeDayEndModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <div class="no-print bg-[#1a1a1a] p-3 rounded-xl border border-zinc-800 flex items-center justify-between gap-2">
-                    <label class="text-xs text-amber-400 font-bold">Hesabat Tarixi:</label>
-                    <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
+                <!-- BURA DƏFTƏRDƏN ŞƏKİL VƏ YEKUN MƏBLƏĞ ƏLAVƏ ETMƏK ÜÇÜN YENİ HİSSƏ ƏLAVƏ OLUNDU -->
+                <div class="no-print bg-[#1a1a1a] p-3 rounded-xl border border-amber-500/40 space-y-2">
+                    <div class="flex justify-between items-center gap-2">
+                        <label class="text-xs text-amber-400 font-bold">Hesabat Tarixi:</label>
+                        <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
+                    </div>
+                    
+                    <div class="border-t border-zinc-800 pt-2 space-y-2">
+                        <div class="text-xs text-zinc-300 font-bold">📖 Əl ilə yazılmış dəftər hesabatının şəkmini əlavə et:</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <input type="file" id="manualNotebookFile" accept="image/*" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black">
+                            <input type="number" step="0.01" id="manualNotebookAmount" placeholder="Dəftərdəki Yekun Məbləğ (AZN)" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
+                        </div>
+                        <button onclick="saveManualNotebookReport()" class="w-full gold-bg font-bold py-2 rounded text-xs shadow">Dəftər Hesabatını Yadda Saxla 📥</button>
+                    </div>
                 </div>
 
-                <!-- BURA TOQLU ARXA FON AĞ, ŞRİFTLƏR QARA OLARAQ TƏNZİMLƏNDİ -->
+                <!-- AĞ ARXA FON VƏ QARA ŞRİFT -->
                 <div id="dayEndPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 text-sm font-sans shadow-lg border border-zinc-200">
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans text-black"></div>
                 </div>
@@ -2571,10 +2583,10 @@
                 });
             } catch(e) {
                 try {
-                    await _supabase.from('day_end_archive').insert([{ 
+                    await _supabase.from('day_end_archive').upsert([{ 
                         report_date: currentDayEndReportDate, 
                         content_summary: currentDayEndSummaryHtml 
-                    }]);
+                    }], { onConflict: 'report_date' });
                 } catch(err) {}
             }
 
@@ -2584,6 +2596,49 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
             });
+        }
+
+        async function saveManualNotebookReport() {
+            let targetDateStr = document.getElementById('dayEndDatePicker').value;
+            let manualAmount = parseFloat(document.getElementById('manualNotebookAmount').value) || 0;
+            let fileInput = document.getElementById('manualNotebookFile');
+
+            if(!targetDateStr) { alert('Zəhmət olmasa tarixi seçin!'); return; }
+
+            let imageUrl = '';
+            if (fileInput && fileInput.files.length > 0) {
+                try {
+                    let file = fileInput.files[0];
+                    let fileName = `notebook_${Date.now()}_${file.name}`;
+                    let { error: uploadError } = await _supabase.storage.from('perfume-images').upload(fileName, file);
+                    if (!uploadError) {
+                        imageUrl = _supabase.storage.from('perfume-images').getPublicUrl(fileName).data.publicUrl;
+                    }
+                } catch(e) {}
+            }
+
+            let notebookSummary = `
+                <div style="font-weight: bold; margin-bottom: 8px; color: #000;">Tarix (Bakı vaxtı): ${targetDateStr}</div>
+                <div style="background: #f4f4f4; padding: 8px; margin-bottom: 10px; border-left: 3px solid #d4af37; color: #000;">
+                    <div>📖 <strong>Əl ilə yazılmış dəftər hesabatı</strong></div>
+                    <div style="margin-top: 4px; font-weight: bold; font-size: 14px; color: #000;">Yekun məbləğ: ${manualAmount.toFixed(2)} AZN</div>
+                    ${imageUrl ? `<div style="margin-top: 6px;"><img src="${imageUrl}" style="max-height: 250px; border-radius: 4px; border: 1px solid #ccc;" alt="Dəftər şəkli"></div>` : ''}
+                </div>
+            `;
+
+            currentDayEndSummaryHtml = notebookSummary;
+            document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
+
+            try {
+                await _supabase.from('day_end_archive').upsert([{ 
+                    report_date: targetDateStr, 
+                    content_summary: currentDayEndSummaryHtml 
+                }], { onConflict: 'report_date' });
+                alert('Dəftər hesabatı və şəkli uğurla yadda saxlanıldı!');
+                await loadDataFromCloud();
+            } catch(err) {
+                alert('Yadda saxlama zamanı xəta baş verdi: ' + err.message);
+            }
         }
 
         function checkNewOrdersBlinking() {
@@ -3442,6 +3497,14 @@
 
         function buildDayEndReportForDate(targetDateStr) {
             currentDayEndReportDate = targetDateStr;
+
+            let foundArchive = dayEndArchive.find(item => String(item.report_date) === targetDateStr);
+            if(foundArchive && foundArchive.content_summary) {
+                currentDayEndSummaryHtml = foundArchive.content_summary;
+                document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
+                return;
+            }
+
             let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
             let totalAmount = 0;
             
@@ -3646,4 +3709,3 @@
         }
     </script>
 </html>
- 
