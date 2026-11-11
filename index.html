@@ -991,14 +991,6 @@
                         <label class="text-xs text-amber-400 font-bold">Hesabat Tarixi:</label>
                         <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                     </div>
-                    
-                    <div class="border-t border-zinc-800 pt-2 space-y-2">
-                        <div class="text-xs text-zinc-300 font-bold">📖 Dəftər qeydi / şəkli əlavə et:</div>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <input type="file" id="manualNotebookFile" accept="image/*" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black">
-                        </div>
-                        <button onclick="saveManualNotebookReport()" class="w-full gold-bg font-bold py-2 rounded text-xs shadow">Dəftər Şəklini Əlavə Et və Yadda Saxla 📥</button>
-                    </div>
                 </div>
 
                 <!-- AĞ ARXA FON VƏ QARA ŞRİFT -->
@@ -2627,146 +2619,6 @@
             });
         }
 
-        async function saveManualNotebookReport() {
-            let targetDateStr = document.getElementById('dayEndDatePicker').value;
-            let fileInput = document.getElementById('manualNotebookFile');
-
-            if(!targetDateStr) { alert('Zəhmət olmasa tarixi seçin!'); return; }
-
-            let imageUrl = '';
-            if (fileInput && fileInput.files.length > 0) {
-                try {
-                    let file = fileInput.files[0];
-                    let fileName = `notebook_${Date.now()}_${file.name}`;
-                    let { error: uploadError } = await _supabase.storage.from('perfume-images').upload(fileName, file);
-                    if (!uploadError) {
-                        imageUrl = _supabase.storage.from('perfume-images').getPublicUrl(fileName).data.publicUrl;
-                    }
-                } catch(e) {}
-            }
-
-            let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
-            let totalAmount = 0;
-            
-            let seherTotal = 0, seherAd = 0, seherCash = 0, seherPos = 0;
-            let gunortaTotal = 0, gunortaAd = 0, gunortaCash = 0, gunortaPos = 0;
-            let adminTotal = 50, adminAd = 18, adminCash = 50, adminPos = 0; // 10 noyabr üçün xüsusi düzəliş
-            let totalPosSum = 0, totalCashRegSum = 50;
-
-            if (targetDateStr !== '2026-11-10') {
-                adminTotal = 0; adminAd = 0; adminCash = 0; adminPos = 0; totalCashRegSum = 0;
-                targetSales.forEach((s) => {
-                    let price = Number(s.total_price || 0);
-                    if(s.payType === 'POS Terminal') totalPosSum += price;
-                    if(s.toCashRegister) totalCashRegSum += price;
-                    
-                    if(s.shift_name === 'SEHER') {
-                        seherTotal += price;
-                        if(s.fromAd) seherAd += price;
-                        if(s.toCashRegister) seherCash += price;
-                        if(s.payType === 'POS Terminal') seherPos += price;
-                    } else if(s.shift_name === 'GUNORTA') {
-                        gunortaTotal += price;
-                        if(s.fromAd) gunortaAd += price;
-                        if(s.toCashRegister) gunortaCash += price;
-                        if(s.payType === 'POS Terminal') gunortaPos += price;
-                    } else {
-                        adminTotal += price;
-                        if(s.fromAd) adminAd += price;
-                        if(s.toCashRegister) adminCash += price;
-                        if(s.payType === 'POS Terminal') adminPos += price;
-                    }
-                });
-            }
-
-            let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
-            
-            if (targetDateStr === '2026-11-10') {
-                listHtml += `
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">1. [Admin] Lattafa Teriaq İntense - 2.5 qr - 7 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">2. [Admin] Lattafa Kamrah - 2 qr - 6 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">3. [Admin] Molecule 02 (Black) - 5 qr - 15 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">4. [Admin] Lattafa Teriaq İntense - 1.5 qr - 4 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">5. [Admin] Ajmal Qafie 2 - 2 qr - 5 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">6. [Admin] Hermess - 2 qr - 3 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">7. [Admin] Luis Vuitton İmagination - 3.5 qr - 10 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                `;
-            } else {
-                targetSales.forEach((s, idx) => {
-                    let p = products.find(x => x.id == s.product_id);
-                    let price = Number(s.total_price || 0);
-                    let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
-                    let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
-                    let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
-
-                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
-                });
-            }
-
-            if(targetSales.length === 0 && !imageUrl && targetDateStr !== '2026-11-10') {
-                listHtml += `<div style="color: #666; padding: 10px 0;">Bu tarixə aid satış qeydə alınmayıb.</div>`;
-            }
-
-            if(imageUrl) {
-                listHtml += `
-                    <div style="background: #f4f4f4; padding: 8px; margin-top: 10px; margin-bottom: 10px; border-left: 3px solid #d4af37; color: #000;">
-                        <div>📖 <strong>Dəftər / Şəkil Qeydi</strong></div>
-                        <div style="margin-top: 6px;"><img src="${imageUrl}" style="max-height: 250px; border-radius: 4px; border: 1px solid #ccc;" alt="Dəftər şəkli"></div>
-                    </div>
-                `;
-            }
-            
-            let totalAmountVal = seherTotal + gunortaTotal + adminTotal;
-
-            let summaryHtml = `
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; color: #000; font-size: 12px; line-height: 1.5;">
-                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
-                        <div style="font-weight: bold;">☀️ Səhər smeni:</div>
-                        <div>• Ümumi satış: ${seherTotal.toFixed(2)} AZN</div>
-                        <div>• POS Terminal: ${seherPos.toFixed(2)} AZN</div>
-                        <div>• Kassa aparatına vurulan: ${seherCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: ${seherAd.toFixed(2)} AZN</div>
-                    </div>
-
-                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
-                        <div style="font-weight: bold;">🌙 Günorta smeni:</div>
-                        <div>• Ümumi satış: ${gunortaTotal.toFixed(2)} AZN</div>
-                        <div>• POS Terminal: ${gunortaPos.toFixed(2)} AZN</div>
-                        <div>• Kassa aparatına vurulan: ${gunortaCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: ${gunortaAd.toFixed(2)} AZN</div>
-                    </div>
-
-                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 8px; border: 1px solid #e5e5e5;">
-                        <div style="font-weight: bold;">👑 Admin:</div>
-                        <div>• Ümumi satış: ${adminTotal.toFixed(2)} AZN</div>
-                        <div>• POS Terminal: ${adminPos.toFixed(2)} AZN</div>
-                        <div>• Kassa aparatına vurulan: ${adminCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: ${adminAd.toFixed(2)} AZN</div>
-                    </div>
-
-                    <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
-                        Ümumi mağaza satışı: ${totalAmountVal.toFixed(2)} AZN<br>
-                        Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN<br>
-                        <span style="color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</span>
-                    </div>
-                </div>
-            `;
-
-            currentDayEndSummaryHtml = listHtml + summaryHtml;
-            document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
-
-            try {
-                await _supabase.from('day_end_archive').upsert([{ 
-                    report_date: targetDateStr, 
-                    content_summary: currentDayEndSummaryHtml 
-                }], { onConflict: 'report_date' });
-                alert('Məlumatlar uğurla yadda saxlanıldı!');
-                await loadDataFromCloud();
-            } catch(err) {
-                alert('Yadda saxlama zamanı xəta: ' + err.message);
-            }
-        }
-
         function checkNewOrdersBlinking() {
             if(!role) return;
             let ordersBtn = document.getElementById('ordersBtn');
@@ -3617,17 +3469,12 @@
             let datePicker = document.getElementById('dayEndDatePicker');
             if(datePicker) datePicker.value = nowStr;
             
-            if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
-
             buildDayEndReportForDate(nowStr);
             document.getElementById('dayEndModal').classList.remove('hidden-screen');
         }
 
         function onDayEndDatePickerChange() {
             let selectedDate = document.getElementById('dayEndDatePicker').value;
-            
-            if(document.getElementById('manualNotebookFile')) document.getElementById('manualNotebookFile').value = '';
-
             if(selectedDate) {
                 buildDayEndReportForDate(selectedDate);
             }
@@ -3637,7 +3484,7 @@
             currentDayEndReportDate = targetDateStr;
 
             let foundArchive = dayEndArchive.find(item => String(item.report_date) === targetDateStr);
-            if(foundArchive && foundArchive.content_summary && targetDateStr !== '2026-11-10') {
+            if(foundArchive && foundArchive.content_summary) {
                 currentDayEndSummaryHtml = foundArchive.content_summary;
                 document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
                 return;
@@ -3645,105 +3492,23 @@
 
             let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
             
-            let seherTotal = 0, seherAd = 0, seherCash = 0, seherPos = 0;
-            let gunortaTotal = 0, gunortaAd = 0, gunortaCash = 0, gunortaPos = 0;
-            let adminTotal = targetDateStr === '2026-11-10' ? 50 : 0;
-            let adminAd = targetDateStr === '2026-11-10' ? 18 : 0;
-            let adminCash = targetDateStr === '2026-11-10' ? 50 : 0;
-            let adminPos = 0;
-            let totalPosSum = 0;
-            let totalCashRegSum = targetDateStr === '2026-11-10' ? 50 : 0;
-
-            if (targetDateStr !== '2026-11-10') {
-                targetSales.forEach((s) => {
-                    let price = Number(s.total_price || 0);
-                    if(s.payType === 'POS Terminal') totalPosSum += price;
-                    if(s.toCashRegister) totalCashRegSum += price;
-
-                    if(s.shift_name === 'SEHER') {
-                        seherTotal += price;
-                        if(s.fromAd) seherAd += price;
-                        if(s.toCashRegister) seherCash += price;
-                        if(s.payType === 'POS Terminal') seherPos += price;
-                    } else if(s.shift_name === 'GUNORTA') {
-                        gunortaTotal += price;
-                        if(s.fromAd) gunortaAd += price;
-                        if(s.toCashRegister) gunortaCash += price;
-                        if(s.payType === 'POS Terminal') gunortaPos += price;
-                    } else {
-                        adminTotal += price;
-                        if(s.fromAd) adminAd += price;
-                        if(s.toCashRegister) adminCash += price;
-                        if(s.payType === 'POS Terminal') adminPos += price;
-                    }
-                });
-            }
-
             let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
-            if (targetDateStr === '2026-11-10') {
-                listHtml += `
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">1. [Admin] Lattafa Teriaq İntense - 2.5 qr - 7 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">2. [Admin] Lattafa Kamrah - 2 qr - 6 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">3. [Admin] Molecule 02 (Black) - 5 qr - 15 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">4. [Admin] Lattafa Teriaq İntense - 1.5 qr - 4 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">5. [Admin] Ajmal Qafie 2 - 2 qr - 5 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">6. [Admin] Hermess - 2 qr - 3 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">7. [Admin] Luis Vuitton İmagination - 3.5 qr - 10 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                `;
-            } else {
-                targetSales.forEach((s, idx) => {
-                    let p = products.find(x => x.id == s.product_id);
-                    let price = Number(s.total_price || 0);
-                    let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
-                    let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
-                    let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
+            targetSales.forEach((s, idx) => {
+                let p = products.find(x => x.id == s.product_id);
+                let price = Number(s.total_price || 0);
+                let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
+                let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
+                let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
 
-                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
-                });
-            }
+                listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
+            });
 
-            if(targetSales.length === 0 && targetDateStr !== '2026-11-10') {
+            if(targetSales.length === 0) {
                 listHtml += `<div style="color: #666; padding: 10px 0;">Bu tarixə aid satış qeydə alınmayıb.</div>`;
             }
 
-            let totalAmountVal = seherTotal + gunortaTotal + adminTotal;
-
-            let summaryHtml = `
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; color: #000; font-size: 12px; line-height: 1.5;">
-                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
-                        <div style="font-weight: bold;">☀️ Səhər smeni:</div>
-                        <div>• Ümumi satış: ${seherTotal.toFixed(2)} AZN</div>
-                        <div>• POS Terminal: ${seherPos.toFixed(2)} AZN</div>
-                        <div>• Kassa aparatına vurulan: ${seherCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: ${seherAd.toFixed(2)} AZN</div>
-                    </div>
-
-                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
-                        <div style="font-weight: bold;">🌙 Günorta smeni:</div>
-                        <div>• Ümumi satış: ${gunortaTotal.toFixed(2)} AZN</div>
-                        <div>• POS Terminal: ${gunortaPos.toFixed(2)} AZN</div>
-                        <div>• Kassa aparatına vurulan: ${gunortaCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: ${gunortaAd.toFixed(2)} AZN</div>
-                    </div>
-
-                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 8px; border: 1px solid #e5e5e5;">
-                        <div style="font-weight: bold;">👑 Admin:</div>
-                        <div>• Ümumi satış: ${adminTotal.toFixed(2)} AZN</div>
-                        <div>• POS Terminal: ${adminPos.toFixed(2)} AZN</div>
-                        <div>• Kassa aparatına vurulan: ${adminCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: ${adminAd.toFixed(2)} AZN</div>
-                    </div>
-
-                    <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
-                        Ümumi mağaza satışı: ${totalAmountVal.toFixed(2)} AZN<br>
-                        Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN<br>
-                        <span style="color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</span>
-                    </div>
-                </div>
-            `;
-
-            currentDayEndSummaryHtml = listHtml + summaryHtml;
+            currentDayEndSummaryHtml = listHtml;
             document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
         }
 
@@ -3868,4 +3633,3 @@
         }
     </script>
 </html>
- 
