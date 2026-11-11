@@ -75,20 +75,35 @@
         <div id="whoAreYouModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
             <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
                 <h2 class="text-lg font-bold gold-text">Sən kimsən?</h2>
-                <input type="text" id="manualNameInput" placeholder="Adınızı daxil edin..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs text-center">
                 
-                <div class="flex justify-center items-center space-x-6 text-xs pt-2">
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="radio" name="genderRadio" id="genderMale" value="Kişi" checked class="w-4 h-4 accent-amber-500">
-                        <span>Kişi 👨</span>
-                    </label>
-                    <label class="flex items-center space-x-2 cursor-pointer">
-                        <input type="radio" name="genderRadio" id="genderFemale" value="Qadın" class="w-4 h-4 accent-amber-500">
-                        <span>Qadın 👩</span>
-                    </label>
+                <!-- ADMIN ÜÇÜN SEÇİM (Sənan / Rasim) -->
+                <div id="adminWhoContainer" class="hidden-screen space-y-2">
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="selectAdminName('Sənan Abbas 👑', 'Kişi')" class="bg-zinc-800 hover:bg-amber-500/20 border border-amber-500/50 p-3 rounded-lg text-amber-400 font-bold text-xs">
+                            Sənan Abbas 👑
+                        </button>
+                        <button type="button" onclick="selectAdminName('Rasim Əsgərzadə 🌕', 'Kişi')" class="bg-zinc-800 hover:bg-amber-500/20 border border-amber-500/50 p-3 rounded-lg text-amber-400 font-bold text-xs">
+                            Rasim Əsgərzadə 🌕
+                        </button>
+                    </div>
                 </div>
 
-                <button onclick="submitWhoAreYou()" class="w-full gold-bg font-bold py-2.5 rounded-lg text-xs mt-2">Davam Et 🚀</button>
+                <!-- SATICI ÜÇÜN ƏLLƏ YAZMA VƏ CİNS SEÇİMİ -->
+                <div id="saticiWhoContainer" class="hidden-screen space-y-3">
+                    <input type="text" id="manualNameInput" placeholder="Adınızı daxil edin..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs text-center">
+                    
+                    <div class="flex justify-center items-center space-x-6 text-xs pt-1">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="genderRadio" id="genderMale" value="Kişi" class="w-4 h-4 accent-amber-500">
+                            <span>Kişi 👨</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="genderRadio" id="genderFemale" value="Qadın" checked class="w-4 h-4 accent-amber-500">
+                            <span>Qadın 👩</span>
+                        </label>
+                    </div>
+                    <button onclick="submitSaticiWho()" class="w-full gold-bg font-bold py-2.5 rounded-lg text-xs mt-2">Davam Et 🚀</button>
+                </div>
             </div>
         </div>
 
@@ -2508,20 +2523,24 @@
             if(pin === '0810') {
                 role = 'ADMIN';
                 shiftType = '';
-                document.getElementById('manualNameInput').value = 'Sənan';
-                document.getElementById('genderMale').checked = true;
+                document.getElementById('adminWhoContainer').classList.remove('hidden-screen');
+                document.getElementById('saticiWhoContainer').classList.add('hidden-screen');
                 document.getElementById('whoAreYouModal').classList.remove('hidden-screen');
             } else if(pin === '1') {
                 role = 'SATICI';
                 shiftType = 'SEHER';
                 document.getElementById('manualNameInput').value = '';
                 document.getElementById('genderFemale').checked = true;
+                document.getElementById('adminWhoContainer').classList.add('hidden-screen');
+                document.getElementById('saticiWhoContainer').classList.remove('hidden-screen');
                 document.getElementById('whoAreYouModal').classList.remove('hidden-screen');
             } else if(pin === '2') {
                 role = 'SATICI';
                 shiftType = 'GUNORTA';
                 document.getElementById('manualNameInput').value = '';
                 document.getElementById('genderFemale').checked = true;
+                document.getElementById('adminWhoContainer').classList.add('hidden-screen');
+                document.getElementById('saticiWhoContainer').classList.remove('hidden-screen');
                 document.getElementById('whoAreYouModal').classList.remove('hidden-screen');
             } else {
                 document.getElementById('loginError').classList.remove('hidden-screen');
@@ -2529,7 +2548,16 @@
             }
         }
 
-        function submitWhoAreYou() {
+        function selectAdminName(name, gender) {
+            currentUserName = name;
+            currentUserGender = gender;
+            localStorage.setItem('melodika_user_name', currentUserName);
+            localStorage.setItem('melodika_user_gender', currentUserGender);
+            document.getElementById('whoAreYouModal').classList.add('hidden-screen');
+            finalizeLogin();
+        }
+
+        function submitSaticiWho() {
             let nameVal = document.getElementById('manualNameInput').value.trim();
             if(!nameVal) { alert('Zəhmət olmasa adınızı yazın!'); return; }
 
@@ -2571,7 +2599,7 @@
                 if(adminYearlySummarySection) adminYearlySummarySection.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 
-                document.getElementById('roleTitle').textContent = `Salam, ${currentUserName || 'Sənan'} ${titleSuffix}! 💥`;
+                document.getElementById('roleTitle').textContent = `Salam, ${currentUserName}! 💥`;
                 setOperationalState(true);
                 updateAdminYearlySummaryValues();
             } else {
