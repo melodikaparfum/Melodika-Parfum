@@ -983,7 +983,7 @@
                     <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                 </div>
 
-                <!-- BURA ŞƏKİLDƏ GÖSTƏRDİYİNİZ KİMİ AĞ FONA VƏ QARA HƏRFLƏRƏ TƏNZİMLƏNDİ -->
+                <!-- BURA ŞƏKİLDƏ GÖSTƏRDİYİNİZ KİMİ AĞ FONA VƏ QARA HƏRflərə TƏNZİMLƏNDİ -->
                 <div id="dayEndPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 text-sm font-sans shadow-lg border border-zinc-200">
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans text-black"></div>
                 </div>
@@ -1914,7 +1914,7 @@
             filteredExp.forEach((e, idx) => {
                 let pAmt = Number(e.amount || 0);
                 totalAmount += pAmt;
-                itemsListHtml += `<div style="border-bottom: 1px solid #ddd; padding: 6px 0; font-size: 13px;">${idx + 1}. ${e.expense_date} — Xərcin adı - ${e.title} : Məbəği: <strong>${pAmt.toFixed(2)} manat</strong></div>`;
+                itemsListHtml += `<div style="border-bottom: 1px solid #ddd; padding: 6px 0; font-size: 13px; color: #000;">${idx + 1}. ${e.expense_date} — Xərcin adı - ${e.title} : Məbəği: <strong>${pAmt.toFixed(2)} manat</strong></div>`;
             });
 
             tempDiv.innerHTML = `
@@ -2342,9 +2342,9 @@
 
                 html += `
                     <tr>
-                        <td style="padding: 5px; border: 1px solid #000; text-align: center; font-weight: bold;">${day} (${currentDayOfWeek}-ci gün)</td>
-                        <td style="padding: 5px; border: 1px solid #000; text-align: center;">${cellSeher}</td>
-                        <td style="padding: 5px; border: 1px solid #000; text-align: center;">${cellGunorta}</td>
+                        <td style="padding: 5px; border: 1px solid #000; text-align: center; font-weight: bold; color: #000;">${day} (${currentDayOfWeek}-ci gün)</td>
+                        <td style="padding: 5px; border: 1px solid #000; text-align: center; color: #000;">${cellSeher}</td>
+                        <td style="padding: 5px; border: 1px solid #000; text-align: center; color: #000;">${cellGunorta}</td>
                     </tr>
                 `;
 
@@ -3113,7 +3113,7 @@
                             <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <div><strong>${itemCounter}. Xərcin adı - ${e.title || '-'}</strong> (${dayNum} ${monthName})</div>
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <span style="font-weight: bold;">Məbəği: ${amt.toFixed(2)} manat</span>
+                                    <span style="font-weight: bold; color: #000;">Məbəği: ${amt.toFixed(2)} manat</span>
                                     ${receiptBtn}
                                     <button onclick="deleteExpenseRecord(${e.id})" style="color: red; font-size: 11px;" class="no-print">Sil</button>
                                 </div>
