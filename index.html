@@ -1288,7 +1288,6 @@
                 }
             });
 
-            // Noyabr ayının 1-dən 9-dək olan məbləğləri yalnız 2026-cı il Noyabr ayı üçün əlavə edirik (618 AZN)
             let manualNov1to9Sales = 618;
             totalSales2026 += manualNov1to9Sales;
             totalProfit2026 += manualNov1to9Sales; 
@@ -1323,7 +1322,7 @@
                         let sDate = s.date ? String(s.date).substring(0, 4) : '';
                         if(sDate === '2026' && s.type === 'MEXARIC') grossProfit += Number(s.profit || 0);
                     });
-                    grossProfit += 618; // Noyabr 1-9 əlavəsi
+                    grossProfit += 618;
 
                     let totalExp = 0;
                     expenses.forEach(e => {
@@ -2651,7 +2650,7 @@
                 } catch(e) {}
             }
 
-            // Mövcud sistem satışlarını da alaraq hər ikisini alt-alta birləşdiririk
+            // 10 noyabr (2026-11-10) üçün şəkildəki sətri satışları və dəftər məlumatlarını səliqəli şəkildə alt-alta yazırıq
             let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
             let totalAmount = manualAmount;
             
@@ -2660,20 +2659,25 @@
             let adminTotal = 0, adminAd = 0, adminCash = 0, adminPos = 0;
             let totalPosSum = 0, totalCashRegSum = 0;
 
-            let listHtml = `<div style="font-weight: bold; margin-bottom: 8px; color: #000;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
+            let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
-            if(imageUrl || manualAmount > 0) {
+            // Əgər 10 noyabrdırsa və bazada həmin günə satış yoxdursa və ya şəkildəki satışları bərpa etmək lazımdırsa:
+            if (targetDateStr === '2026-11-10' && targetSales.length === 0) {
+                // Şəkildəki 7 ədəd satış qeydini bərpa edirik
                 listHtml += `
-                    <div style="background: #f4f4f4; padding: 8px; margin-bottom: 10px; border-left: 3px solid #d4af37; color: #000;">
-                        <div>📖 <strong>Dəftər / Şəkil Qeydi</strong></div>
-                        ${manualAmount > 0 ? `<div style="margin-top: 4px; font-weight: bold; font-size: 13px; color: #000;">Əlavə məbləğ: ${manualAmount.toFixed(2)} AZN</div>` : ''}
-                        ${imageUrl ? `<div style="margin-top: 6px;"><img src="${imageUrl}" style="max-height: 250px; border-radius: 4px; border: 1px solid #ccc;" alt="Dəftər şəkli"></div>` : ''}
-                    </div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">1. [Admin] Lattafa Teriaq Intense - 2.5 qr - 7 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">2. [Admin] Lattafa Kamrah - 2 qr - 6 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">3. [Admin] Molecule 02 (Black) - 5 qr - 15 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">4. [Admin] Lattafa Teriaq Intense - 1.5 qr - 4 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">5. [Admin] Ajmal Qafie 2 - 2 qr - 5 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">6. [Admin] Hermess - 2 qr - 3 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">7. [Admin] Louis Vuitton Imagination - 3.5 qr - 10 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
                 `;
-            }
-
-            if(targetSales.length > 0) {
-                listHtml += `<div style="font-weight: bold; margin-top: 10px; margin-bottom: 4px; color: #000;">Sistem Üzrə Satışlar:</div>`;
+                totalAmount += 50; // 7+6+15+4+5+3+10 = 50 AZN
+                adminTotal += 50;
+                totalCashRegSum += 50;
+                adminCash += 50;
+            } else {
                 targetSales.forEach((s, idx) => {
                     let p = products.find(x => x.id == s.product_id);
                     let price = Number(s.total_price || 0);
@@ -2703,32 +2707,52 @@
                     let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
                     let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
 
-                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — <span style="font-size: 11px; color: #333;">${adInfo}, ${cashInfo}</span></div>`;
+                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
                 });
-            } else if(manualAmount === 0 && !imageUrl) {
-                listHtml += `<div style="color: #666; padding: 10px 0;">Seçilmiş tarixə aid məlumat yoxdur.</div>`;
+            }
+
+            if(imageUrl || manualAmount > 0) {
+                totalAmount += manualAmount;
+                listHtml += `
+                    <div style="background: #f4f4f4; padding: 8px; margin-top: 10px; margin-bottom: 10px; border-left: 3px solid #d4af37; color: #000;">
+                        <div>📖 <strong>Dəftər / Şəkil Qeydi</strong></div>
+                        ${manualAmount > 0 ? `<div style="margin-top: 4px; font-weight: bold; font-size: 13px; color: #000;">Əlavə məbləğ: ${manualAmount.toFixed(2)} AZN</div>` : ''}
+                        ${imageUrl ? `<div style="margin-top: 6px;"><img src="${imageUrl}" style="max-height: 250px; border-radius: 4px; border: 1px solid #ccc;" alt="Dəftər şəkli"></div>` : ''}
+                    </div>
+                `;
             }
             
             let summaryHtml = `
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; text-align: right; font-weight: bold; color: #000; font-size: 12px; line-height: 1.5;">
-                    ${targetSales.length > 0 ? `
-                    <div style="background: #f4f4f4; padding: 4px; margin-bottom: 4px; text-align: left; color: #000;">
-                        <div>☀️ Səhər smeni:</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Ümumi satış: ${seherTotal.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• POS Terminal: ${seherPos.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Kassa aparatına vurulan: ${seherCash.toFixed(2)} AZN</div>
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; color: #000; font-size: 12px; line-height: 1.5;">
+                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
+                        <div style="font-weight: bold;">☀️ Səhər smeni:</div>
+                        <div>• Ümumi satış: ${seherTotal.toFixed(2)} AZN</div>
+                        <div>• POS Terminal: ${seherPos.toFixed(2)} AZN</div>
+                        <div>• Kassa aparatına vurulan: ${seherCash.toFixed(2)} AZN</div>
+                        <div>• Reklam: ${seherAd.toFixed(2)} AZN</div>
                     </div>
 
-                    <div style="background: #f4f4f4; padding: 4px; margin-bottom: 6px; text-align: left; color: #000;">
-                        <div>🌙 Günorta smeni:</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Ümumi satış: ${gunortaTotal.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• POS Terminal: ${gunortaPos.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Kassa aparatına vurulan: ${gunortaCash.toFixed(2)} AZN</div>
-                    </div>` : ''}
+                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
+                        <div style="font-weight: bold;">🌙 Günorta smeni:</div>
+                        <div>• Ümumi satış: ${gunortaTotal.toFixed(2)} AZN</div>
+                        <div>• POS Terminal: ${gunortaPos.toFixed(2)} AZN</div>
+                        <div>• Kassa aparatına vurulan: ${gunortaCash.toFixed(2)} AZN</div>
+                        <div>• Reklam: ${gunortaAd.toFixed(2)} AZN</div>
+                    </div>
 
-                    <div style="border-top: 1px solid #000; padding-top: 4px; font-size: 13px; color: #000;">Ümumi yekun məbləğ (Dəftər + Sistem): ${totalAmount.toFixed(2)} AZN</div>
-                    ${totalPosSum > 0 ? `<div style="font-size: 12px; color: #1e3a8a;">Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN</div>` : ''}
-                    ${totalCashRegSum > 0 ? `<div style="font-size: 12px; color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</div>` : ''}
+                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 8px; border: 1px solid #e5e5e5;">
+                        <div style="font-weight: bold;">👑 Admin:</div>
+                        <div>• Ümumi satış: ${adminTotal.toFixed(2)} AZN</div>
+                        <div>• POS Terminal: ${adminPos.toFixed(2)} AZN</div>
+                        <div>• Kassa aparatına vurulan: ${adminCash.toFixed(2)} AZN</div>
+                        <div>• Reklam: 18.00 AZN</div>
+                    </div>
+
+                    <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
+                        Ümumi mağaza satışlı: ${totalAmount.toFixed(2)} AZN<br>
+                        Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN<br>
+                        <span style="color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</span>
+                    </div>
                 </div>
             `;
 
@@ -2740,7 +2764,7 @@
                     report_date: targetDateStr, 
                     content_summary: currentDayEndSummaryHtml 
                 }], { onConflict: 'report_date' });
-                alert('Məlumatlar və şəkil uğurla birləşdirilərək yadda saxlanıldı!');
+                alert('10 noyabr satışları və məlumatlar istədiyin formatda uğurla birləşdirilərək yadda saxlanıldı!');
                 await loadDataFromCloud();
             } catch(err) {
                 alert('Yadda saxlama zamanı xəta: ' + err.message);
@@ -3619,7 +3643,7 @@
             currentDayEndReportDate = targetDateStr;
 
             let foundArchive = dayEndArchive.find(item => String(item.report_date) === targetDateStr);
-            if(foundArchive && foundArchive.content_summary) {
+            if(foundArchive && foundArchive.content_summary && targetDateStr !== '2026-11-10') {
                 currentDayEndSummaryHtml = foundArchive.content_summary;
                 document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
                 return;
@@ -3633,12 +3657,25 @@
             let adminTotal = 0, adminAd = 0, adminCash = 0, adminPos = 0;
             let totalPosSum = 0, totalCashRegSum = 0;
 
-            let listHtml = `<div style="font-weight: bold; margin-bottom: 8px; color: #000;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
+            let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
-            if(targetSales.length === 0) {
+            if (targetDateStr === '2026-11-10') {
+                listHtml += `
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">1. [Admin] Lattafa Teriaq Intense - 2.5 qr - 7 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">2. [Admin] Lattafa Kamrah - 2 qr - 6 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">3. [Admin] Molecule 02 (Black) - 5 qr - 15 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">4. [Admin] Lattafa Teriaq Intense - 1.5 qr - 4 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">5. [Admin] Ajmal Qafie 2 - 2 qr - 5 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">6. [Admin] Hermess - 2 qr - 3 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
+                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">7. [Admin] Louis Vuitton Imagination - 3.5 qr - 10 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
+                `;
+                totalAmount += 50;
+                adminTotal += 50;
+                totalCashRegSum += 50;
+                adminCash += 50;
+            } else if(targetSales.length === 0) {
                 listHtml += `<div style="color: #666; padding: 10px 0;">Seçilmiş tarixə aid sistem satışı qeydə alınmayıb.</div>`;
             } else {
-                listHtml += `<div style="font-weight: bold; margin-bottom: 4px; color: #000;">Sistem Üzrə Satışlar:</div>`;
                 targetSales.forEach((s, idx) => {
                     let p = products.find(x => x.id == s.product_id);
                     let price = Number(s.total_price || 0);
@@ -3668,30 +3705,41 @@
                     let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
                     let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
 
-                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — <span style="font-size: 11px; color: #333;">${adInfo}, ${cashInfo}</span></div>`;
+                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
                 });
             }
             
             let summaryHtml = `
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; text-align: right; font-weight: bold; color: #000; font-size: 12px; line-height: 1.5;">
-                    ${targetSales.length > 0 ? `
-                    <div style="background: #f4f4f4; padding: 4px; margin-bottom: 4px; text-align: left; color: #000;">
-                        <div>☀️ Səhər smeni:</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Ümumi satış: ${seherTotal.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• POS Terminal: ${seherPos.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Kassa aparatına vurulan: ${seherCash.toFixed(2)} AZN</div>
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 2px solid #000; color: #000; font-size: 12px; line-height: 1.5;">
+                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
+                        <div style="font-weight: bold;">☀️ Səhər smeni:</div>
+                        <div>• Ümumi satış: ${seherTotal.toFixed(2)} AZN</div>
+                        <div>• POS Terminal: ${seherPos.toFixed(2)} AZN</div>
+                        <div>• Kassa aparatına vurulan: ${seherCash.toFixed(2)} AZN</div>
+                        <div>• Reklam: ${seherAd.toFixed(2)} AZN</div>
                     </div>
 
-                    <div style="background: #f4f4f4; padding: 4px; margin-bottom: 6px; text-align: left; color: #000;">
-                        <div>🌙 Günorta smeni:</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Ümumi satış: ${gunortaTotal.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• POS Terminal: ${gunortaPos.toFixed(2)} AZN</div>
-                        <div style="padding-left: 10px; font-weight: normal; color: #000;">• Kassa aparatına vurulan: ${gunortaCash.toFixed(2)} AZN</div>
-                    </div>` : ''}
+                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 4px; border: 1px solid #e5e5e5;">
+                        <div style="font-weight: bold;">🌙 Günorta smeni:</div>
+                        <div>• Ümumi satış: ${gunortaTotal.toFixed(2)} AZN</div>
+                        <div>• POS Terminal: ${gunortaPos.toFixed(2)} AZN</div>
+                        <div>• Kassa aparatına vurulan: ${gunortaCash.toFixed(2)} AZN</div>
+                        <div>• Reklam: ${gunortaAd.toFixed(2)} AZN</div>
+                    </div>
 
-                    <div style="border-top: 1px solid #000; padding-top: 4px; font-size: 13px; color: #000;">Ümumi satış: ${totalAmount.toFixed(2)} AZN</div>
-                    ${totalPosSum > 0 ? `<div style="font-size: 12px; color: #1e3a8a;">Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN</div>` : ''}
-                    ${totalCashRegSum > 0 ? `<div style="font-size: 12px; color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</div>` : ''}
+                    <div style="background: #f9f9f9; padding: 6px; margin-bottom: 8px; border: 1px solid #e5e5e5;">
+                        <div style="font-weight: bold;">👑 Admin:</div>
+                        <div>• Ümumi satış: ${adminTotal.toFixed(2)} AZN</div>
+                        <div>• POS Terminal: ${adminPos.toFixed(2)} AZN</div>
+                        <div>• Kassa aparatına vurulan: ${adminCash.toFixed(2)} AZN</div>
+                        <div>• Reklam: ${targetDateStr === '2026-11-10' ? '18.00' : adminAd.toFixed(2)} AZN</div>
+                    </div>
+
+                    <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
+                        Ümumi mağaza satışlı: ${totalAmount.toFixed(2)} AZN<br>
+                        Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN<br>
+                        <span style="color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</span>
+                    </div>
                 </div>
             `;
 
