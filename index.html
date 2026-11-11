@@ -9,11 +9,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { background-color: #ffffff; color: #111827; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
-        .gold-border { border-color: #d4af37; }
-        .gold-text { color: #b8860b; }
-        .gold-bg { background-color: #d4af37; color: #000; }
-        .gold-bg:hover { background-color: #b9972a; }
+        /* BÜTÜN SƏHİFƏLƏR ÜÇÜN QARA DİZAYN */
+        body { background-color: #000000 !important; color: #ffffff !important; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        .gold-border { border-color: #d4af37 !important; }
+        .gold-text { color: #d4af37 !important; }
+        .gold-bg { background-color: #d4af37 !important; color: #000 !important; }
+        .gold-bg:hover { background-color: #b9972a !important; }
         .hidden-screen { display: none !important; }
         
         .disabled-section {
@@ -22,12 +23,28 @@
             filter: grayscale(100%);
         }
 
-        /* NÖVBƏ BAĞLI OLDUQDA ÜST DÜYMƏLƏRİN BLOKLANMASI ÜÇÜN */
         .disabled-nav-item {
             opacity: 0.3 !important;
             pointer-events: none !important;
             filter: grayscale(100%);
             cursor: not-allowed !important;
+        }
+
+        /* QARA FON ÜÇÜN ELEMENTLƏRİN UYĞUNLAŞDIRILMASI */
+        .card-dark, div[class*="bg-white"], div[class*="bg-zinc-50"], header, .bg-white, .bg-zinc-50 {
+            background-color: #121212 !important;
+            color: #ffffff !important;
+            border-color: #333333 !important;
+        }
+
+        input, select, textarea {
+            background-color: #1a1a1a !important;
+            color: #ffffff !important;
+            border-color: #444444 !important;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: #888888 !important;
         }
 
         @keyframes pulse-glow {
@@ -47,58 +64,58 @@
         }
     </style>
 </head>
-<body id="appBody" class="p-4 bg-white text-zinc-900">
+<body id="appBody" class="p-4 bg-black text-white">
     <div class="max-w-4xl mx-auto space-y-4">
         
         <!-- STATUS QUTUSU -->
-        <div id="debugBox" class="bg-zinc-100 border border-amber-600 p-3 rounded-xl text-xs text-amber-800 font-mono no-print shadow-sm">
+        <div id="debugBox" class="bg-[#121212] border border-amber-600 p-3 rounded-xl text-xs text-amber-400 font-mono no-print shadow-sm">
             Status: Bulud bazasına qoşulur...
         </div>
 
         <!-- GİRİŞ EKRANI -->
-        <div id="loginScreen" class="bg-white border border-amber-500/40 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-xl no-print space-y-4 text-zinc-900">
+        <div id="loginScreen" class="bg-[#121212] border border-amber-500/40 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-xl no-print space-y-4 text-white">
             <h1 class="text-2xl font-bold gold-text">MELODİKA PARFUM</h1>
             
             <div class="space-y-2">
-                <div class="bg-amber-500/10 border border-amber-500/40 p-3 rounded-lg text-xs text-amber-900 font-medium leading-relaxed">
+                <div class="bg-amber-500/10 border border-amber-500/40 p-3 rounded-lg text-xs text-amber-300 font-medium leading-relaxed">
                     💥 <strong>Xüsusi Kampaniya:</strong> 2 ədəd hazır (upakovka) ətir alana, 1 ədəd və 3 ədəd ətir qablaşdırılması hədiyyə!
                 </div>
-                <div class="bg-amber-500/10 border border-amber-500/40 p-3 rounded-lg text-xs text-amber-900 font-medium leading-relaxed">
+                <div class="bg-amber-500/10 border border-amber-500/40 p-3 rounded-lg text-xs text-amber-300 font-medium leading-relaxed">
                     🎉 <strong>Ad Günü Kampaniyası:</strong> Əlavə olaraq, bütün mallara, 1 yaşımız münasibəti ilə 40% endirim tətbiq edilmişdir 😎
                 </div>
             </div>
 
-            <input type="password" id="pinInput" placeholder="PİN Kod" class="w-full text-center text-xl bg-zinc-50 border border-zinc-300 p-3 rounded-lg text-zinc-900 focus:outline-none focus:border-amber-600">
+            <input type="password" id="pinInput" placeholder="PİN Kod" class="w-full text-center text-xl bg-[#1a1a1a] border border-zinc-700 p-3 rounded-lg text-white focus:outline-none focus:border-amber-600">
             <button onclick="login()" class="w-full gold-bg font-bold py-3 rounded-lg shadow">Daxil Ol</button>
-            <p id="loginError" class="text-red-600 text-sm hidden-screen">Yanlış PİN kod!</p>
+            <p id="loginError" class="text-red-500 text-sm hidden-screen">Yanlış PİN kod!</p>
             
-            <div class="border-t border-zinc-200 pt-3">
-                <button onclick="openCustomerCatalog()" class="w-full bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-500/50 font-bold py-2.5 rounded-lg text-sm shadow-sm">
+            <div class="border-t border-zinc-800 pt-3">
+                <button onclick="openCustomerCatalog()" class="w-full bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-500/50 font-bold py-2.5 rounded-lg text-sm shadow-sm">
                     Müştəri Kataloqu / Sifariş Et 🛍️
                 </button>
             </div>
         </div>
 
         <!-- AD / KİM OLDUĞUNU YAZMA MODALI -->
-        <div id="whoAreYouModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 flex items-center justify-center z-50">
-            <div class="max-w-sm w-full bg-white border border-amber-500 p-6 rounded-xl space-y-4 text-center shadow-2xl text-zinc-900">
+        <div id="whoAreYouModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 flex items-center justify-center z-50">
+            <div class="max-w-sm w-full bg-[#121212] border border-amber-500 p-6 rounded-xl space-y-4 text-center shadow-2xl text-white">
                 <h2 class="text-lg font-bold gold-text">Sən kimsən?</h2>
                 
                 <div id="adminWhoContainer" class="hidden-screen space-y-2">
                     <div class="grid grid-cols-2 gap-2">
-                        <button type="button" onclick="selectAdminName('Sənan Abbas 👑', 'Kişi')" class="bg-zinc-100 hover:bg-zinc-200 border border-amber-500 p-3 rounded-lg text-amber-900 font-bold text-xs">
+                        <button type="button" onclick="selectAdminName('Sənan Abbas 👑', 'Kişi')" class="bg-[#1a1a1a] hover:bg-zinc-800 border border-amber-500 p-3 rounded-lg text-amber-400 font-bold text-xs">
                             Sənan Abbas 👑
                         </button>
-                        <button type="button" onclick="selectAdminName('Rasim Əsgərzadə 🌕', 'Kişi')" class="bg-zinc-100 hover:bg-zinc-200 border border-amber-500 p-3 rounded-lg text-amber-900 font-bold text-xs">
+                        <button type="button" onclick="selectAdminName('Rasim Əsgərzadə 🌕', 'Kişi')" class="bg-[#1a1a1a] hover:bg-zinc-800 border border-amber-500 p-3 rounded-lg text-amber-400 font-bold text-xs">
                             Rasim Əsgərzadə 🌕
                         </button>
                     </div>
                 </div>
 
                 <div id="saticiWhoContainer" class="hidden-screen space-y-3">
-                    <input type="text" id="manualNameInput" placeholder="Adınızı daxil edin..." class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-xs text-center focus:outline-none focus:border-amber-600">
+                    <input type="text" id="manualNameInput" placeholder="Adınızı daxil edin..." class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-xs text-center focus:outline-none focus:border-amber-600">
                     
-                    <div class="flex justify-center items-center space-x-6 text-xs pt-1 text-zinc-700">
+                    <div class="flex justify-center items-center space-x-6 text-xs pt-1 text-zinc-300">
                         <label class="flex items-center space-x-2 cursor-pointer font-medium">
                             <input type="radio" name="genderRadio" id="genderMale" value="Kişi" class="w-4 h-4 accent-amber-600">
                             <span>Kişi 👨</span>
@@ -114,25 +131,25 @@
         </div>
 
         <!-- MÜŞTƏRİ KATALOQ VƏ SİFARİŞ EKRANI -->
-        <div id="customerScreen" class="hidden-screen space-y-4 bg-white border border-amber-500/40 p-4 rounded-xl text-zinc-900 shadow-xl">
-            <header class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="customerScreen" class="hidden-screen space-y-4 bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-white shadow-xl">
+            <header class="flex justify-between items-center border-b border-zinc-800 pb-3">
                 <h1 class="text-base font-bold gold-text">MELODİKA — MÜŞTƏRİ KATALOQU</h1>
-                <button onclick="closeCustomerCatalog()" class="text-xs bg-zinc-100 hover:bg-zinc-200 text-zinc-700 border border-zinc-300 px-3 py-1.5 rounded font-bold">Girişə Qayıt</button>
+                <button onclick="closeCustomerCatalog()" class="text-xs bg-[#1a1a1a] hover:bg-zinc-800 text-zinc-300 border border-zinc-700 px-3 py-1.5 rounded font-bold">Girişə Qayıt</button>
             </header>
 
             <div class="space-y-2">
-                <div class="bg-amber-500/15 border-2 border-amber-500 p-3 rounded-xl text-center text-xs text-amber-900 font-bold shadow-md">
+                <div class="bg-amber-500/15 border-2 border-amber-500 p-3 rounded-xl text-center text-xs text-amber-300 font-bold shadow-md">
                     💥 2 ədəd hazır (upakovka) ətir alana, 1 ədəd və 3 ədəd ətir qablaşdırılması hədiyyə!
                 </div>
-                <div class="bg-amber-500/15 border-2 border-amber-500 p-3 rounded-xl text-center text-xs text-amber-900 font-bold shadow-md">
+                <div class="bg-amber-500/15 border-2 border-amber-500 p-3 rounded-xl text-center text-xs text-amber-300 font-bold shadow-md">
                     🎉 Bütün mallara, 1 yaşımız münasibəti ilə 40% endirim tətbiq edilmişdir 😎
                 </div>
             </div>
 
-            <div class="bg-zinc-50 border-2 border-amber-500 p-4 rounded-xl space-y-3 shadow-md">
+            <div class="bg-[#121212] border-2 border-amber-500 p-4 rounded-xl space-y-3 shadow-md">
                 <div class="flex items-center justify-between border-b border-amber-500/30 pb-2">
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">🌟 İlin Top 3 Seçilən Ətri (Xüsusi Seçim)</h2>
-                    <span class="text-[10px] bg-amber-500/20 text-amber-800 px-2 py-0.5 rounded font-mono font-bold">Top Hit</span>
+                    <span class="text-[10px] bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded font-mono font-bold">Top Hit</span>
                 </div>
                 <div id="topFeaturedContainer" class="grid grid-cols-1 sm:grid-cols-3 gap-3"></div>
             </div>
@@ -140,28 +157,28 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="md:col-span-2 space-y-3">
                     <h2 class="text-sm font-semibold gold-text">Ətirlər və Notlar</h2>
-                    <input type="text" id="customerSearch" oninput="renderCustomerCatalog()" placeholder="Ətir axtar..." class="w-full bg-zinc-50 border border-zinc-300 p-2 rounded text-zinc-900 text-xs mb-2 focus:outline-none focus:border-amber-600">
+                    <input type="text" id="customerSearch" oninput="renderCustomerCatalog()" placeholder="Ətir axtar..." class="w-full bg-[#1a1a1a] border border-zinc-700 p-2 rounded text-white text-xs mb-2 focus:outline-none focus:border-amber-600">
                     <div id="customerProductsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2"></div>
                 </div>
 
-                <div class="bg-zinc-50 border border-zinc-300 p-4 rounded-xl space-y-3 h-fit sticky top-4 shadow-sm">
+                <div class="bg-[#121212] border border-zinc-700 p-4 rounded-xl space-y-3 h-fit sticky top-4 shadow-sm">
                     <h2 class="text-sm font-semibold gold-text">Səbətiniz 🛒</h2>
-                    <div id="cartItemsList" class="space-y-2 text-xs text-zinc-700 max-h-40 overflow-y-auto border-b border-zinc-300 pb-2">
+                    <div id="cartItemsList" class="space-y-2 text-xs text-zinc-300 max-h-40 overflow-y-auto border-b border-zinc-800 pb-2">
                         <span class="text-zinc-500">Səbətiniz boşdur.</span>
                     </div>
                     <div class="text-right font-bold text-sm gold-text" id="cartTotalPrice">Cəmi: 0.00 AZN</div>
 
-                    <div class="space-y-2 pt-2 border-t border-zinc-300 text-xs">
-                        <input type="text" id="custName" placeholder="Adınız və Soyadınız *" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900 focus:outline-none focus:border-amber-600">
-                        <input type="text" id="custPhone" placeholder="Əlaqə Nömrəsi *" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900 focus:outline-none focus:border-amber-600">
+                    <div class="space-y-2 pt-2 border-t border-zinc-800 text-xs">
+                        <input type="text" id="custName" placeholder="Adınız və Soyadınız *" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2 rounded text-white focus:outline-none focus:border-amber-600">
+                        <input type="text" id="custPhone" placeholder="Əlaqə Nömrəsi *" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2 rounded text-white focus:outline-none focus:border-amber-600">
                         
-                        <label class="flex items-center space-x-2 cursor-pointer pt-1 font-medium text-zinc-700">
-                            <input type="checkbox" id="custDelivery" onchange="toggleAddressBox()" class="w-4 h-4 accent-amber-600 rounded bg-white border-zinc-300">
+                        <label class="flex items-center space-x-2 cursor-pointer pt-1 font-medium text-zinc-300">
+                            <input type="checkbox" id="custDelivery" onchange="toggleAddressBox()" class="w-4 h-4 accent-amber-600 rounded bg-[#1a1a1a] border-zinc-700">
                             <span>Çatdırılma istəyirəm</span>
                         </label>
                         
                         <div id="addressBox" class="hidden-screen pt-1">
-                            <textarea id="custAddress" placeholder="Çatdırılma ünvanı..." class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900 h-16 text-xs focus:outline-none focus:border-amber-600"></textarea>
+                            <textarea id="custAddress" placeholder="Çatdırılma ünvanı..." class="w-full bg-[#1a1a1a] border border-zinc-700 p-2 rounded text-white h-16 text-xs focus:outline-none focus:border-amber-600"></textarea>
                         </div>
                     </div>
 
@@ -171,19 +188,19 @@
         </div>
 
         <!-- İLİN SEÇİLƏN ƏTİRLƏRİ ÜÇÜN QRAM/SƏBƏT MODALI -->
-        <div id="featuredModal" class="hidden-screen fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="max-w-sm w-full bg-white border border-amber-500 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
+        <div id="featuredModal" class="hidden-screen fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div class="max-w-sm w-full bg-[#121212] border border-amber-500 p-6 rounded-xl space-y-4 text-white shadow-2xl">
                 <h3 id="featuredModalTitle" class="text-sm font-bold gold-text">Ətiri Səbətə At</h3>
                 <input type="hidden" id="featuredPerfumeId">
                 <input type="hidden" id="featuredPerfumeName">
                 <input type="hidden" id="featuredPerfumePrice">
                 <div class="space-y-2 text-xs">
-                    <label class="text-zinc-600 font-medium">Miqdar daxil edin (qram):</label>
-                    <input type="number" step="1" min="1" id="featuredGramsInput" oninput="calcFeaturedModalTotal()" placeholder="Məs: 10" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-sm focus:outline-none focus:border-amber-600">
+                    <label class="text-zinc-400 font-medium">Miqdar daxil edin (qram):</label>
+                    <input type="number" step="1" min="1" id="featuredGramsInput" oninput="calcFeaturedModalTotal()" placeholder="Məs: 10" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-sm focus:outline-none focus:border-amber-600">
                     <div class="text-right font-bold text-sm gold-text pt-1" id="featuredModalTotalPrice">Yekun: 0.00 AZN</div>
                 </div>
                 <div class="flex space-x-2 pt-2">
-                    <button onclick="closeFeaturedModal()" class="w-1/2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold py-2 rounded text-xs">İmtina</button>
+                    <button onclick="closeFeaturedModal()" class="w-1/2 bg-[#1a1a1a] hover:bg-zinc-800 text-zinc-300 font-bold py-2 rounded text-xs">İmtina</button>
                     <button onclick="addFeaturedToCartConfirmed()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs shadow">Səbətə At</button>
                 </div>
             </div>
@@ -191,44 +208,43 @@
 
         <!-- ƏSAS PANEL (ADMIN / SATICI) -->
         <div id="mainApp" class="hidden-screen space-y-4">
-            <header class="flex flex-wrap justify-between items-center border-b pb-3 gap-2 no-print" id="mainHeaderContainer">
+            <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print" id="mainHeaderContainer">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Mərkəzi 🗂️</button>
                     <button id="adminTopCashBtn" onclick="openCashPinModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Kassa Mərkəzi 💰</button>
                     <button id="adminTopReportsBtn" onclick="openTopReportsModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Hesabatlar Mərkəzi 📊</button>
                     
-                    <!-- Satıcı üçün növbə bağlı olanda bloklanacaq naviqasiya düymələri -->
-                    <button id="navOpsLogBtn" onclick="openOperationsLogModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
-                    <button id="navDayEndBtn" onclick="openDayEndModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
-                    <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
-                    <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
+                    <button id="navOpsLogBtn" onclick="openOperationsLogModal()" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
+                    <button id="navDayEndBtn" onclick="openDayEndModal()" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
+                    <button onclick="openChatModal()" id="chatBtn" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
+                    <button onclick="openOrdersModal()" id="ordersBtn" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
                     
-                    <button onclick="logout()" class="text-xs bg-red-800 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
+                    <button onclick="logout()" class="text-xs bg-red-900 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
                 </div>
             </header>
 
             <!-- 2026 İLLİK İCMAL (YALNIZ ADMIN ÜÇÜN) -->
             <div id="adminYearlySummarySection" class="hidden-screen grid grid-cols-1 sm:grid-cols-3 gap-2 no-print">
-                <button onclick="openYearlyDetailModal('sales')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
-                    <div class="text-[10px] text-blue-100">2026 cı il üzrə toplam satış:</div>
+                <button onclick="openYearlyDetailModal('sales')" class="bg-[#121212] border border-blue-600 hover:bg-zinc-900 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
+                    <div class="text-[10px] text-blue-400">2026 cı il üzrə toplam satış:</div>
                     <div id="summarySalesVal" class="text-sm font-extrabold mt-0.5">0.00 AZN</div>
                 </button>
-                <button onclick="openYearlyDetailModal('profit')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
-                    <div class="text-[10px] text-blue-100">2026 cı il ərzində toplam net gəlir:</div>
+                <button onclick="openYearlyDetailModal('profit')" class="bg-[#121212] border border-blue-600 hover:bg-zinc-900 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
+                    <div class="text-[10px] text-blue-400">2026 cı il ərzində toplam net gəlir:</div>
                     <div id="summaryProfitVal" class="text-sm font-extrabold mt-0.5">0.00 AZN</div>
                 </button>
-                <button onclick="openYearlyDetailModal('expenses')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
-                    <div class="text-[10px] text-blue-100">2026 cı il üzrə toplam xərclər:</div>
+                <button onclick="openYearlyDetailModal('expenses')" class="bg-[#121212] border border-blue-600 hover:bg-zinc-900 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
+                    <div class="text-[10px] text-blue-400">2026 cı il üzrə toplam xərclər:</div>
                     <div id="summaryExpensesVal" class="text-sm font-extrabold mt-0.5">0.00 AZN</div>
                 </button>
             </div>
 
             <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ -->
-            <div id="shiftControlBox" class="bg-white border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print shadow-sm">
-                <div class="text-xs text-zinc-700" id="shiftStatusContainer">
+            <div id="shiftControlBox" class="bg-[#121212] border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print shadow-sm">
+                <div class="text-xs text-zinc-300" id="shiftStatusContainer">
                     <span>Satıcı Növbə Statusu: </span>
-                    <strong id="shiftStatusText" class="text-amber-700 font-mono">Yoxlanılır...</strong>
+                    <strong id="shiftStatusText" class="text-amber-400 font-mono">Yoxlanılır...</strong>
                 </div>
                 <div class="flex items-center space-x-2 w-full sm:w-auto">
                     <button onclick="startShift()" id="startShiftBtn" class="flex-1 sm:flex-none bg-green-700 hover:bg-green-600 text-white font-bold px-3 py-1.5 rounded text-xs">Növbəni Başlat 🟢</button>
@@ -240,116 +256,116 @@
             <div id="operationalContainer" class="space-y-4">
 
                 <!-- MAĞAZA ANALİTİKASI -->
-                <div id="adminAnalyticsSection" class="bg-white border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print shadow-sm">
-                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-200 pb-3">
+                <div id="adminAnalyticsSection" class="bg-[#121212] border border-amber-500/40 p-4 rounded-xl space-y-4 my-4 no-print shadow-sm">
+                    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-zinc-800 pb-3">
                         <h3 class="text-sm font-bold gold-text uppercase">📊 Mağaza Analitikası</h3>
                         
-                        <div class="flex bg-zinc-100 p-1 rounded-lg text-xs space-x-1">
-                            <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">Günlük</button>
-                            <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">Həftəlik</button>
-                            <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">Aylıq</button>
-                            <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">İllik</button>
+                        <div class="flex bg-[#1a1a1a] p-1 rounded-lg text-xs space-x-1">
+                            <button onclick="loadAnalytics('day')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
+                            <button onclick="loadAnalytics('week')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
+                            <button onclick="loadAnalytics('month')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
+                            <button onclick="loadAnalytics('year')" class="px-3 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-3 gap-3 text-center">
-                        <div class="analytics-card bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                            <div class="text-xs text-zinc-500">👀 Baxış Sayı</div>
-                            <div id="stat-visits" class="text-lg font-bold text-zinc-900 mt-1">0</div>
+                        <div class="analytics-card bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                            <div class="text-xs text-zinc-400">👀 Baxış Sayı</div>
+                            <div id="stat-visits" class="text-lg font-bold text-white mt-1">0</div>
                         </div>
-                        <div class="analytics-card bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                            <div class="text-xs text-zinc-500">🛒 Sifarişlər</div>
-                            <div id="stat-orders" class="text-lg font-bold text-amber-700 mt-1">0</div>
+                        <div class="analytics-card bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                            <div class="text-xs text-zinc-400">🛒 Sifarişlər</div>
+                            <div id="stat-orders" class="text-lg font-bold text-amber-400 mt-1">0</div>
                         </div>
-                        <div class="analytics-card bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                            <div class="text-xs text-zinc-500">🎯 Sifariş %-i</div>
-                            <div id="stat-conversion" class="text-lg font-bold text-green-700 mt-1">0%</div>
+                        <div class="analytics-card bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                            <div class="text-xs text-zinc-400">🎯 Sifariş %-i</div>
+                            <div id="stat-conversion" class="text-lg font-bold text-green-400 mt-1">0%</div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Satış İcmalı -->
-                <div class="sales-overview-card bg-white border border-zinc-200 p-4 rounded-xl space-y-3 no-print shadow-sm">
+                <div class="sales-overview-card bg-[#121212] border border-zinc-800 p-4 rounded-xl space-y-3 no-print shadow-sm">
                     <h2 class="text-sm font-semibold gold-text">Satış İcmalı (Dövriyyə)</h2>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
-                            <div class="text-[11px] text-zinc-500">Günlük Satış</div>
+                        <div class="sub-card bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                            <div class="text-[11px] text-zinc-400">Günlük Satış</div>
                             <div id="salesDaily" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
-                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
-                            <div class="text-[11px] text-zinc-500">Həftəlik Satış</div>
+                        <div class="sub-card bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                            <div class="text-[11px] text-zinc-400">Həftəlik Satış</div>
                             <div id="salesWeekly" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
-                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
-                            <div class="text-[11px] text-zinc-500">Aylıq Satış</div>
+                        <div class="sub-card bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                            <div class="text-[11px] text-zinc-400">Aylıq Satış</div>
                             <div id="salesMonthly" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
-                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
-                            <div class="text-[11px] text-zinc-500">İllik Satış</div>
+                        <div class="sub-card bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                            <div class="text-[11px] text-zinc-400">İllik Satış</div>
                             <div id="salesYearly" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-                        <div class="sub-card bg-zinc-50 p-2 rounded border border-zinc-100">Nəğd (Ayın 1-dən): <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
-                        <div class="sub-card bg-zinc-50 p-2 rounded border border-zinc-100">POS (Ayın 1-dən): <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
-                        <div class="sub-card bg-zinc-50 p-2 rounded border border-zinc-100">Kassa (Ayın 1-dən): <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="sub-card bg-[#1a1a1a] p-2 rounded border border-zinc-800">Nəğd (Ayın 1-dən): <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="sub-card bg-[#1a1a1a] p-2 rounded border border-zinc-800">POS (Ayın 1-dən): <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="sub-card bg-[#1a1a1a] p-2 rounded border border-zinc-800">Kassa (Ayın 1-dən): <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- 2026 İLLİK DETAL MODALI -->
-        <div id="yearlyDetailModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="max-w-md w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-2">
+        <div id="yearlyDetailModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                     <h2 id="yearlyDetailTitle" class="text-sm font-bold gold-text">2026 Detal</h2>
-                    <button onclick="closeYearlyDetailModal()" class="text-xs bg-zinc-100 px-2.5 py-1 rounded">X</button>
+                    <button onclick="closeYearlyDetailModal()" class="text-xs bg-[#1a1a1a] px-2.5 py-1 rounded">X</button>
                 </div>
 
-                <div id="salesPeriodFilterBox" class="flex bg-zinc-100 p-1 rounded-lg text-xs space-x-1 mb-2">
-                    <button onclick="renderSalesDetailByPeriod('day')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">Günlük</button>
-                    <button onclick="renderSalesDetailByPeriod('week')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">Həftəlik</button>
-                    <button onclick="renderSalesDetailByPeriod('month')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">Aylıq</button>
-                    <button onclick="renderSalesDetailByPeriod('year')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-700 font-medium">İllik</button>
+                <div id="salesPeriodFilterBox" class="flex bg-[#1a1a1a] p-1 rounded-lg text-xs space-x-1 mb-2">
+                    <button onclick="renderSalesDetailByPeriod('day')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
+                    <button onclick="renderSalesDetailByPeriod('week')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
+                    <button onclick="renderSalesDetailByPeriod('month')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
+                    <button onclick="renderSalesDetailByPeriod('year')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
                 </div>
 
-                <div id="yearlyDetailContent" class="space-y-2 text-xs text-zinc-700 max-h-[60vh] overflow-y-auto"></div>
+                <div id="yearlyDetailContent" class="space-y-2 text-xs text-zinc-300 max-h-[60vh] overflow-y-auto"></div>
             </div>
         </div>
 
         <!-- HESABATLAR MƏRKƏZİ MODALI -->
-        <div id="topReportsModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="max-w-xl w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="topReportsModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-xl w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-sm font-extrabold gold-text uppercase tracking-wider">📊 HESABATLAR MƏRKƏZİ (ADMİN)</h2>
-                    <button onclick="closeTopReportsModal()" class="text-xs bg-zinc-100 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeTopReportsModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
                 
-                <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div class="bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800 grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
-                        <label class="text-[10px] text-zinc-500 block mb-1">Başlanğıc Tarix</label>
-                        <input type="date" id="startDate" class="w-full bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs">
+                        <label class="text-[10px] text-zinc-400 block mb-1">Başlanğıc Tarix</label>
+                        <input type="date" id="startDate" class="w-full bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                     </div>
                     <div>
-                        <label class="text-[10px] text-zinc-500 block mb-1">Son Tarix</label>
-                        <input type="date" id="endDate" class="w-full bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs">
+                        <label class="text-[10px] text-zinc-400 block mb-1">Son Tarix</label>
+                        <input type="date" id="endDate" class="w-full bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    <button onclick="openPeriodicReport('weekly')" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                    <button onclick="openPeriodicReport('weekly')" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>📅</span><span>Həftəlik</span>
                     </button>
-                    <button onclick="openPeriodicReport('monthly')" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                    <button onclick="openPeriodicReport('monthly')" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>📊</span><span>Aylıq</span>
                     </button>
-                    <button onclick="openPeriodicReport('yearly')" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                    <button onclick="openPeriodicReport('yearly')" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>📈</span><span>İllik</span>
                     </button>
-                    <button onclick="openRangeReportModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                    <button onclick="openRangeReportModal()" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>🔍</span><span>Aralıq</span>
                     </button>
-                    <button onclick="openExpensesModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
+                    <button onclick="openExpensesModal()" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>💸</span><span>Xərclər</span>
                     </button>
                 </div>
@@ -357,55 +373,55 @@
         </div>
 
         <!-- ƏMƏLİYYATLAR JURNALI MODALI -->
-        <div id="operationsLogModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-5xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="operationsLogModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-5xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-lg font-bold gold-text">📋 BÜTÜN ƏMƏLİYYATLAR JURNALI</h2>
-                    <button onclick="closeOperationsLogModal()" class="text-xs bg-zinc-100 hover:bg-zinc-200 px-3 py-1 rounded text-zinc-900">Bağla</button>
+                    <button onclick="closeOperationsLogModal()" class="text-xs bg-[#1a1a1a] hover:bg-zinc-800 px-3 py-1 rounded text-white">Bağla</button>
                 </div>
 
-                <div class="flex flex-wrap gap-2 pt-1 pb-2 border-b border-zinc-200">
+                <div class="flex flex-wrap gap-2 pt-1 pb-2 border-b border-zinc-800">
                     <button onclick="openSalesFormModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs shadow">Satış Et ➕</button>
-                    <button onclick="openProductCatalogModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Məhsul Kataloqu 📦</button>
+                    <button onclick="openProductCatalogModal()" class="bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Məhsul Kataloqu 📦</button>
                     <button id="logAdminAddProdBtn" onclick="openAdminAddProductModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded text-xs shadow">Məhsul Əlavə Et ➕</button>
-                    <button id="logCatalogDetailsBtn" onclick="openCatalogDetailsModal()" class="hidden-screen bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Kataloq Məlumatları (Şəkil və Notlar) 🖼️</button>
+                    <button id="logCatalogDetailsBtn" onclick="openCatalogDetailsModal()" class="hidden-screen bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Kataloq Məlumatları (Şəkil və Notlar) 🖼️</button>
                 </div>
 
-                <div id="adminBox" class="bg-zinc-50 border border-amber-500/40 p-4 rounded-xl space-y-3 hidden-screen">
+                <div id="adminBox" class="bg-[#1a1a1a] border border-amber-500/40 p-4 rounded-xl space-y-3 hidden-screen">
                     <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
                     <input type="hidden" id="editingProductId">
                     <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                        <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs">
-                        <input type="text" id="pName" placeholder="Ad (məs: Megamare)" class="bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs">
-                        <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs">
-                        <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs">
-                        <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs">
+                        <input type="text" id="pCode" placeholder="Kod (məs: A001)" class="bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="text" id="pName" placeholder="Ad (məs: Megamare)" class="bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="number" step="0.01" id="pStock" placeholder="Başlanğıc Qram" class="bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="number" step="0.01" id="pBuy" placeholder="Alış (1qr)" class="bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs">
+                        <input type="number" step="0.01" id="pSell" placeholder="Satış (1qr)" class="bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs">
                     </div>
                     <div class="flex space-x-2">
                         <button onclick="saveProduct()" id="saveProdBtn" class="gold-bg font-bold px-4 py-2 rounded text-xs">Əlavə Et</button>
-                        <button onclick="cancelEdit()" id="cancelEditBtn" class="hidden-screen bg-zinc-300 text-zinc-900 font-bold px-4 py-2 rounded text-xs">Ləğv Et</button>
+                        <button onclick="cancelEdit()" id="cancelEditBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2 rounded text-xs">Ləğv Et</button>
                     </div>
                 </div>
 
-                <div class="bg-zinc-50 border border-amber-500/60 p-4 rounded-xl space-y-2 shadow-sm">
-                    <div class="flex justify-between items-center border-b border-zinc-200 pb-2">
+                <div class="bg-[#1a1a1a] border border-amber-500/60 p-4 rounded-xl space-y-2 shadow-sm">
+                    <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                         <h3 class="text-sm font-bold gold-text flex items-center space-x-1">
                             <span>📌 Bu Günün Satışları (Box)</span>
                         </h3>
-                        <span id="todayTotalBadge" class="text-xs bg-amber-500/20 text-amber-900 font-bold px-2.5 py-1 rounded font-mono">0.00 AZN</span>
+                        <span id="todayTotalBadge" class="text-xs bg-amber-500/20 text-amber-300 font-bold px-2.5 py-1 rounded font-mono">0.00 AZN</span>
                     </div>
-                    <div id="todaySalesBoxContent" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-xs text-zinc-700">
+                    <div id="todaySalesBoxContent" class="space-y-1.5 max-h-40 overflow-y-auto pr-1 text-xs text-zinc-300">
                         <div class="text-zinc-500 text-center py-2">Bu gün hələ satış qeydə alınmayıb.</div>
                     </div>
                 </div>
 
                 <div class="pt-1">
-                    <input type="text" id="logSearchInput" oninput="renderOperationsLogTable()" placeholder="Axtar (Ad, kod, tarix, smen, ödəniş, növ...)" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded-lg text-zinc-900 text-xs focus:outline-none gold-border">
+                    <input type="text" id="logSearchInput" oninput="renderOperationsLogTable()" placeholder="Axtar (Ad, kod, tarix, smen, ödəniş, növ...)" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded-lg text-white text-xs focus:outline-none gold-border">
                 </div>
 
                 <div class="overflow-x-auto max-h-[50vh] overflow-y-auto">
-                    <table class="w-full text-left text-xs text-zinc-700">
-                        <thead class="border-b border-zinc-200 gold-text sticky top-0 bg-white">
+                    <table class="w-full text-left text-xs text-zinc-300">
+                        <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-[#121212]">
                             <tr>
                                 <th class="p-2">S/S</th>
                                 <th class="p-2">Tarix</th>
@@ -427,18 +443,18 @@
         </div>
 
         <!-- MƏHSUL KATALOQU MODALI -->
-        <div id="productCatalogModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-4xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="productCatalogModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-4xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-lg font-bold gold-text">📦 MƏHSUL KATALOQU</h2>
-                    <button onclick="closeProductCatalogModal()" class="text-xs bg-zinc-100 hover:bg-zinc-200 px-3 py-1 rounded text-zinc-900">Bağla</button>
+                    <button onclick="closeProductCatalogModal()" class="text-xs bg-[#1a1a1a] hover:bg-zinc-800 px-3 py-1 rounded text-white">Bağla</button>
                 </div>
                 <div class="flex justify-between items-center">
-                    <input type="text" id="modalProductSearch" oninput="renderModalProductCatalog()" placeholder="Ətir axtar..." class="bg-zinc-50 border border-zinc-300 px-3 py-2 rounded text-zinc-900 text-xs w-full max-w-xs">
+                    <input type="text" id="modalProductSearch" oninput="renderModalProductCatalog()" placeholder="Ətir axtar..." class="bg-[#1a1a1a] border border-zinc-700 px-3 py-2 rounded text-white text-xs w-full max-w-xs">
                 </div>
                 <div class="overflow-x-auto max-h-[60vh] overflow-y-auto">
-                    <table class="w-full text-left text-xs text-zinc-700">
-                        <thead class="border-b border-zinc-200 gold-text sticky top-0 bg-white">
+                    <table class="w-full text-left text-xs text-zinc-300">
+                        <thead class="border-b border-zinc-800 gold-text sticky top-0 bg-[#121212]">
                             <tr>
                                 <th class="p-2">Kod</th>
                                 <th class="p-2">Ad</th>
@@ -455,11 +471,11 @@
         </div>
 
         <!-- SATIŞ / ƏMƏLİYYAT FORMASI MODALI -->
-        <div id="salesFormModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="max-w-xl w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="salesFormModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-xl w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 id="opFormTitle" class="text-sm font-semibold gold-text">Satış / Əməliyyat</h2>
-                    <button onclick="closeSalesFormModal()" class="text-xs bg-zinc-100 hover:bg-zinc-200 px-3 py-1 rounded text-zinc-900">Bağla</button>
+                    <button onclick="closeSalesFormModal()" class="text-xs bg-[#1a1a1a] hover:bg-zinc-800 px-3 py-1 rounded text-white">Bağla</button>
                 </div>
                 
                 <input type="hidden" id="editingSaleId">
@@ -468,16 +484,16 @@
                 <div class="space-y-3 text-xs">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                            <label class="text-zinc-600 block mb-1">Əməliyyat Növü</label>
-                            <select id="opType" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-sm">
+                            <label class="text-zinc-400 block mb-1">Əməliyyat Növü</label>
+                            <select id="opType" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-sm">
                                 <option value="MEXARIC">Məxaric (Satış)</option>
                                 <option value="MEDAXIL">Mədaxil (Artırma)</option>
                                 <option value="ITKI">İtki</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-zinc-600 block mb-1">Məhsul Seçin</label>
-                            <select id="opProduct" onchange="calcPrice()" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-sm">
+                            <label class="text-zinc-400 block mb-1">Məhsul Seçin</label>
+                            <select id="opProduct" onchange="calcPrice()" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-sm">
                                 <option value="">Məhsul seçin...</option>
                             </select>
                         </div>
@@ -485,41 +501,41 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <div>
-                            <label class="text-zinc-600 block mb-1">Miqdar (qr/ədəd)</label>
-                            <input type="number" id="opGram" oninput="calcPrice()" placeholder="Miqdar" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-sm">
+                            <label class="text-zinc-400 block mb-1">Miqdar (qr/ədəd)</label>
+                            <input type="number" id="opGram" oninput="calcPrice()" placeholder="Miqdar" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-sm">
                         </div>
                         <div>
-                            <label class="text-zinc-600 block mb-1">Ödəniş Üsulu</label>
-                            <select id="payType" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-sm">
+                            <label class="text-zinc-400 block mb-1">Ödəniş Üsulu</label>
+                            <select id="payType" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-sm">
                                 <option value="Nəğd">Nəğd</option>
                                 <option value="POS Terminal">POS Terminal</option>
                                 <option value="Karta göndərmə">Karta göndərmə</option>
                             </select>
                         </div>
                         <div>
-                            <label class="text-zinc-600 block mb-1">Endirim %</label>
-                            <input type="number" id="opDiscount" oninput="calcPrice()" placeholder="Endirim %" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-sm">
+                            <label class="text-zinc-400 block mb-1">Endirim %</label>
+                            <input type="number" id="opDiscount" oninput="calcPrice()" placeholder="Endirim %" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-sm">
                         </div>
                     </div>
 
                     <div>
-                        <label class="text-zinc-600 block mb-1">Yekun Qiymət (AZN)</label>
-                        <input type="number" step="0.01" id="opPrice" placeholder="Yekun Qiymət (AZN)" class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-sm">
+                        <label class="text-zinc-400 block mb-1">Yekun Qiymət (AZN)</label>
+                        <input type="number" step="0.01" id="opPrice" placeholder="Yekun Qiymət (AZN)" class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-sm">
                     </div>
                     
-                    <div class="flex flex-wrap gap-4 pt-1 text-xs text-zinc-700 items-center justify-between border-t border-zinc-200 pt-2">
+                    <div class="flex flex-wrap gap-4 pt-1 text-xs text-zinc-300 items-center justify-between border-t border-zinc-800 pt-2">
                         <div class="flex flex-col gap-2">
                             <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" id="fromAd" class="w-4 h-4 accent-amber-500 rounded bg-white border-zinc-300">
+                                <input type="checkbox" id="fromAd" class="w-4 h-4 accent-amber-500 rounded bg-[#1a1a1a] border-zinc-700">
                                 <span>Reklamdan gəldi (flaşur / qapı önü)</span>
                             </label>
                             <label class="flex items-center space-x-2 cursor-pointer">
-                                <input type="checkbox" id="toCashRegister" class="w-4 h-4 accent-amber-500 rounded bg-white border-zinc-300">
+                                <input type="checkbox" id="toCashRegister" class="w-4 h-4 accent-amber-500 rounded bg-[#1a1a1a] border-zinc-700">
                                 <span>Kassa aparatına vuruldu</span>
                             </label>
                         </div>
                         <div>
-                            <button type="button" id="adminYesterdayBtn" onclick="shiftSaleToYesterday()" class="hidden-screen bg-amber-600/20 hover:bg-amber-600/30 text-amber-900 border border-amber-500/50 text-[11px] font-bold px-2.5 py-1.5 rounded shadow">
+                            <button type="button" id="adminYesterdayBtn" onclick="shiftSaleToYesterday()" class="hidden-screen bg-amber-600/20 hover:bg-amber-600/30 text-amber-300 border border-amber-500/50 text-[11px] font-bold px-2.5 py-1.5 rounded shadow">
                                 ⏳ Dünənə at (23:59)
                             </button>
                         </div>
@@ -527,50 +543,50 @@
 
                     <div class="flex space-x-2 pt-2">
                         <button onclick="saveOp()" id="saveOpBtn" class="w-full gold-bg font-bold py-2.5 rounded text-sm">Təsdiq Et</button>
-                        <button onclick="cancelEditSale()" id="cancelOpBtn" class="hidden-screen bg-zinc-300 text-zinc-900 font-bold px-4 py-2.5 rounded text-xs">Ləğv Et</button>
+                        <button onclick="cancelEditSale()" id="cancelOpBtn" class="hidden-screen bg-zinc-700 text-white font-bold px-4 py-2.5 rounded text-xs">Ləğv Et</button>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- MASTER ARXİV PİN MODALI -->
-        <div id="masterArchivePinModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 flex items-center justify-center z-50">
-            <div class="max-w-sm w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
+        <div id="masterArchivePinModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 flex items-center justify-center z-50">
+            <div class="max-w-sm w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
                 <h2 class="text-base font-bold gold-text">Arxiv Girişi</h2>
-                <p class="text-xs text-zinc-600">PIN kodunu (000) daxil edin:</p>
-                <input type="password" id="masterArchivePinInput" placeholder="PIN Kod (000)" class="w-full text-center text-xl bg-zinc-50 border border-zinc-300 p-3 rounded-lg text-zinc-900 focus:outline-none gold-border">
+                <p class="text-xs text-zinc-400">PIN kodunu (000) daxil edin:</p>
+                <input type="password" id="masterArchivePinInput" placeholder="PIN Kod (000)" class="w-full text-center text-xl bg-[#1a1a1a] border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
                 <div class="flex space-x-2">
-                    <button onclick="closeMasterArchivePinModal()" class="w-1/2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold py-2 rounded text-xs">İmtina</button>
+                    <button onclick="closeMasterArchivePinModal()" class="w-1/2 bg-[#1a1a1a] hover:bg-zinc-800 text-zinc-300 font-bold py-2 rounded text-xs">İmtina</button>
                     <button onclick="verifyMasterArchivePin()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Daxil Ol</button>
                 </div>
             </div>
         </div>
 
         <!-- BÜTÜN ARXİVLƏRİN GÖSTƏRİLDİYİ MASTER ARXİV MODALI -->
-        <div id="globalMasterArchiveModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-3xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="globalMasterArchiveModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-3xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-lg font-bold gold-text">🗂️ BÜTÜN ARXİVLƏR MƏRKƏZİ (GÜN SONU VƏ AYLIQ)</h2>
-                    <button onclick="closeGlobalMasterArchiveModal()" class="text-xs bg-zinc-100 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeGlobalMasterArchiveModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
                 <div class="space-y-4">
-                    <div class="text-xs text-zinc-600 font-medium">Bütün vaxtlar üzrə qeydə alınmış Gün Sonu Hesabatları və Aylıq Arxivlər burada saxlanılır.</div>
+                    <div class="text-xs text-zinc-400 font-medium">Bütün vaxtlar üzrə qeydə alınmış Gün Sonu Hesabatları və Aylıq Arxivlər burada saxlanılır.</div>
                     
-                    <div class="space-y-3 bg-zinc-50 p-3 rounded-xl border border-zinc-200">
-                        <div class="flex justify-between items-center border-b border-zinc-200 pb-1">
+                    <div class="space-y-3 bg-[#1a1a1a] p-3 rounded-xl border border-zinc-800">
+                        <div class="flex justify-between items-center border-b border-zinc-800 pb-1">
                             <h3 class="text-sm font-bold gold-text">📅 Gün Sonu Hesabatları Arxivi:</h3>
                             <button onclick="deleteSelectedDayEndArchives()" class="bg-red-800 hover:bg-red-700 text-white font-bold px-3 py-1 rounded text-xs shadow">Seçilmişləri Sil 🗑️</button>
                         </div>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             <div>
-                                <label class="text-[10px] text-zinc-500 block mb-1">İl seçin:</label>
-                                <select id="archiveYearSelect" onchange="renderArchiveCalendar()" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs font-bold"></select>
+                                <label class="text-[10px] text-zinc-400 block mb-1">İl seçin:</label>
+                                <select id="archiveYearSelect" onchange="renderArchiveCalendar()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold"></select>
                             </div>
                             <div>
-                                <label class="text-[10px] text-zinc-500 block mb-1">Ay seçin:</label>
-                                <select id="archiveMonthSelect" onchange="renderArchiveCalendar()" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs font-bold">
+                                <label class="text-[10px] text-zinc-400 block mb-1">Ay seçin:</label>
+                                <select id="archiveMonthSelect" onchange="renderArchiveCalendar()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold">
                                     <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
                                     <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
                                     <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
@@ -578,23 +594,23 @@
                             </div>
                         </div>
 
-                        <div id="archiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-200"></div>
+                        <div id="archiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-800"></div>
                     </div>
 
                     <!-- AYLIQ / İLLİK ARXİVLƏR -->
                     <div class="space-y-3 pt-2">
-                        <h3 class="text-sm font-bold gold-text border-b border-zinc-200 pb-1">📈 Aylıq / İllik Arxivlər:</h3>
+                        <h3 class="text-sm font-bold gold-text border-b border-zinc-800 pb-1">📈 Aylıq / İllik Arxivlər:</h3>
                         
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                            <button onclick="openArchiveSectionModal('attendance')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold p-3 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 shadow">
+                            <button onclick="openArchiveSectionModal('attendance')" class="bg-[#1a1a1a] hover:bg-zinc-800 text-blue-400 border border-blue-600/50 font-bold p-3 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 shadow">
                                 <span>🕒</span>
                                 <span>İşçinin İş Saatları</span>
                             </button>
-                            <button onclick="openArchiveSectionModal('expenses')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold p-3 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 shadow">
+                            <button onclick="openArchiveSectionModal('expenses')" class="bg-[#1a1a1a] hover:bg-zinc-800 text-blue-400 border border-blue-600/50 font-bold p-3 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 shadow">
                                 <span>💸</span>
                                 <span>Xərclər</span>
                             </button>
-                            <button onclick="openArchiveSectionModal('reports')" class="bg-blue-600 hover:bg-blue-500 text-white font-bold p-3 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 shadow">
+                            <button onclick="openArchiveSectionModal('reports')" class="bg-[#1a1a1a] hover:bg-zinc-800 text-blue-400 border border-blue-600/50 font-bold p-3 rounded-lg text-xs flex flex-col items-center justify-center space-y-1 shadow">
                                 <span>📊</span>
                                 <span>Həftəlik / Aylıq / İllik Hesabatlar</span>
                             </button>
@@ -605,47 +621,47 @@
         </div>
 
         <!-- ARXİV BÖLMƏSİ ÜÇÜN SEÇİM VƏ NƏTİCƏ MODALI -->
-        <div id="archiveSectionModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-2xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="archiveSectionModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-2xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 id="archiveSectionModalTitle" class="text-lg font-bold gold-text">Arxiv Bölməsi</h2>
-                    <button onclick="closeArchiveSectionModal()" class="text-xs bg-zinc-100 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeArchiveSectionModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <div class="space-y-3 bg-zinc-50 p-3 rounded-xl border border-zinc-200">
+                <div class="space-y-3 bg-[#1a1a1a] p-3 rounded-xl border border-zinc-800">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                            <label class="text-[10px] text-zinc-500 block mb-1">Başlanğıc Tarix:</label>
-                            <input type="date" id="secArchiveStartDate" onchange="renderArchiveSectionDays()" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs font-bold">
+                            <label class="text-[10px] text-zinc-400 block mb-1">Başlanğıc Tarix:</label>
+                            <input type="date" id="secArchiveStartDate" onchange="renderArchiveSectionDays()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold">
                         </div>
                         <div>
-                            <label class="text-[10px] text-zinc-500 block mb-1">Son Tarix:</label>
-                            <input type="date" id="secArchiveEndDate" onchange="renderArchiveSectionDays()" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs font-bold">
+                            <label class="text-[10px] text-zinc-400 block mb-1">Son Tarix:</label>
+                            <input type="date" id="secArchiveEndDate" onchange="renderArchiveSectionDays()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold">
                         </div>
                     </div>
 
-                    <div id="secArchiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-200"></div>
+                    <div id="secArchiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-800"></div>
                 </div>
 
-                <div id="secArchiveDetailContainer" class="bg-zinc-50 p-4 rounded-xl border border-zinc-200 space-y-3 hidden-screen">
-                    <div id="secArchiveDetailTitle" class="font-bold gold-text text-sm border-b border-zinc-200 pb-1">Seçilmiş Günün Məlumatı</div>
-                    <div id="secArchiveDetailContent" class="text-xs text-zinc-800"></div>
+                <div id="secArchiveDetailContainer" class="bg-[#1a1a1a] p-4 rounded-xl border border-zinc-800 space-y-3 hidden-screen">
+                    <div id="secArchiveDetailTitle" class="font-bold gold-text text-sm border-b border-zinc-800 pb-1">Seçilmiş Günün Məlumatı</div>
+                    <div id="secArchiveDetailContent" class="text-xs text-zinc-200"></div>
                 </div>
 
-                <div id="archiveActionFooter" class="space-y-3 pt-2 border-t border-zinc-200 hidden-screen">
+                <div id="archiveActionFooter" class="space-y-3 pt-2 border-t border-zinc-800 hidden-screen">
                     <div id="archiveExpDownloadBox" class="hidden-screen space-y-2">
                         <button onclick="downloadArchiveExpensesAsImage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs shadow">Xərcləri Şəkil Kimi Yüklə (PNG) 📥</button>
                     </div>
 
-                    <div id="archiveAttDownloadBox" class="hidden-screen space-y-2 bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                    <div id="archiveAttDownloadBox" class="hidden-screen space-y-2 bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
                         <div class="text-xs font-bold gold-text mb-1">Aylıq İş Saatları Hesabatını PDF Kimi Yüklə:</div>
                         <div class="grid grid-cols-2 gap-2">
-                            <select id="archivePdfMonth" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs">
+                            <select id="archivePdfMonth" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                                 <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
                                 <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
                                 <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
                             </select>
-                            <select id="archivePdfYear" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs"></select>
+                            <select id="archivePdfYear" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs"></select>
                         </div>
                         <button onclick="downloadAttendanceAsPDFFromArchive()" class="w-full gold-bg font-bold py-2 rounded text-xs mt-1">Aylıq Hesabatı PDF Kimi Yüklə 📄</button>
                     </div>
@@ -654,116 +670,116 @@
         </div>
 
         <!-- KASSA PIN MODALI -->
-        <div id="cashPinModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 flex items-center justify-center z-50">
-            <div class="max-w-sm w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
+        <div id="cashPinModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 flex items-center justify-center z-50">
+            <div class="max-w-sm w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
                 <h2 class="text-base font-bold gold-text">Kassa Mərkəzi Girişi</h2>
-                <p class="text-xs text-zinc-600">PIN kodunu daxil edin (Admin: 000, Rasim: 111):</p>
-                <input type="password" id="cashPinInput" placeholder="PIN Kod" class="w-full text-center text-xl bg-zinc-50 border border-zinc-300 p-3 rounded-lg text-zinc-900 focus:outline-none gold-border">
+                <p class="text-xs text-zinc-400">PIN kodunu daxil edin (Admin: 000, Rasim: 111):</p>
+                <input type="password" id="cashPinInput" placeholder="PIN Kod" class="w-full text-center text-xl bg-[#1a1a1a] border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
                 <div class="flex space-x-2">
-                    <button onclick="closeCashPinModal()" class="w-1/2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold py-2 rounded text-xs">İmtina</button>
+                    <button onclick="closeCashPinModal()" class="w-1/2 bg-[#1a1a1a] hover:bg-zinc-800 text-zinc-300 font-bold py-2 rounded text-xs">İmtina</button>
                     <button onclick="verifyCashPin()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Daxil Ol</button>
                 </div>
             </div>
         </div>
 
         <!-- KASSA / İDARƏETMƏ MODALI -->
-        <div id="cashSheetModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-2xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="cashSheetModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-2xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-lg font-bold gold-text" id="cashSheetTitle">KASSA MƏRKƏZİ</h2>
-                    <button onclick="closeCashSheetModal()" class="text-xs bg-zinc-100 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeCashSheetModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <div class="bg-zinc-50 p-3 rounded-xl border border-zinc-200 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs">
-                    <span class="text-amber-800 font-bold">Əməliyyat Aparılan Ay və İl:</span>
+                <div class="bg-[#1a1a1a] p-3 rounded-xl border border-zinc-800 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs">
+                    <span class="text-amber-400 font-bold">Əməliyyat Aparılan Ay və İl:</span>
                     <div class="flex space-x-2 w-full sm:w-auto">
-                        <select id="cashSheetMonthSelect" onchange="updateCashSheetView()" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs font-bold">
+                        <select id="cashSheetMonthSelect" onchange="updateCashSheetView()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs font-bold">
                             <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
                             <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
                             <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
                         </select>
-                        <select id="cashSheetYearSelect" onchange="updateCashSheetView()" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs font-bold"></select>
+                        <select id="cashSheetYearSelect" onchange="updateCashSheetView()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs font-bold"></select>
                     </div>
                 </div>
 
-                <div id="adminCashControls" class="hidden-screen space-y-3 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-                    <div class="text-xs text-amber-800 font-bold">Admin İdarəetmə Paneli:</div>
+                <div id="adminCashControls" class="hidden-screen space-y-3 bg-[#1a1a1a] p-4 rounded-xl border border-zinc-800">
+                    <div class="text-xs text-amber-400 font-bold">Admin İdarəetmə Paneli:</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div>
-                            <label class="text-zinc-600 block mb-1">Evdəki Kassa Balansı (AZN)</label>
-                            <input type="number" step="0.01" id="adminHomeCashInput" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900">
+                            <label class="text-zinc-400 block mb-1">Evdəki Kassa Balansı (AZN)</label>
+                            <input type="number" step="0.01" id="adminHomeCashInput" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white">
                         </div>
                         <div>
-                            <label class="text-zinc-600 block mb-1">Mağazadakı Kassa Balansı (AZN)</label>
-                            <input type="number" step="0.01" id="adminStoreCashInput" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900">
+                            <label class="text-zinc-400 block mb-1">Mağazadakı Kassa Balansı (AZN)</label>
+                            <input type="number" step="0.01" id="adminStoreCashInput" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white">
                         </div>
                     </div>
                     <button onclick="adminSaveCashBalances()" class="gold-bg font-bold py-2 px-4 rounded text-xs w-full">Balansları Yadda Saxla / Yenilə</button>
                 </div>
 
-                <div id="rasimCashControls" class="hidden-screen space-y-3 bg-zinc-50 p-4 rounded-xl border border-zinc-200">
-                    <div class="text-xs text-amber-800 font-bold">Günlük Kassa Qeydi (Ev / Mağaza):</div>
+                <div id="rasimCashControls" class="hidden-screen space-y-3 bg-[#1a1a1a] p-4 rounded-xl border border-zinc-800">
+                    <div class="text-xs text-amber-400 font-bold">Günlük Kassa Qeydi (Ev / Mağaza):</div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                         <div>
-                            <label class="text-zinc-600 block mb-1">Evdəki kassaya qoydum:</label>
-                            <input type="number" step="0.01" id="rasimHomeInput" placeholder="Məs: 50" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900">
+                            <label class="text-zinc-400 block mb-1">Evdəki kassaya qoydum:</label>
+                            <input type="number" step="0.01" id="rasimHomeInput" placeholder="Məs: 50" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white">
                         </div>
                         <div>
-                            <label class="text-zinc-600 block mb-1">Mağazadakı kassaya qoydum:</label>
-                            <input type="number" step="0.01" id="rasimStoreInput" placeholder="Məs: 10" class="w-full bg-white border border-zinc-300 p-2 rounded text-zinc-900">
+                            <label class="text-zinc-400 block mb-1">Mağazadakı kassaya qoydum:</label>
+                            <input type="number" step="0.01" id="rasimStoreInput" placeholder="Məs: 10" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white">
                         </div>
                     </div>
                     <button onclick="rasimSaveDailyCash()" class="gold-bg font-bold py-2 px-4 rounded text-xs w-full">Təsdiq Et və Çıx</button>
                 </div>
 
-                <div class="bg-zinc-50 p-4 rounded-xl space-y-3 text-xs border border-zinc-200">
-                    <div class="font-bold gold-text text-sm border-b border-zinc-200 pb-2" id="selectedMonthSalesTitle">Cari Kassa Vəziyyəti:</div>
+                <div class="bg-[#1a1a1a] p-4 rounded-xl space-y-3 text-xs border border-zinc-800">
+                    <div class="font-bold gold-text text-sm border-b border-zinc-800 pb-2" id="selectedMonthSalesTitle">Cari Kassa Vəziyyəti:</div>
                     
                     <div class="flex justify-between items-center bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/30">
-                        <span class="font-bold text-amber-900">Evdəki + Mağazadakı Kassa Cəmi:</span>
-                        <strong id="kassaCombinedTotal" class="text-amber-800 font-extrabold text-base">0.00 AZN</strong>
+                        <span class="font-bold text-amber-300">Evdəki + Mağazadakı Kassa Cəmi:</span>
+                        <strong id="kassaCombinedTotal" class="text-amber-400 font-extrabold text-base">0.00 AZN</strong>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2 text-xs pt-1">
-                        <div class="bg-white p-2 rounded border border-zinc-200">
-                            <span class="text-zinc-500 block text-[10px]">Evdəki Kassa (Üst-üstə):</span>
-                            <strong id="kassaHomeBalance" class="text-green-700 text-xs">0.00 AZN</strong>
+                        <div class="bg-[#121212] p-2 rounded border border-zinc-800">
+                            <span class="text-zinc-400 block text-[10px]">Evdəki Kassa (Üst-üstə):</span>
+                            <strong id="kassaHomeBalance" class="text-green-400 text-xs">0.00 AZN</strong>
                         </div>
-                        <div class="bg-white p-2 rounded border border-zinc-200">
-                            <span class="text-zinc-500 block text-[10px]">Mağazadakı Kassa (Günlük qalıq):</span>
-                            <strong id="kassaStoreBalance" class="text-amber-800 text-xs">0.00 AZN</strong>
+                        <div class="bg-[#121212] p-2 rounded border border-zinc-800">
+                            <span class="text-zinc-400 block text-[10px]">Mağazadakı Kassa (Günlük qalıq):</span>
+                            <strong id="kassaStoreBalance" class="text-amber-400 text-xs">0.00 AZN</strong>
                         </div>
                     </div>
 
-                    <div class="space-y-1.5 pt-2 border-t border-zinc-200">
+                    <div class="space-y-1.5 pt-2 border-t border-zinc-800">
                         <div class="flex justify-between">
-                            <span class="font-bold text-amber-900">Ay Sonu Yekun Kassa:</span>
-                            <strong id="kassaAySonuYekun" class="text-amber-800 text-sm">0.00 AZN</strong>
+                            <span class="font-bold text-amber-300">Ay Sonu Yekun Kassa:</span>
+                            <strong id="kassaAySonuYekun" class="text-amber-400 text-sm">0.00 AZN</strong>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-zinc-700">Xərclər:</span>
-                            <strong id="kassaTotalExpenses" class="text-red-700">0.00 AZN</strong>
+                            <span class="text-zinc-300">Xərclər:</span>
+                            <strong id="kassaTotalExpenses" class="text-red-400">0.00 AZN</strong>
                         </div>
-                        <div class="flex justify-between border-t border-zinc-200 pt-1">
-                            <span class="font-bold text-zinc-900">Net Gəlir:</span>
-                            <strong id="kassaNetProfit" class="text-green-700 font-extrabold">0.00 AZN</strong>
+                        <div class="flex justify-between border-t border-zinc-800 pt-1">
+                            <span class="font-bold text-white">Net Gəlir:</span>
+                            <strong id="kassaNetProfit" class="text-green-400 font-extrabold">0.00 AZN</strong>
                         </div>
                     </div>
                 </div>
 
-                <div id="adminResetSection" class="hidden-screen pt-2 space-y-2 border-t border-zinc-200">
+                <div id="adminResetSection" class="hidden-screen pt-2 space-y-2 border-t border-zinc-800">
                     <button onclick="resetMonthlyCash()" class="w-full bg-red-800 hover:bg-red-700 text-white font-bold py-2.5 rounded text-xs">Kassanı Sıfırla (Seçilmiş Ay Üzrə) 🔄</button>
-                    <button onclick="openYearlyReportModal()" class="w-full bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold py-2.5 rounded text-xs">İllik Hesabat / Arxiv 📈</button>
+                    <button onclick="openYearlyReportModal()" class="w-full bg-[#1a1a1a] hover:bg-zinc-800 text-amber-400 border border-amber-600/50 font-bold py-2.5 rounded text-xs">İllik Hesabat / Arxiv 📈</button>
                 </div>
             </div>
         </div>
 
         <!-- İLLİK HESABAT MODALI -->
-        <div id="yearlyReportModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="max-w-md w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-2">
+        <div id="yearlyReportModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                     <h2 class="text-sm font-bold gold-text">İllik Hesabat Arxivi</h2>
-                    <button onclick="closeYearlyReportModal()" class="text-xs bg-zinc-100 px-2.5 py-1 rounded">X</button>
+                    <button onclick="closeYearlyReportModal()" class="text-xs bg-[#1a1a1a] px-2.5 py-1 rounded">X</button>
                 </div>
                 <div id="yearlyReportList" class="space-y-3 max-h-[60vh] overflow-y-auto text-xs">
                     <div class="text-zinc-500 text-center">Arxiv yüklənir...</div>
@@ -772,19 +788,19 @@
         </div>
 
         <!-- ÇAT MODALI -->
-        <div id="chatModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="max-w-lg w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="chatModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-lg w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-base font-bold gold-text">💬 Daxili Çat / Qeydlər Paneli</h2>
-                    <button onclick="closeChatModal()" class="text-xs bg-zinc-100 hover:bg-zinc-200 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeChatModal()" class="text-xs bg-[#1a1a1a] hover:bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
                 
-                <div id="chatMessagesList" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 bg-zinc-50 p-3 rounded-xl border border-zinc-200 text-xs">
+                <div id="chatMessagesList" class="space-y-3 max-h-[350px] overflow-y-auto pr-2 bg-[#1a1a1a] p-3 rounded-xl border border-zinc-800 text-xs">
                     <div class="text-zinc-500 text-center">Mesajlar yüklənir...</div>
                 </div>
 
-                <div class="space-y-2 pt-2 border-t border-zinc-200">
-                    <textarea id="chatInputText" placeholder="Mesajınızı və ya qeydinizi yazın..." class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-xs h-20 focus:outline-none gold-border"></textarea>
+                <div class="space-y-2 pt-2 border-t border-zinc-800">
+                    <textarea id="chatInputText" placeholder="Mesajınızı və ya qeydinizi yazın..." class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-xs h-20 focus:outline-none gold-border"></textarea>
                     <button onclick="sendChatMessage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs">Göndər 📤</button>
                 </div>
             </div>
@@ -814,25 +830,25 @@
         </div>
 
         <!-- SƏBƏB QEYD ETDİKÇƏ POPUP MODAL -->
-        <div id="reasonModal" class="hidden-screen fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div class="max-w-md w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
+        <div id="reasonModal" class="hidden-screen fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+            <div class="max-w-md w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
                 <h3 id="modalTitleText" class="text-sm font-bold gold-text">İşə gəlməmə səbəbi yaz / redaktə et</h3>
                 <input type="hidden" id="modalDateKey">
                 <input type="hidden" id="modalRoleName">
-                <textarea id="modalReasonInput" placeholder="Səbəbi ətraflı qeyd edin..." class="w-full bg-zinc-50 border border-zinc-300 p-2.5 rounded text-zinc-900 text-xs h-24 focus:outline-none gold-border"></textarea>
+                <textarea id="modalReasonInput" placeholder="Səbəbi ətraflı qeyd edin..." class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-xs h-24 focus:outline-none gold-border"></textarea>
                 <div class="flex space-x-2">
-                    <button onclick="closeReasonModal()" class="w-1/2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold py-2 rounded text-xs">İmtina Et</button>
+                    <button onclick="closeReasonModal()" class="w-1/2 bg-[#1a1a1a] hover:bg-zinc-800 text-zinc-300 font-bold py-2 rounded text-xs">İmtina Et</button>
                     <button onclick="saveAttendanceReason()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs">Yerinə Yetirildi</button>
                 </div>
             </div>
         </div>
 
         <!-- DÖVRİ HESABAT MODALI -->
-        <div id="periodicReportModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="max-w-md w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 text-center shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-2">
+        <div id="periodicReportModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                     <h2 id="periodicReportTitle" class="text-sm font-bold gold-text">Dövri Hesabat</h2>
-                    <button onclick="closePeriodicReportModal()" class="text-xs bg-zinc-100 px-2.5 py-1 rounded">X</button>
+                    <button onclick="closePeriodicReportModal()" class="text-xs bg-[#1a1a1a] px-2.5 py-1 rounded">X</button>
                 </div>
                 <div id="periodicReportPrintArea" class="bg-white text-zinc-900 p-6 rounded-lg space-y-3 font-sans text-left text-sm shadow-lg border border-zinc-200">
                     <div id="periodicReportHeader" class="font-bold text-zinc-900 text-center border-b-2 border-zinc-900 pb-2">Hesabat</div>
@@ -860,11 +876,11 @@
         </div>
 
         <!-- ARALIQ HESABAT ŞƏKİL MODALI -->
-        <div id="rangeReportModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50 flex items-center justify-center">
-            <div class="max-w-md w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 text-center shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-2">
+        <div id="rangeReportModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                     <h2 class="text-sm font-bold gold-text">Tarixlər Üzrə / Aralıq Hesabat</h2>
-                    <button onclick="closeRangeReportModal()" class="text-xs bg-zinc-100 px-2.5 py-1 rounded">X</button>
+                    <button onclick="closeRangeReportModal()" class="text-xs bg-[#1a1a1a] px-2.5 py-1 rounded">X</button>
                 </div>
                 <div id="rangeReportPrintArea" class="bg-white text-zinc-900 p-6 rounded-lg space-y-3 font-sans text-left text-sm shadow-lg border border-zinc-200">
                     <div id="rangeReportHeader" class="font-bold text-zinc-900 text-center border-b-2 border-zinc-900 pb-2">Hesabat</div>
@@ -889,35 +905,35 @@
         </div>
 
         <!-- XƏRCLƏR İDARƏ MODALI -->
-        <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-4xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-200 pb-3 gap-2 no-print">
+        <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-4xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                     <div>
                         <h2 class="text-lg font-bold gold-text" id="expenseHeaderTitle">XƏRCLƏR BÖLMƏSİ</h2>
-                        <div class="text-xs text-zinc-600">İl və ay seçərək xərcləri günlər üzrə daxil edin və şəkil əlavə edin.</div>
+                        <div class="text-xs text-zinc-400">İl və ay seçərək xərcləri günlər üzrə daxil edin və şəkil əlavə edin.</div>
                     </div>
                     <div class="flex items-center space-x-2">
-                        <select id="expenseYearSelect" onchange="renderExpenseSheet()" class="bg-zinc-50 border border-zinc-300 p-1.5 rounded text-xs text-amber-800 font-bold"></select>
-                        <select id="expenseMonthSelect" onchange="renderExpenseSheet()" class="bg-zinc-50 border border-zinc-300 p-1.5 rounded text-xs text-amber-800 font-bold">
+                        <select id="expenseYearSelect" onchange="renderExpenseSheet()" class="bg-[#1a1a1a] border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
+                        <select id="expenseMonthSelect" onchange="renderExpenseSheet()" class="bg-[#1a1a1a] border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold">
                             <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
                             <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
                             <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
                         </select>
-                        <button onclick="closeExpensesModal()" class="no-print text-xs bg-zinc-100 px-3 py-1.5 rounded text-zinc-700 hover:bg-zinc-200">Bağla</button>
+                        <button onclick="closeExpensesModal()" class="no-print text-xs bg-[#1a1a1a] px-3 py-1.5 rounded text-zinc-300 hover:bg-zinc-800">Bağla</button>
                     </div>
                 </div>
 
-                <div class="no-print space-y-2 bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-                    <div class="text-xs text-amber-800 font-bold">Yeni Xərc Əlavə Et:</div>
+                <div class="no-print space-y-2 bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
+                    <div class="text-xs text-amber-400 font-bold">Yeni Xərc Əlavə Et:</div>
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
-                        <select id="expInputDay" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs">
+                        <select id="expInputDay" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                             <option value="">Gün seçin...</option>
                         </select>
-                        <input type="text" id="expInputTitle" placeholder="Xərcin Adı (Qeyd)" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs sm:col-span-2">
-                        <input type="number" step="0.01" id="expInputAmount" placeholder="Məbləğ (AZN)" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs">
+                        <input type="text" id="expInputTitle" placeholder="Xərcin Adı (Qeyd)" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs sm:col-span-2">
+                        <input type="number" step="0.01" id="expInputAmount" placeholder="Məbləğ (AZN)" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                     </div>
                     <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
-                        <input type="file" id="expInputFile" accept="image/*" class="w-full bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black">
+                        <input type="file" id="expInputFile" accept="image/*" class="w-full bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black">
                         <button onclick="saveNewExpense()" class="gold-bg font-bold px-4 py-2 rounded text-xs w-full sm:w-auto">Yadda Saxla</button>
                     </div>
                 </div>
@@ -935,119 +951,119 @@
                     </div>
                 </div>
 
-                <div class="pt-4 border-t border-zinc-200 flex justify-end space-x-2 no-print">
+                <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
                     <button onclick="downloadExpensesAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
                 </div>
             </div>
         </div>
 
         <!-- ÇEK / ŞƏKİL GÖSTƏRMƏ MODALI (LIGHTBOX) -->
-        <div id="receiptModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 flex flex-col items-center justify-center z-50">
-            <div class="max-w-lg w-full bg-white border border-amber-500/50 p-4 rounded-xl space-y-3 text-center shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-2">
+        <div id="receiptModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 flex flex-col items-center justify-center z-50">
+            <div class="max-w-lg w-full bg-[#121212] border border-amber-500/50 p-4 rounded-xl space-y-3 text-center shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
                     <h3 class="text-sm font-bold gold-text">Xərc Çeki / Sənədi</h3>
-                    <button onclick="closeReceiptModal()" class="text-xs bg-zinc-100 px-3 py-1 rounded text-zinc-900">Bağla</button>
+                    <button onclick="closeReceiptModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded text-white">Bağla</button>
                 </div>
                 <div class="flex justify-center items-center">
-                    <img id="receiptModalImg" src="" alt="Çek" class="max-h-[70vh] max-w-full object-contain rounded border border-zinc-300">
+                    <img id="receiptModalImg" src="" alt="Çek" class="max-h-[70vh] max-w-full object-contain rounded border border-zinc-700">
                 </div>
             </div>
         </div>
 
         <!-- GÜN SONu HESABAT EKRANI -->
-        <div id="dayEndModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-2xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3 no-print">
+        <div id="dayEndModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-2xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3 no-print">
                     <h2 class="text-lg font-bold gold-text">GÜN SONU HESABATI</h2>
-                    <button onclick="closeDayEndModal()" class="text-xs bg-zinc-100 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeDayEndModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <div class="no-print bg-zinc-50 p-3 rounded-xl border border-zinc-200 flex items-center justify-between gap-2">
-                    <label class="text-xs text-amber-800 font-bold">Hesabat Tarixi:</label>
-                    <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-white border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs">
+                <div class="no-print bg-[#1a1a1a] p-3 rounded-xl border border-zinc-800 flex items-center justify-between gap-2">
+                    <label class="text-xs text-amber-400 font-bold">Hesabat Tarixi:</label>
+                    <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                 </div>
 
                 <div id="dayEndPrintArea" class="bg-white text-zinc-900 p-6 rounded-lg space-y-4 text-sm font-sans shadow-lg border border-zinc-200">
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans"></div>
                 </div>
 
-                <div class="pt-2 border-t border-zinc-200 flex justify-end space-x-2 no-print">
+                <div class="pt-2 border-t border-zinc-800 flex justify-end space-x-2 no-print">
                     <button onclick="downloadDayEndAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs w-full">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
                 </div>
             </div>
         </div>
 
         <!-- MÜŞTƏRİ KATALOQ MƏLUMATLARI (EDİT) EKRANI -->
-        <div id="catalogDetailsModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-4xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="catalogDetailsModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-4xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-lg font-bold gold-text">MÜŞTƏRİ KATALOQU MƏLUMATLARI (Tərkib, Notlar və Şəkil)</h2>
-                    <button onclick="closeCatalogDetailsModal()" class="no-print text-xs bg-zinc-100 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeCatalogDetailsModal()" class="no-print text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
-                <div class="text-xs text-zinc-600">Yalnız 'A' kodu ilə olan ətirlərin tərkibi, notları və şəkli buradan idarə olunur.</div>
+                <div class="text-xs text-zinc-400">Yalnız 'A' kodu ilə olan ətirlərin tərkibi, notları və şəkli buradan idarə olunur.</div>
                 <div id="catalogDetailsList" class="space-y-4 max-h-[60vh] overflow-y-auto pr-2"></div>
             </div>
         </div>
 
         <!-- SİFARİŞLƏR PANELİ EKRANI -->
-        <div id="ordersModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 overflow-y-auto z-50">
-            <div class="max-w-4xl mx-auto bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 shadow-2xl">
-                <div class="flex justify-between items-center border-b border-zinc-200 pb-3">
+        <div id="ordersModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
+            <div class="max-w-4xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
                     <h2 class="text-lg font-bold gold-text">MÜŞTƏRİ SİFARİŞLƏRİ</h2>
-                    <button onclick="closeOrdersModal()" class="no-print text-xs bg-zinc-100 px-3 py-1 rounded">Bağla</button>
+                    <button onclick="closeOrdersModal()" class="no-print text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
                 <div id="ordersListContent" class="space-y-3 max-h-[65vh] overflow-y-auto"></div>
             </div>
         </div>
 
         <!-- ÇATDIRILMA TƏSDİQ MODALI -->
-        <div id="deliveryConfirmModal" class="hidden-screen fixed inset-0 bg-black/50 p-4 flex items-center justify-center z-50">
-            <div class="max-w-md w-full bg-white border border-amber-500/50 p-6 rounded-xl space-y-4 text-zinc-900 text-center shadow-2xl">
+        <div id="deliveryConfirmModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 flex items-center justify-center z-50">
+            <div class="max-w-md w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
                 <div class="text-4xl">⚠️</div>
-                <div class="text-sm font-medium text-zinc-800 leading-relaxed">
+                <div class="text-sm font-medium text-zinc-200 leading-relaxed">
                     Minimum 30 AZN sifariş edildikdə, çatdırılma pulsuzdur. Əks halda 7 AZN əlavə ödəniş ediləcək.
                 </div>
                 <div class="flex space-x-3 pt-2">
-                    <button onclick="rejectDelivery()" class="w-1/2 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 font-bold py-2.5 rounded-lg text-xs">İmtina Et</button>
+                    <button onclick="rejectDelivery()" class="w-1/2 bg-[#1a1a1a] hover:bg-zinc-800 text-zinc-300 font-bold py-2.5 rounded-lg text-xs">İmtina Et</button>
                     <button onclick="acceptDelivery()" class="w-1/2 gold-bg font-bold py-2.5 rounded-lg text-xs">Razı Ol</button>
                 </div>
             </div>
         </div>
 
         <!-- MAĞAZA ŞƏKİLİ VƏ HAQQINDA BLOKU -->
-        <div class="info-block bg-white border border-amber-500/40 p-4 rounded-xl space-y-3 text-center no-print text-zinc-900 shadow-sm">
+        <div class="info-block bg-[#121212] border border-amber-500/40 p-4 rounded-xl space-y-3 text-center no-print text-white shadow-sm">
             <div class="flex justify-center">
                 <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" alt="Melodika Parfum" class="w-24 h-24 object-cover rounded-full border-2 border-amber-500 shadow-md">
             </div>
             <div class="space-y-1">
                 <h2 class="text-sm font-bold gold-text uppercase tracking-wide">Melodika Parfum</h2>
-                <p class="text-xs text-zinc-600 leading-relaxed">
+                <p class="text-xs text-zinc-400 leading-relaxed">
                     <strong>02.11.2025</strong>-ci il tarixindən fəaliyyətdədir. Amalımız, hər qoxunun melodiya ilə yansılanmasıdır!
                 </p>
             </div>
-            <div class="pt-2 text-xs text-amber-800 font-medium flex items-center justify-center space-x-1 border-t border-zinc-200">
+            <div class="pt-2 text-xs text-amber-400 font-medium flex items-center justify-center space-x-1 border-t border-zinc-800">
                 <span>📍</span>
                 <span><strong>Ünvanımız:</strong> Xırdalan dairəsi, Araz marketin yanı.</span>
             </div>
         </div>
 
         <!-- WHATSAPP ƏLAQƏ BLOKU -->
-        <div class="info-block bg-white border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print text-zinc-900 shadow-sm">
-            <div class="text-xs text-zinc-600 font-medium">Suallarınız və ya əlavə sifarişlər üçün:</div>
+        <div class="info-block bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print text-white shadow-sm">
+            <div class="text-xs text-zinc-400 font-medium">Suallarınız və ya əlavə sifarişlər üçün:</div>
             <a href="https://wa.me/994559703829" target="_blank" class="inline-flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition-all w-full shadow">
                 <span>💬 WhatsApp ilə yazın</span>
             </a>
-            <div class="text-xs font-mono text-amber-800 font-bold pt-1">+994 55 970 38 29</div>
+            <div class="text-xs font-mono text-amber-400 font-bold pt-1">+994 55 970 38 29</div>
         </div>
 
         <!-- SOSİAL ŞƏBƏKƏLƏRƏ KEÇİD BLOKU -->
-        <div class="info-block bg-white border border-amber-500/40 p-4 rounded-xl text-center space-y-3 no-print text-zinc-900 shadow-sm">
-            <div class="text-xs text-zinc-600 font-medium">Bizi sosial şəbəkələrdə izləyin:</div>
+        <div class="info-block bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-center space-y-3 no-print text-white shadow-sm">
+            <div class="text-xs text-zinc-400 font-medium">Bizi sosial şəbəkələrdə izləyin:</div>
             <div class="grid grid-cols-2 gap-2">
                 <a href="https://www.instagram.com/melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-90 text-white font-bold py-2 px-3 rounded-lg text-xs transition-all shadow">
                   <span>📷 Instagram</span>
                 </a>
-                <a href="https://www.tiktok.com/@melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-900 border border-zinc-300 font-bold py-2 px-3 rounded-lg text-xs transition-all">
+                <a href="https://www.tiktok.com/@melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-[#1a1a1a] hover:bg-zinc-800 text-white border border-zinc-700 font-bold py-2 px-3 rounded-lg text-xs transition-all">
                   <span>🎵 TikTok</span>
                 </a>
             </div>
@@ -1134,9 +1150,6 @@
                 let titleSuffix = currentUserGender === 'Qadın' ? 'xanım' : 'bəy';
 
                 if(role === 'ADMIN') {
-                    // ADMIN FONUNU QARA ET
-                    setAdminTheme(true);
-
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
                     if(adminTopCashBtn) adminTopCashBtn.classList.remove('hidden-screen');
@@ -1150,9 +1163,6 @@
                     setOperationalState(true);
                     updateAdminYearlySummaryValues();
                 } else {
-                    // SATICI FONUNU AĞ SAXLA
-                    setAdminTheme(false);
-
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
                     if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
@@ -1176,31 +1186,6 @@
                 checkNewChatBlinking();
             }
         };
-
-        // ADMIN SƏHİFƏSİNİN ARXA FONUNU QARA EDƏN FUNKSİYA
-        function setAdminTheme(isAdmin) {
-            let body = document.getElementById('appBody');
-            let mainApp = document.getElementById('mainApp');
-            if(!body) return;
-
-            if(isAdmin) {
-                body.style.backgroundColor = '#000000';
-                body.style.color = '#ffffff';
-                
-                // Bütün kartları və konteynerləri qara dizayna uyğunlaşdır
-                document.querySelectorAll('#mainApp .bg-white, #mainApp .bg-zinc-50').forEach(el => {
-                    el.style.backgroundColor = '#121212';
-                    el.style.color = '#ffffff';
-                    el.style.borderColor = '#333333';
-                });
-                document.querySelectorAll('#mainApp .text-zinc-900, #mainApp .text-zinc-700, #mainApp .text-zinc-600').forEach(el => {
-                    el.style.color = '#e0e0e0';
-                });
-            } else {
-                body.style.backgroundColor = '#ffffff';
-                body.style.color = '#111827';
-            }
-        }
 
         async function loadDataFromCloud() {
             try {
@@ -1251,7 +1236,7 @@
                 } catch(e) { chatMessages = []; }
 
                 document.getElementById('debugBox').textContent = "Status: Bulud bazasına uğurla qoşuldu (Canlı Sinxronizasiya)";
-                document.getElementById('debugBox').className = "bg-zinc-100 border border-green-600 p-3 rounded-xl text-xs text-green-800 font-mono no-print shadow-sm";
+                document.getElementById('debugBox').className = "bg-[#121212] border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print shadow-sm";
                 
                 if(role === 'ADMIN') updateAdminYearlySummaryValues();
 
@@ -1263,7 +1248,7 @@
             } catch (err) {
                 console.error(err);
                 document.getElementById('debugBox').textContent = "Status Xətası: " + err.message;
-                document.getElementById('debugBox').className = "bg-zinc-100 border border-red-600 p-3 rounded-xl text-xs text-red-800 font-mono no-print shadow-sm";
+                document.getElementById('debugBox').className = "bg-[#121212] border border-red-600 p-3 rounded-xl text-xs text-red-400 font-mono no-print shadow-sm";
             }
         }
 
@@ -1315,7 +1300,7 @@
                         if(String(e.expense_date).substring(0, 4) === '2026') totalExp += Number(e.amount || 0);
                     });
                     let net = grossProfit - totalExp;
-                    contentHtml = `<div class="space-y-1"><div>Ümumi Qross Mənfəət: ${grossProfit.toFixed(2)} AZN</div><div>Toplam Xərclər: ${totalExp.toFixed(2)} AZN</div><div class="font-bold text-green-700 pt-1 border-t border-zinc-200">Net Gəlir: ${net.toFixed(2)} AZN</div></div>`;
+                    contentHtml = `<div class="space-y-1"><div>Ümumi Qross Mənfəət: ${grossProfit.toFixed(2)} AZN</div><div>Toplam Xərclər: ${totalExp.toFixed(2)} AZN</div><div class="font-bold text-green-400 pt-1 border-t border-zinc-800">Net Gəlir: ${net.toFixed(2)} AZN</div></div>`;
                 } else if(type === 'expenses') {
                     title = '2026 cı il üzrə Toplam Xərclər Detalları';
                     let sum = 0;
@@ -1326,7 +1311,7 @@
                             list += `<div>• ${e.expense_date}: ${e.title} - ${Number(e.amount).toFixed(2)} AZN</div>`;
                         }
                     });
-                    contentHtml = `<div class="font-bold text-red-700 mb-2">Toplam Xərc: ${sum.toFixed(2)} AZN</div><div class="space-y-1 max-h-50 overflow-y-auto">${list || 'Xərc yoxdur'}</div>`;
+                    contentHtml = `<div class="font-bold text-red-400 mb-2">Toplam Xərc: ${sum.toFixed(2)} AZN</div><div class="space-y-1 max-h-50 overflow-y-auto">${list || 'Xərc yoxdur'}</div>`;
                 }
                 document.getElementById('yearlyDetailContent').innerHTML = contentHtml;
             }
@@ -1385,12 +1370,12 @@
             for(let pName in perfumeSummaryMap) {
                 let item = perfumeSummaryMap[pName];
                 listHtml += `
-                    <div class="bg-zinc-50 p-2.5 rounded-lg border border-zinc-200 flex justify-between items-center text-xs">
+                    <div class="bg-[#1a1a1a] p-2.5 rounded-lg border border-zinc-800 flex justify-between items-center text-xs">
                         <div>
                             <strong class="gold-text text-sm">${pName}</strong>
-                            <div class="text-[11px] text-zinc-500">Satılan: ${item.grams} qr | Maya Dəyəri: <span class="text-amber-800 font-bold">${item.totalCost.toFixed(2)} AZN</span></div>
+                            <div class="text-[11px] text-zinc-400">Satılan: ${item.grams} qr | Maya Dəyəri: <span class="text-amber-400 font-bold">${item.totalCost.toFixed(2)} AZN</span></div>
                         </div>
-                        <div class="text-right font-extrabold text-green-700 text-sm">${item.totalPrice.toFixed(2)} AZN</div>
+                        <div class="text-right font-extrabold text-green-400 text-sm">${item.totalPrice.toFixed(2)} AZN</div>
                     </div>
                 `;
             }
@@ -1398,10 +1383,10 @@
             let periodTitleAz = period === 'day' ? 'Günlük' : (period === 'week' ? 'Həftəlik' : (period === 'month' ? 'Aylıq' : 'İllik'));
 
             let summaryHeader = `
-                <div class="bg-zinc-50 p-3 rounded-xl border border-amber-500/40 space-y-1 mb-3">
-                    <div class="text-xs text-zinc-600">Dövr: <strong>${periodTitleAz} (${startDateStr} / ${endDateStr})</strong></div>
-                    <div class="text-sm font-bold text-zinc-900">Toplam Satış: <span class="gold-text">${totalSalesAmount.toFixed(2)} AZN</span></div>
-                    <div class="text-sm font-bold text-amber-800">Ətirlərin Ümumi Maya Dəyəri: ${totalCostAmount.toFixed(2)} AZN</div>
+                <div class="bg-[#1a1a1a] p-3 rounded-xl border border-amber-500/40 space-y-1 mb-3">
+                    <div class="text-xs text-zinc-400">Dövr: <strong>${periodTitleAz} (${startDateStr} / ${endDateStr})</strong></div>
+                    <div class="text-sm font-bold text-white">Toplam Satış: <span class="gold-text">${totalSalesAmount.toFixed(2)} AZN</span></div>
+                    <div class="text-sm font-bold text-amber-400">Ətirlərin Ümumi Maya Dəyəri: ${totalCostAmount.toFixed(2)} AZN</div>
                 </div>
                 <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
                     ${listHtml || '<div class="text-zinc-500 text-center py-2">Bu dövr üzrə satış yoxdur.</div>'}
@@ -1513,16 +1498,16 @@
             products.forEach(p => {
                 let currentStock = stockMap[p.id] !== undefined ? stockMap[p.id] : p.initial_stock;
                 if(p.code.toLowerCase().includes(searchQuery) || p.name.toLowerCase().includes(searchQuery)) {
-                    let actionBtns = role === 'ADMIN' ? `<div class="flex space-x-2"><button onclick="editProduct(${p.id})" class="text-amber-800 font-bold">Düzənlə</button><button onclick="deleteProduct(${p.id})" class="text-red-700 font-bold">X</button></div>` : '-';
-                    let buyPriceTd = role === 'ADMIN' ? `<td class="p-2 text-zinc-500">${p.buy_price || 0} AZN</td>` : '';
+                    let actionBtns = role === 'ADMIN' ? `<div class="flex space-x-2"><button onclick="editProduct(${p.id})" class="text-amber-400 font-bold">Düzənlə</button><button onclick="deleteProduct(${p.id})" class="text-red-400 font-bold">X</button></div>` : '-';
+                    let buyPriceTd = role === 'ADMIN' ? `<td class="p-2 text-zinc-400">${p.buy_price || 0} AZN</td>` : '';
                     
                     prodHtml += `
-                        <tr class="border-b border-zinc-200">
+                        <tr class="border-b border-zinc-800">
                             <td class="p-2 font-mono">
-                                <span onclick="selectProductFromCatalog(${p.id})" class="text-blue-600 hover:text-blue-700 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək satışa əlavə et">${p.code}</span>
+                                <span onclick="selectProductFromCatalog(${p.id})" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək satışa əlavə et">${p.code}</span>
                             </td>
                             <td class="p-2">${p.name}</td>
-                            <td class="p-2 font-bold ${currentStock <= 0 ? 'text-red-700' : 'text-amber-800'}">${currentStock} qr</td>
+                            <td class="p-2 font-bold ${currentStock <= 0 ? 'text-red-400' : 'text-amber-400'}">${currentStock} qr</td>
                             ${buyPriceTd}
                             <td class="p-2 font-semibold gold-text">${p.sell_price || 0} AZN</td>
                             <td class="p-2">${actionBtns}</td>
@@ -1542,17 +1527,16 @@
             
             if(!rec || !rec.check_in || rec.check_out) {
                 statusTextElem.textContent = "Növbə başlanmayıb / Bağlıdır";
-                statusTextElem.className = "text-red-700 font-mono";
+                statusTextElem.className = "text-red-400 font-mono";
                 setOperationalState(false);
             } else if(rec.check_in && !rec.check_out) {
                 let timeStr = new Date(rec.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 statusTextElem.textContent = `Aktivdir (Gəliş: ${timeStr})`;
-                statusTextElem.className = "text-green-700 font-mono";
+                statusTextElem.className = "text-green-400 font-mono";
                 setOperationalState(true);
             }
         }
 
-        // NÖVBƏ STATUSUNA GÖRƏ ƏMƏLİYYATLAR JURNALI, GÜN SONU, ÇAR VƏ SİFARİŞLƏR BÖLMƏSİNİN BLOKLANMASI VƏ YA AÇILMASI
         function setOperationalState(isActive) {
             let container = document.getElementById('operationalContainer');
             let navOpsLogBtn = document.getElementById('navOpsLogBtn');
@@ -1707,15 +1691,15 @@
                 let foundArchive = dayEndArchive.find(item => String(item.report_date) === dateKey);
                 let badgeIndicator = foundArchive ? '🟢' : '⚪';
 
-                let checkboxHtml = foundArchive ? `<input type="checkbox" value="${foundArchive.id}" class="archive-checkbox w-4 h-4 accent-amber-500 rounded bg-white border-zinc-300 ml-2">` : `<input type="checkbox" disabled class="w-4 h-4 opacity-30 rounded bg-white border-zinc-300 ml-2">`;
+                let checkboxHtml = foundArchive ? `<input type="checkbox" value="${foundArchive.id}" class="archive-checkbox w-4 h-4 accent-amber-500 rounded bg-[#1a1a1a] border-zinc-700 ml-2">` : `<input type="checkbox" disabled class="w-4 h-4 opacity-30 rounded bg-[#1a1a1a] border-zinc-700 ml-2">`;
 
                 html += `
-                    <div class="flex justify-between items-center bg-white p-2 rounded border border-zinc-200 hover:bg-zinc-50 transition-colors">
+                    <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800 hover:bg-zinc-900 transition-colors">
                         <div class="flex items-center space-x-2">
                             ${checkboxHtml}
-                            <span onclick="openSpecificDayArchive('${dateKey}')" class="text-blue-600 hover:text-blue-700 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək hesabatı aç">${d} ${monthName}</span>
+                            <span onclick="openSpecificDayArchive('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək hesabatı aç">${d} ${monthName}</span>
                         </div>
-                        <span class="text-[10px] text-zinc-500">${badgeIndicator} ${foundArchive ? 'Hesabat mövcuddur' : 'Hesabat yoxdur'}</span>
+                        <span class="text-[10px] text-zinc-400">${badgeIndicator} ${foundArchive ? 'Hesabat mövcuddur' : 'Hesabat yoxdur'}</span>
                     </div>
                 `;
             }
@@ -1801,7 +1785,7 @@
 
             let startDate = new Date(startStr);
             let endDate = new Date(endStr);
-            if(startDate > endDate) { container.innerHTML = '<div class="text-red-700 text-center py-2">Başlanğıc tarixi son tarixdən böyük ola bilməz!</div>'; return; }
+            if(startDate > endDate) { container.innerHTML = '<div class="text-red-400 text-center py-2">Başlanğıc tarixi son tarixdən böyük ola bilməz!</div>'; return; }
 
             let html = '';
             let cur = new Date(startDate);
@@ -1813,9 +1797,9 @@
                 let yr = cur.getFullYear();
 
                 html += `
-                    <div class="flex justify-between items-center bg-white p-2 rounded border border-zinc-200 hover:bg-zinc-50 transition-colors">
-                        <span onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-blue-600 hover:text-blue-700 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək bax">${dNum} ${mName} ${yr}</span>
-                        <button onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-[11px] bg-blue-100 text-blue-800 hover:bg-blue-200 border border-blue-300 px-2 py-0.5 rounded font-bold">Göstər 👁️</button>
+                    <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800 hover:bg-zinc-900 transition-colors">
+                        <span onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək bax">${dNum} ${mName} ${yr}</span>
+                        <button onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-[11px] bg-blue-950 text-blue-300 hover:bg-blue-900 border border-blue-800 px-2 py-0.5 rounded font-bold">Göstər 👁️</button>
                     </div>
                 `;
                 cur.setDate(cur.getDate() + 1);
@@ -1846,13 +1830,13 @@
 
                 html = `
                     <div class="space-y-2 text-xs">
-                        <div class="flex justify-between items-center bg-white p-2 rounded border border-zinc-200">
-                            <div><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS} ${noteTextS ? '<br><span class="text-amber-800">Səbəb: ' + noteTextS + '</span>' : ''}</div>
-                            <button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2 py-1 rounded text-[10px]">Redaktə et / Səbəb yaz ✏️</button>
+                        <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800">
+                            <div><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS} ${noteTextS ? '<br><span class="text-amber-400">Səbəb: ' + noteTextS + '</span>' : ''}</div>
+                            <button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2 py-1 rounded text-[10px]">Redaktə et / Səbəb yaz ✏️</button>
                         </div>
-                        <div class="flex justify-between items-center bg-white p-2 rounded border border-zinc-200">
-                            <div><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG} ${noteTextG ? '<br><span class="text-amber-800">Səbəb: ' + noteTextG + '</span>' : ''}</div>
-                            <button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="bg-amber-500 hover:bg-amber-600 text-white font-bold px-2 py-1 rounded text-[10px]">Redaktə et / Səbəb yaz ✏️</button>
+                        <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800">
+                            <div><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG} ${noteTextG ? '<br><span class="text-amber-400">Səbəb: ' + noteTextG + '</span>' : ''}</div>
+                            <button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-2 py-1 rounded text-[10px]">Redaktə et / Səbəb yaz ✏️</button>
                         </div>
                     </div>
                 `;
@@ -1861,8 +1845,8 @@
                 if(expList.length > 0) {
                     let itemsHtml = '';
                     expList.forEach((e, idx) => {
-                        let receiptBtn = e.image_url ? `<button onclick="showReceipt('${e.image_url}')" class="text-amber-800 font-bold underline ml-2 hover:text-amber-700">Çeki göstər 🧾</button>` : '';
-                        itemsHtml += `<div class="bg-white p-2 rounded border border-zinc-200 mb-2">
+                        let receiptBtn = e.image_url ? `<button onclick="showReceipt('${e.image_url}')" class="text-amber-400 font-bold underline ml-2 hover:text-amber-300">Çeki göstər 🧾</button>` : '';
+                        itemsHtml += `<div class="bg-[#1a1a1a] p-2 rounded border border-zinc-800 mb-2">
                             <div><strong>${idx + 1}. Xərcin adı - ${e.title || '-'}</strong></div>
                             <div>Məbəği: ${Number(e.amount || 0).toFixed(2)} manat ${receiptBtn}</div>
                         </div>`;
@@ -1874,7 +1858,7 @@
             } else if(currentActiveArchiveSection === 'reports') {
                 let found = dayEndArchive.find(item => String(item.report_date) === dateKey);
                 if(found) {
-                    html = `<div class="bg-white text-zinc-900 p-4 rounded text-xs leading-relaxed space-y-2 border border-zinc-200">${found.content_summary}</div>`;
+                    html = `<div class="bg-[#1a1a1a] text-white p-4 rounded text-xs leading-relaxed space-y-2 border border-zinc-800">${found.content_summary}</div>`;
                 } else {
                     let daySales = sales.filter(s => s.date && getBakuDateString(s.date) === dateKey && s.type === 'MEXARIC');
                     let totalDaySales = 0;
@@ -2165,15 +2149,15 @@
                 let html = '';
                 yearlyArchive.forEach((item) => {
                     html += `
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200 space-y-1 relative">
+                        <div class="bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800 space-y-1 relative">
                             <div class="flex justify-between items-center font-bold gold-text">
                                 <span>${item.month_name}</span>
-                                <button onclick="deleteYearlyArchive(${item.id})" class="text-red-700 hover:text-red-800 font-bold text-xs bg-white px-2 py-0.5 rounded border border-zinc-200">Sil 🗑️</button>
+                                <button onclick="deleteYearlyArchive(${item.id})" class="text-red-400 hover:text-red-300 font-bold text-xs bg-[#121212] px-2 py-0.5 rounded border border-zinc-800">Sil 🗑️</button>
                             </div>
-                            <div class="pl-2 space-y-0.5 text-zinc-700">
+                            <div class="pl-2 space-y-0.5 text-zinc-300">
                                 <div>Ay Sonu Yekun Kassa - ${Number(item.total_gain || 0).toFixed(2)} manat</div>
                                 <div>Xərc - ${Number(item.total_expense || 0).toFixed(2)} manat</div>
-                                <div class="font-bold text-green-700">Net gəlir - ${Number(item.net_profit || 0).toFixed(2)} manat</div>
+                                <div class="font-bold text-green-400">Net gəlir - ${Number(item.net_profit || 0).toFixed(2)} manat</div>
                             </div>
                         </div>
                     `;
@@ -2245,7 +2229,7 @@
                 if (role !== 'ADMIN' && m.sender === 'ADMIN') isMe = false;
                 if (role !== 'ADMIN' && m.sender.startsWith('SATICI_') && m.sender === currentSenderKey) isMe = true;
 
-                let alignClass = isMe ? 'text-right ml-auto bg-amber-500/10 border-amber-500/30' : 'text-left mr-auto bg-white border-zinc-200 shadow-sm';
+                let alignClass = isMe ? 'text-right ml-auto bg-amber-500/10 border-amber-500/30' : 'text-left mr-auto bg-[#121212] border-zinc-800 shadow-sm';
                 
                 let senderLabel = '👤 Satıcı';
                 if(m.sender === 'ADMIN') senderLabel = '👑 Admin';
@@ -2253,15 +2237,15 @@
                 else if(m.sender === 'SATICI_GUNORTA') senderLabel = '🌙 Günorta smeni';
 
                 let timeStr = m.created_at ? getBakuDateTimeString(m.created_at) : '';
-                let readIcon = m.is_read ? `<span style="color: #2563eb; font-weight: bold; font-size: 13px;" title="Oxundu">✓✓</span>` : `<span style="color: #6b7280; font-weight: bold; font-size: 13px;" title="Göndərildi">✓✓</span>`;
+                let readIcon = m.is_read ? `<span style="color: #60a5fa; font-weight: bold; font-size: 13px;" title="Oxundu">✓✓</span>` : `<span style="color: #9ca3af; font-weight: bold; font-size: 13px;" title="Göndərildi">✓✓</span>`;
 
                 html += `
                     <div class="max-w-[85%] p-2.5 rounded-lg border ${alignClass} space-y-1">
-                        <div class="flex justify-between items-center text-[10px] text-zinc-500 font-bold border-b border-zinc-200 pb-1">
+                        <div class="flex justify-between items-center text-[10px] text-zinc-400 font-bold border-b border-zinc-800 pb-1">
                             <span>${senderLabel}</span>
                             <span>${timeStr}</span>
                         </div>
-                        <div class="text-zinc-900 text-xs break-words">${m.message}</div>
+                        <div class="text-white text-xs break-words">${m.message}</div>
                         ${isMe ? `<div class="text-right pt-0.5">${readIcon}</div>` : ''}
                     </div>
                 `;
@@ -2321,7 +2305,7 @@
                 let noteTextS = recSeher.note ? String(recSeher.note).trim() : '';
 
                 let cellSeher = '';
-                let actionBtnS = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="no-print bg-amber-500 hover:bg-amber-600 text-white font-bold px-1.5 py-0.5 rounded text-[10px] ml-1">✏️</button>`;
+                let actionBtnS = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="no-print bg-amber-600 hover:bg-amber-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px] ml-1">✏️</button>`;
 
                 if(recSeher.check_in && !recSeher.check_out) {
                     cellSeher = `${checkInS} - Gözlənilir ${actionBtnS}`;
@@ -2341,7 +2325,7 @@
                 let noteTextG = recGunorta.note ? String(recGunorta.note).trim() : '';
 
                 let cellGunorta = '';
-                let actionBtnG = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="no-print bg-amber-500 hover:bg-amber-600 text-white font-bold px-1.5 py-0.5 rounded text-[10px] ml-1">✏️</button>`;
+                let actionBtnG = `<button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="no-print bg-amber-600 hover:bg-amber-500 text-white font-bold px-1.5 py-0.5 rounded text-[10px] ml-1">✏️</button>`;
 
                 if(recGunorta.check_in && !recGunorta.check_out) {
                     cellGunorta = `${checkInG} - Gözlənilir ${actionBtnG}`;
@@ -2672,8 +2656,6 @@
             let titleSuffix = currentUserGender === 'Qadın' ? 'xanım' : 'bəy';
 
             if(role === 'ADMIN') {
-                setAdminTheme(true);
-
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
                 if(adminTopCashBtn) adminTopCashBtn.classList.remove('hidden-screen');
@@ -2687,8 +2669,6 @@
                 setOperationalState(true);
                 updateAdminYearlySummaryValues();
             } else {
-                setAdminTheme(false);
-
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
                 if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
@@ -2786,14 +2766,14 @@
                 let p = products.find(item => item.name && item.name.toLowerCase() === fName.toLowerCase());
                 if(p) {
                     let sellPrice = Number(p.sell_price || 0);
-                    let imgTag = p.image_url ? `<img src="${p.image_url}" class="w-full h-24 object-cover rounded mb-1.5 border border-zinc-200 shadow-sm">` : `<div class="w-full h-24 bg-zinc-100 rounded mb-1.5 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>`;
+                    let imgTag = p.image_url ? `<img src="${p.image_url}" class="w-full h-24 object-cover rounded mb-1.5 border border-zinc-800 shadow-sm">` : `<div class="w-full h-24 bg-[#1a1a1a] rounded mb-1.5 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>`;
                     
                     html += `
-                        <div class="bg-white p-2.5 rounded-lg border border-amber-500/50 flex flex-col justify-between space-y-1.5 shadow-sm">
+                        <div class="bg-[#1a1a1a] p-2.5 rounded-lg border border-amber-500/50 flex flex-col justify-between space-y-1.5 shadow-sm">
                             <div>
                                 ${imgTag}
-                                <div class="font-bold text-zinc-900 text-xs truncate">${p.name}</div>
-                                <div class="text-[10px] text-zinc-600 truncate"><strong>Notlar:</strong> ${p.notes || p.ingredients || 'Qeyd olunmayıb'}</div>
+                                <div class="font-bold text-white text-xs truncate">${p.name}</div>
+                                <div class="text-[10px] text-zinc-400 truncate"><strong>Notlar:</strong> ${p.notes || p.ingredients || 'Qeyd olunmayıb'}</div>
                                 <div class="text-xs gold-text font-extrabold mt-1">${sellPrice.toFixed(2)} AZN / qr</div>
                             </div>
                             <button onclick="openFeaturedModal(${p.id}, '${p.name}', ${sellPrice})" class="gold-bg font-bold py-1 rounded text-[11px] w-full shadow">Səbətə At</button>
@@ -2818,7 +2798,7 @@
 
             filtered.forEach(p => {
                 let sellPrice = Number(p.sell_price || 0);
-                let imgTag = p.image_url ? `<img src="${p.image_url}" class="w-16 h-16 object-cover rounded border border-zinc-200 mb-2 shadow-sm">` : '';
+                let imgTag = p.image_url ? `<img src="${p.image_url}" class="w-16 h-16 object-cover rounded border border-zinc-800 mb-2 shadow-sm">` : '';
                 
                 let pRatings = productRatings.filter(r => r.product_id === p.id);
                 let avgRating = 0;
@@ -2830,41 +2810,41 @@
                 let avgStarsHtml = '';
                 let roundedAvg = Math.round(avgRating);
                 for(let i = 1; i <= 5; i++) {
-                    let color = i <= roundedAvg ? 'text-amber-500' : 'text-zinc-300';
+                    let color = i <= roundedAvg ? 'text-amber-500' : 'text-zinc-700';
                     avgStarsHtml += `<span class="${color}">★</span>`;
                 }
 
                 let interactiveStarsHtml = '';
                 for(let i = 1; i <= 5; i++) {
-                    interactiveStarsHtml += `<span onclick="rateProduct(${p.id}, ${i})" class="cursor-pointer text-zinc-400 hover:text-amber-500 text-base transition-colors" title="${i} ulduz ver">★</span>`;
+                    interactiveStarsHtml += `<span onclick="rateProduct(${p.id}, ${i})" class="cursor-pointer text-zinc-600 hover:text-amber-500 text-base transition-colors" title="${i} ulduz ver">★</span>`;
                 }
 
                 listHtml += `
-                    <div class="bg-white border border-zinc-200 p-3 rounded-xl space-y-2 shadow-sm">
+                    <div class="bg-[#121212] border border-zinc-800 p-3 rounded-xl space-y-2 shadow-sm">
                         <div class="flex items-start space-x-3">
                             ${imgTag}
                             <div class="flex-1">
                                 <div class="flex justify-between items-center">
                                     <h3 class="font-bold gold-text text-sm">${p.name} <span class="text-zinc-500 font-mono text-xs">(${p.code})</span></h3>
-                                    <span class="text-xs text-zinc-900 font-semibold">${sellPrice.toFixed(2)} AZN / qr</span>
+                                    <span class="text-xs text-white font-semibold">${sellPrice.toFixed(2)} AZN / qr</span>
                                 </div>
-                                <div class="text-xs text-zinc-600 space-y-1 mt-1">
-                                    <div><strong class="text-zinc-900">Tərkibi:</strong> ${p.ingredients || 'Qeyd olunmayıb'}</div>
-                                    <div><strong class="text-zinc-900">İç notları:</strong> ${p.notes || 'Qeyd olunmayıb'}</div>
+                                <div class="text-xs text-zinc-400 space-y-1 mt-1">
+                                    <div><strong class="text-white">Tərkibi:</strong> ${p.ingredients || 'Qeyd olunmayıb'}</div>
+                                    <div><strong class="text-white">İç notları:</strong> ${p.notes || 'Qeyd olunmayıb'}</div>
                                 </div>
                                 <div class="flex items-center space-x-2 mt-2 text-xs">
-                                    <span class="text-zinc-500">Ortalama Reytinq:</span>
+                                    <span class="text-zinc-400">Ortalama Reytinq:</span>
                                     <div class="flex text-sm">${avgStarsHtml}</div>
-                                    <span class="text-amber-800 font-bold">${avgRating > 0 ? avgRating : '0.0'} (${pRatings.length} səs)</span>
+                                    <span class="text-amber-400 font-bold">${avgRating > 0 ? avgRating : '0.0'} (${pRatings.length} səs)</span>
                                 </div>
                                 <div class="flex items-center space-x-1 mt-1 text-xs">
-                                    <span class="text-zinc-500 mr-1">Dəyərləndir:</span>
+                                    <span class="text-zinc-400 mr-1">Dəyərləndir:</span>
                                     <div class="flex space-x-0.5" id="stars_container_${p.id}">${interactiveStarsHtml}</div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-2 pt-2 border-t border-zinc-200">
-                            <input type="number" step="1" min="1" id="gram_${p.id}" oninput="calcCustItemPrice(${p.id}, ${sellPrice})" placeholder="Qram (qr)" class="bg-zinc-50 border border-zinc-300 p-1.5 rounded text-zinc-900 text-xs w-28 focus:outline-none focus:border-amber-600">
+                        <div class="flex items-center space-x-2 pt-2 border-t border-zinc-800">
+                            <input type="number" step="1" min="1" id="gram_${p.id}" oninput="calcCustItemPrice(${p.id}, ${sellPrice})" placeholder="Qram (qr)" class="bg-[#1a1a1a] border border-zinc-700 p-1.5 rounded text-white text-xs w-28 focus:outline-none focus:border-amber-600">
                             <div class="text-xs font-bold gold-text" id="total_${p.id}">0.00 AZN</div>
                             <button onclick="addToCart(${p.id}, '${p.name}', ${sellPrice})" class="gold-bg font-bold px-3 py-1.5 rounded text-xs ml-auto shadow">Səbətə At</button>
                         </div>
@@ -2916,11 +2896,11 @@
             cart.forEach((item, idx) => {
                 grandTotal += item.total;
                 html += `
-                    <div class="flex justify-between items-center border-b border-zinc-200 pb-1">
+                    <div class="flex justify-between items-center border-b border-zinc-800 pb-1">
                         <div>${item.name} (${item.grams} qr/ədəd)</div>
                         <div class="flex items-center space-x-2">
-                            <span class="text-amber-800 font-bold">${item.total.toFixed(2)} AZN</span>
-                            <button onclick="removeFromCart(${idx})" class="text-red-700 font-bold hover:text-red-800">✕</button>
+                            <span class="text-amber-400 font-bold">${item.total.toFixed(2)} AZN</span>
+                            <button onclick="removeFromCart(${idx})" class="text-red-400 font-bold hover:text-red-300">✕</button>
                         </div>
                     </div>
                 `;
@@ -2933,7 +2913,7 @@
         function updateCartTotal(grandTotal) {
             let totalWithDelivery = grandTotal + deliveryFee;
             let totalText = `Cəmi: ${grandTotal.toFixed(2)} AZN`;
-            if (deliveryFee > 0) totalText = `Məhsullar: ${grandTotal.toFixed(2)} AZN + Çatdırılma: ${deliveryFee.toFixed(2)} AZN = <span class="text-amber-800 font-bold">Yekun: ${totalWithDelivery.toFixed(2)} AZN</span>`;
+            if (deliveryFee > 0) totalText = `Məhsullar: ${grandTotal.toFixed(2)} AZN + Çatdırılma: ${deliveryFee.toFixed(2)} AZN = <span class="text-amber-400 font-bold">Yekun: ${totalWithDelivery.toFixed(2)} AZN</span>`;
             document.getElementById('cartTotalPrice').innerHTML = totalText;
         }
 
@@ -3032,16 +3012,16 @@
                 if(Array.isArray(o.items)) {
                     o.items.forEach(i => { itemsStr += `<div>• ${i.name} - ${i.grams} qr/ədəd (${i.total.toFixed(2)} AZN)</div>`; });
                 }
-                let statusColor = o.status === 'Qəbul edildi' ? 'text-green-700' : (o.status === 'Ləğv edildi' ? 'text-red-700' : 'text-amber-800');
+                let statusColor = o.status === 'Qəbul edildi' ? 'text-green-400' : (o.status === 'Ləğv edildi' ? 'text-red-400' : 'text-amber-400');
                 let deliveryInfoStr = o.is_delivery ? ` | Çatdırılma: ${o.delivery_fee ? o.delivery_fee + ' AZN' : 'Pulsuz'}` : '';
 
                 let readStatusIcon = o.is_read 
-                    ? `<span style="color: #2563eb; font-weight: bold; font-size: 14px;" title="Oxundu">✓✓</span>` 
+                    ? `<span style="color: #60a5fa; font-weight: bold; font-size: 14px;" title="Oxundu">✓✓</span>` 
                     : `<span style="color: #9ca3af; font-weight: bold; font-size: 14px;" title="Göndərildi (Oxunmayıb)">✓✓</span>`;
 
                 html += `
-                    <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200 space-y-2 text-xs">
-                        <div class="flex justify-between items-center border-b border-zinc-200 pb-1">
+                    <div class="bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800 space-y-2 text-xs">
+                        <div class="flex justify-between items-center border-b border-zinc-800 pb-1">
                             <div class="flex items-center space-x-2">
                                 <span class="font-bold gold-text">${o.customer_name} (${o.customer_phone})</span>
                                 <span>${readStatusIcon}</span>
@@ -3049,12 +3029,12 @@
                             <span class="font-bold ${statusColor}">${o.status}</span>
                         </div>
                         <div><strong>Ünvan:</strong> ${o.address}${deliveryInfoStr}</div>
-                        <div><strong>Sifarişlər:</strong><div class="pl-2 text-zinc-600">${itemsStr}</div></div>
+                        <div><strong>Sifarişlər:</strong><div class="pl-2 text-zinc-400">${itemsStr}</div></div>
                         <div class="text-zinc-500 text-[11px]">Tarix: ${formattedDate}</div>
-                        <div class="flex space-x-2 pt-2 border-t border-zinc-200">
+                        <div class="flex space-x-2 pt-2 border-t border-zinc-800">
                             <button onclick="updateOrderStatus(${o.id}, 'Qəbul edildi')" class="bg-green-700 hover:bg-green-600 text-white px-3 py-1 rounded font-bold">Qəbul Et</button>
                             <button onclick="updateOrderStatus(${o.id}, 'Ləğv edildi')" class="bg-red-800 hover:bg-red-700 text-white px-3 py-1 rounded font-bold">Ləğv Et</button>
-                            <button onclick="deleteOrder(${o.id})" class="bg-zinc-200 hover:bg-red-800 hover:text-white text-zinc-800 px-3 py-1 rounded font-bold ml-auto">Sil 🗑️</button>
+                            <button onclick="deleteOrder(${o.id})" class="bg-[#121212] hover:bg-red-900 hover:text-white text-zinc-300 px-3 py-1 rounded font-bold ml-auto border border-zinc-700">Sil 🗑️</button>
                         </div>
                     </div>
                 `;
@@ -3204,16 +3184,16 @@
             if(aProducts.length === 0) listHtml = '<div class="text-zinc-500 text-xs">A kodu ilə başlayan məhsul tapılmadı.</div>';
             else {
                 aProducts.forEach(p => {
-                    let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-300 cursor-pointer" onclick="showReceipt('${p.image_url}')">` : '<div class="w-12 h-12 bg-zinc-100 rounded border border-zinc-300 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
+                    let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-700 cursor-pointer" onclick="showReceipt('${p.image_url}')">` : '<div class="w-12 h-12 bg-[#1a1a1a] rounded border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
                     listHtml += `
-                        <div class="bg-zinc-50 p-3 rounded-lg space-y-2 border border-zinc-200">
+                        <div class="bg-[#1a1a1a] p-3 rounded-lg space-y-2 border border-zinc-800">
                             <div class="font-bold gold-text text-sm">${p.name} (${p.code})</div>
                             <div class="flex items-center space-x-3">
                                 ${imgPreview}
                                 <div class="flex-1 grid grid-cols-1 md:grid-cols-3 gap-2">
-                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-500 mb-0.5">Şəkil Seçin</label><input type="file" id="det_img_${p.id}" accept="image/*" class="bg-white border border-zinc-300 p-1 rounded text-zinc-900 text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black hover:file:bg-amber-600"></div>
-                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-500 mb-0.5">Tərkibi</label><input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" class="bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs"></div>
-                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-500 mb-0.5">İç notları</label><input type="text" id="det_note_${p.id}" value="${p.notes || ''}" class="bg-white border border-zinc-300 p-2 rounded text-zinc-900 text-xs"></div>
+                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-400 mb-0.5">Şəkil Seçin</label><input type="file" id="det_img_${p.id}" accept="image/*" class="bg-[#121212] border border-zinc-700 p-1 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black hover:file:bg-amber-600"></div>
+                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-400 mb-0.5">Tərkibi</label><input type="text" id="det_ing_${p.id}" value="${p.ingredients || ''}" class="bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs"></div>
+                                    <div class="flex flex-col"><label class="text-[10px] text-zinc-400 mb-0.5">İç notları</label><input type="text" id="det_note_${p.id}" value="${p.notes || ''}" class="bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs"></div>
                                 </div>
                             </div>
                             <button onclick="saveCatalogDetails(${p.id})" class="gold-bg font-bold px-3 py-1 rounded text-xs">Yadda Saxla</button>
@@ -3287,13 +3267,13 @@
                 let shiftBadge = '';
                 if(s.shift_name === 'SEHER') {
                     shiftNameText = 'səhər';
-                    shiftBadge = '<span class="text-amber-800 font-semibold text-[10px]">☀️ Səhər</span>';
+                    shiftBadge = '<span class="text-amber-400 font-semibold text-[10px]">☀️ Səhər</span>';
                 } else if(s.shift_name === 'GUNORTA') {
                     shiftNameText = 'günorta';
-                    shiftBadge = '<span class="text-blue-700 font-semibold text-[10px]">🌙 Günorta</span>';
+                    shiftBadge = '<span class="text-blue-400 font-semibold text-[10px]">🌙 Günorta</span>';
                 } else {
                     shiftNameText = 'admin';
-                    shiftBadge = '<span class="text-purple-700 font-semibold text-[10px]">👑 Admin</span>';
+                    shiftBadge = '<span class="text-purple-400 font-semibold text-[10px]">👑 Admin</span>';
                 }
 
                 let adStatus = s.fromAd ? '✅ Hə' : '❌ Yox';
@@ -3306,8 +3286,8 @@
                     let pPrice = Number(s.total_price || 0);
                     todayTotalSum += pPrice;
                     todayBoxHtml += `
-                        <div class="flex justify-between items-center bg-white p-2 rounded border border-zinc-200">
-                            <div><strong>${pName}</strong> (${s.grams_sold} qr) — <span class="text-zinc-500">${payTypeText}</span></div>
+                        <div class="flex justify-between items-center bg-[#121212] p-2 rounded border border-zinc-800">
+                            <div><strong>${pName}</strong> (${s.grams_sold} qr) — <span class="text-zinc-400">${payTypeText}</span></div>
                             <div class="font-bold gold-text">${pPrice.toFixed(2)} AZN</div>
                         </div>
                     `;
@@ -3318,18 +3298,18 @@
                     return;
                 }
 
-                let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-800 hover:text-amber-700 font-bold mr-2">Redaktə et</button>`;
-                if(role === 'ADMIN') actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-700 hover:text-red-800 font-bold">Sil</button>`;
+                let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Redaktə et</button>`;
+                if(role === 'ADMIN') actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-300 font-bold">Sil</button>`;
 
                 logHtml += `
-                    <tr class="border-b border-zinc-200">
+                    <tr class="border-b border-zinc-800">
                         <td class="p-2 font-bold">${index}</td>
-                        <td class="p-2 text-zinc-500 text-[11px]">${sDate}</td>
+                        <td class="p-2 text-zinc-400 text-[11px]">${sDate}</td>
                         <td class="p-2">${shiftBadge}</td>
-                        <td class="p-2 font-bold ${s.type === 'MEXARIC' ? 'text-green-700' : 'text-blue-700'}">${s.type}</td>
-                        <td class="p-2">${pName} <span class="text-zinc-400 font-mono text-[10px]">(${pCode})</span></td>
+                        <td class="p-2 font-bold ${s.type === 'MEXARIC' ? 'text-green-400' : 'text-blue-400'}">${s.type}</td>
+                        <td class="p-2">${pName} <span class="text-zinc-500 font-mono text-[10px]">(${pCode})</span></td>
                         <td class="p-2">${s.grams_sold}</td>
-                        <td class="p-2 text-zinc-700">${payTypeText}</td>
+                        <td class="p-2 text-zinc-300">${payTypeText}</td>
                         <td class="p-2 font-bold gold-text">${s.total_price} AZN</td>
                         <td class="p-2">${adStatus}</td>
                         <td class="p-2">${cashStatus}</td>
