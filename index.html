@@ -1052,7 +1052,7 @@
             </div>
         </div>
 
-        <!-- MAĞAZA ŞƏKİLİ VƏ HAQQINDA BLOKU -->
+        <!-- MAĞAZA ŞƏKİLİ VƏ HAqqINDA BLOKU -->
         <div class="info-block bg-[#121212] border border-amber-500/40 p-4 rounded-xl space-y-3 text-center no-print text-white shadow-sm">
             <div class="flex justify-center">
                 <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" alt="Melodika Parfum" class="w-24 h-24 object-cover rounded-full border-2 border-amber-500 shadow-md">
@@ -2730,7 +2730,7 @@
                     </div>
 
                     <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
-                        Ümumi mağaza satışlı: ${totalAmount.toFixed(2)} AZN<br>
+                        Ümumi mağaza satışı: ${totalAmount.toFixed(2)} AZN<br>
                         Cəmi POS Terminal: ${totalPosSum.toFixed(2)} AZN<br>
                         <span style="color: #047857;">Cəmi Kassa Aparatına Vurulan: ${totalCashRegSum.toFixed(2)} AZN</span>
                     </div>
@@ -3672,7 +3672,7 @@
                 });
             }
 
-            // DÜZƏLİŞ: Ümumi mağaza satışı yalnız tək-tək vurulan satışların əsl cəmidir (şəkildəki 150 manat kimi səhv statik dəyərlər ləğv edildi)
+            // DÜZƏLİŞ: Ümumi mağaza satışı yalnız tək-tək vurulan satışların əsl cəmidir
             let totalAmount = seherTotal + gunortaTotal + adminTotal;
             
             let summaryHtml = `
