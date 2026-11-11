@@ -167,9 +167,9 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Sheet 🗂️</button>
+                    <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Mərkəzi 🗂️</button>
                     <button id="adminTopCashBtn" onclick="openCashPinModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Kassa Mərkəzi 💰</button>
-                    <button id="adminTopReportsBtn" onclick="openTopReportsModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Hesabatlar Sheeti 📊</button>
+                    <button id="adminTopReportsBtn" onclick="openTopReportsModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-black font-bold px-2.5 py-1.5 rounded text-xs shadow">Hesabatlar Mərkəzi 📊</button>
                     <button onclick="openOperationsLogModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
                     <button onclick="openDayEndModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
                     <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
@@ -275,13 +275,21 @@
                     <h2 id="yearlyDetailTitle" class="text-sm font-bold gold-text">2026 Detal</h2>
                     <button onclick="closeYearlyDetailModal()" class="text-xs bg-zinc-800 px-2.5 py-1 rounded">X</button>
                 </div>
+
+                <div id="salesPeriodFilterBox" class="flex bg-zinc-800 p-1 rounded-lg text-xs space-x-1 mb-2">
+                    <button onclick="renderSalesDetailByPeriod('day')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Günlük</button>
+                    <button onclick="renderSalesDetailByPeriod('week')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Həftəlik</button>
+                    <button onclick="renderSalesDetailByPeriod('month')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">Aylıq</button>
+                    <button onclick="renderSalesDetailByPeriod('year')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
+                </div>
+
                 <div id="yearlyDetailContent" class="space-y-2 text-xs text-zinc-300 max-h-[60vh] overflow-y-auto">
                     <!-- Detallar bura yüklənəcək -->
                 </div>
             </div>
         </div>
 
-        <!-- HESABATLAR MƏRKƏZİ MODALI (YUXARIDAKI DÜYMƏ ÜÇÜN) -->
+        <!-- HESABATLAR MƏRKƏZİ MODALI -->
         <div id="topReportsModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
             <div class="max-w-xl w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -315,9 +323,6 @@
                     </button>
                     <button onclick="openExpensesModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
                         <span>💸</span><span>Xərclər</span>
-                    </button>
-                    <button onclick="openAttendanceModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/40 font-bold p-3 rounded text-xs flex flex-col items-center justify-center space-y-1">
-                        <span>🕒</span><span>İş Saatları</span>
                     </button>
                 </div>
             </div>
@@ -490,7 +495,6 @@
                             </label>
                         </div>
                         <div>
-                            <!-- YALNIZ ADMİN ÜÇÜN GÖRÜNƏN DÜYMƏ -->
                             <button type="button" id="adminYesterdayBtn" onclick="shiftSaleToYesterday()" class="hidden-screen bg-amber-600/30 hover:bg-amber-600/50 text-amber-300 border border-amber-500/50 text-[11px] font-bold px-2.5 py-1.5 rounded shadow">
                                 ⏳ Dünənə at (23:59)
                             </button>
@@ -505,10 +509,10 @@
             </div>
         </div>
 
-        <!-- MASTER ARXİV SHEET PİN MODALI -->
+        <!-- MASTER ARXİV PİN MODALI -->
         <div id="masterArchivePinModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
             <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
-                <h2 class="text-base font-bold gold-text">Arxiv Sheet Girişi</h2>
+                <h2 class="text-base font-bold gold-text">Arxiv Girişi</h2>
                 <p class="text-xs text-zinc-400">PIN kodunu (000) daxil edin:</p>
                 <input type="password" id="masterArchivePinInput" placeholder="PIN Kod (000)" class="w-full text-center text-xl bg-zinc-800 border border-zinc-700 p-3 rounded-lg text-white focus:outline-none gold-border">
                 <div class="flex space-x-2">
@@ -531,7 +535,7 @@
                     
                     <div class="space-y-3 bg-zinc-800/80 p-3 rounded-xl border border-zinc-700">
                         <div class="flex justify-between items-center border-b border-zinc-800 pb-1">
-                            <h3 class="text-sm font-bold gold-text">📅 Gün Sonu Hesabatları Arxivi (İl və Ay Seçimi):</h3>
+                            <h3 class="text-sm font-bold gold-text">📅 Gün Sonu Hesabatları Arxivi:</h3>
                             <button onclick="deleteSelectedDayEndArchives()" class="bg-red-800 hover:bg-red-700 text-white font-bold px-3 py-1 rounded text-xs shadow">Seçilmişləri Sil 🗑️</button>
                         </div>
                         
@@ -578,7 +582,7 @@
             </div>
         </div>
 
-        <!-- ARXİV BÖLMƏSİ ÜÇÜN İL, AY VƏ GÜN SEÇİM MODALI -->
+        <!-- ARXİV BÖLMƏSİ ÜÇÜN SEÇİM VƏ NƏTİCƏ MODALI -->
         <div id="archiveSectionModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -589,28 +593,46 @@
                 <div class="space-y-3 bg-zinc-800/80 p-3 rounded-xl border border-zinc-700">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                         <div>
-                            <label class="text-[10px] text-zinc-400 block mb-1">İl seçin:</label>
-                            <select id="secArchiveYearSelect" onchange="renderArchiveSectionDays()" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs font-bold"></select>
+                            <label class="text-[10px] text-zinc-400 block mb-1">Başlanğıc Tarix:</label>
+                            <input type="date" id="secArchiveStartDate" onchange="renderArchiveSectionDays()" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs font-bold">
                         </div>
                         <div>
-                            <label class="text-[10px] text-zinc-400 block mb-1">Ay seçin:</label>
-                            <select id="secArchiveMonthSelect" onchange="renderArchiveSectionDays()" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs font-bold">
-                                <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
-                                <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
-                                <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
-                            </select>
+                            <label class="text-[10px] text-zinc-400 block mb-1">Son Tarix:</label>
+                            <input type="date" id="secArchiveEndDate" onchange="renderArchiveSectionDays()" class="w-full bg-zinc-900 border border-zinc-700 p-2 rounded text-white text-xs font-bold">
                         </div>
                     </div>
 
                     <div id="secArchiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-700">
-                        <!-- Günlər bura göy rəngdə yüklənəcək -->
+                        <!-- Günlər göy rəngdə bura yüklənəcək -->
                     </div>
                 </div>
 
-                <!-- Seçilmiş günün məlumatının göstəriləcəyi sahə -->
-                <div id="secArchiveDetailContainer" class="bg-zinc-800/90 p-4 rounded-xl border border-zinc-700 space-y-2 hidden-screen">
+                <!-- SEÇİLMİŞ GÜNÜN / TARİXİN MƏLUMATI -->
+                <div id="secArchiveDetailContainer" class="bg-zinc-800/90 p-4 rounded-xl border border-zinc-700 space-y-3 hidden-screen">
                     <div id="secArchiveDetailTitle" class="font-bold gold-text text-sm border-b border-zinc-700 pb-1">Seçilmiş Günün Məlumatı</div>
                     <div id="secArchiveDetailContent" class="text-xs text-zinc-200"></div>
+                </div>
+
+                <!-- XƏRCLƏR ÜÇÜN PNG VƏ İŞ SAATLARI ÜÇÜN PDF DÜYMƏLƏRİ (BİRBAŞA ARXİVDƏ) -->
+                <div id="archiveActionFooter" class="space-y-3 pt-2 border-t border-zinc-800 hidden-screen">
+                    <!-- Xərclər Şəkil Kimi Yüklə -->
+                    <div id="archiveExpDownloadBox" class="hidden-screen space-y-2">
+                        <button onclick="downloadArchiveExpensesAsImage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs shadow">Xərcləri Şəkil Kimi Yüklə (PNG) 📥</button>
+                    </div>
+
+                    <!-- İş saatları PDF Yüklə -->
+                    <div id="archiveAttDownloadBox" class="hidden-screen space-y-2 bg-zinc-800/60 p-3 rounded-lg border border-zinc-700">
+                        <div class="text-xs font-bold gold-text mb-1">Aylıq İş Saatları Hesabatını PDF Kimi Yüklə:</div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="archivePdfMonth" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
+                                <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
+                                <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
+                                <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
+                            </select>
+                            <select id="archivePdfYear" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs"></select>
+                        </div>
+                        <button onclick="downloadAttendanceAsPDFFromArchive()" class="w-full gold-bg font-bold py-2 rounded text-xs mt-1">Aylıq Hesabatı PDF Kimi Yüklə 📄</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -628,11 +650,11 @@
             </div>
         </div>
 
-        <!-- KASSA SHEET / İDARƏETMƏ MODALI -->
+        <!-- KASSA / İDARƏETMƏ MODALI -->
         <div id="cashSheetModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-                    <h2 class="text-lg font-bold gold-text" id="cashSheetTitle">KASSA SHEET-İ</h2>
+                    <h2 class="text-lg font-bold gold-text" id="cashSheetTitle">KASSA MƏRKƏZİ</h2>
                     <button onclick="closeCashSheetModal()" class="text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
 
@@ -752,47 +774,25 @@
             </div>
         </div>
 
-        <!-- İŞÇİLƏRİN İŞ SAATLARI SHEET -->
-        <div id="attendanceModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
-            <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
-                    <div>
-                        <h2 class="text-lg font-bold gold-text">🕒 İŞÇİLƏRİN GƏLİB-GETMƏ VAXTLARI (PDF ŞƏKLİNDƏ)</h2>
-                        <div class="text-xs text-zinc-400">Səhər və Günorta smenləri dəftər nümunəsinə uyğun olaraq eyni cədvəldə göstərilir.</div>
-                    </div>
-                    <div class="flex items-center space-x-2">
-                        <select id="attYearSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
-                        <select id="attMonthSelect" onchange="renderAttendanceSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold">
-                            <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
-                            <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
-                            <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
-                        </select>
-                        <button onclick="closeAttendanceModal()" class="no-print text-xs bg-zinc-800 px-3 py-1.5 rounded text-zinc-300 hover:bg-zinc-700">Bağla</button>
-                    </div>
-                </div>
+        <!-- İŞÇİLƏRİN İŞ SAATLARI ÇAP HİSSƏSİ (GİZLİ) -->
+        <div id="attendanceModal" class="hidden-screen">
+            <div id="attendancePrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg text-xs">
+                <div id="attendancePrintHeader" class="text-sm font-bold text-black border-b-2 border-black pb-2">Noyabr ayı üzrə işçinin gəlib-getmə vaxtları</div>
+                
+                <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;" border="1">
+                    <thead>
+                        <tr style="background-color: #f0f0f0;">
+                            <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 25%;">Tarix</th>
+                            <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 37.5%;">Səhər smeni</th>
+                            <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 37.5%;">Günorta smeni</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attendanceTableBody"></tbody>
+                </table>
 
-                <div id="attendancePrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg text-xs">
-                    <div id="attendancePrintHeader" class="text-sm font-bold text-black border-b-2 border-black pb-2">Noyabr ayı üzrə işçinin gəlib-getmə vaxtları</div>
-                    
-                    <table style="width: 100%; border-collapse: collapse; border: 1px solid #000;" border="1">
-                        <thead>
-                            <tr style="background-color: #f0f0f0;">
-                                <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 25%;">Tarix</th>
-                                <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 37.5%;">Səhər smeni</th>
-                                <th style="padding: 6px; border: 1px solid #000; text-align: center; width: 37.5%;">Günorta smeni</th>
-                            </tr>
-                        </thead>
-                        <tbody id="attendanceTableBody"></tbody>
-                    </table>
-
-                    <div class="pt-4 border-t-2 border-black flex justify-between items-center font-bold text-black text-xs">
-                        <span>Melodika Parfum</span>
-                        <span>Yerinə yetirildi</span>
-                    </div>
-                </div>
-
-                <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
-                    <button onclick="downloadAttendanceAsPDF()" class="gold-bg font-bold px-4 py-2 rounded text-xs">PDF Kimi Yadda Saxla 📄</button>
+                <div class="pt-4 border-t-2 border-black flex justify-between items-center font-bold text-black text-xs">
+                    <span>Melodika Parfum</span>
+                    <span>Yerinə yetirildi</span>
                 </div>
             </div>
         </div>
@@ -872,12 +872,12 @@
             </div>
         </div>
 
-        <!-- XƏRCLƏR SHEET -->
+        <!-- XƏRCLƏR İDARƏ MODALI -->
         <div id="expensesModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-4xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                     <div>
-                        <h2 class="text-lg font-bold gold-text" id="expenseHeaderTitle">XƏRCLƏR SHEETİ</h2>
+                        <h2 class="text-lg font-bold gold-text" id="expenseHeaderTitle">XƏRCLƏR BÖLMƏSİ</h2>
                         <div class="text-xs text-zinc-400">İl və ay seçərək xərcləri günlər üzrə daxil edin və şəkil əlavə edin.</div>
                     </div>
                     <div class="flex items-center space-x-2">
@@ -977,7 +977,7 @@
             <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white text-center shadow-2xl">
                 <div class="text-4xl">⚠️</div>
                 <div class="text-sm font-medium text-zinc-200 leading-relaxed">
-                    Minimum 30 AZN sifariş edildikdə, çatdırılma pulsuzddur. Əks halda 7 AZN əlavə ödəniş ediləcək.
+                    Minimum 30 AZN sifariş edildikdə, çatdırılma pulsuzdur. Əks halda 7 AZN əlavə ödəniş ediləcək.
                 </div>
                 <div class="flex space-x-3 pt-2">
                     <button onclick="rejectDelivery()" class="w-1/2 bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2.5 rounded-lg text-xs">İmtina Et</button>
@@ -1152,8 +1152,10 @@
                 let oRes = await _supabase.from('orders').select('*');
                 if(!oRes.error) orders = oRes.data || [];
 
-                let eRes = await _supabase.from('expenses').select('*');
-                if(!eRes.error) expenses = eRes.data || [];
+                try {
+                    let eRes = await _supabase.from('expenses').select('*');
+                    if(!eRes.error) expenses = eRes.data || [];
+                } catch(e) { expenses = []; }
 
                 try {
                     let cRes = await _supabase.from('cash_state').select('*').limit(1);
@@ -1233,50 +1235,119 @@
 
         function openYearlyDetailModal(type) {
             let title = '';
-            let contentHtml = '';
-
             if(type === 'sales') {
                 title = '2026 cı il üzrə Toplam Satış Detalları';
-                let sum = 0;
-                let list = '';
-                sales.forEach(s => {
-                    let sDate = s.date ? String(s.date).substring(0, 4) : '';
-                    if(sDate === '2026' && s.type === 'MEXARIC') {
-                        sum += Number(s.total_price || 0);
-                        let p = products.find(x => x.id == s.product_id);
-                        list += `<div>• ${s.date ? s.date.substring(0, 10) : ''}: ${p ? p.name : ''} - ${s.total_price} AZN</div>`;
-                    }
-                });
-                contentHtml = `<div class="font-bold gold-text mb-2">Toplam: ${sum.toFixed(2)} AZN</div><div class="space-y-1 max-h-50 overflow-y-auto">${list || 'Satış yoxdur'}</div>`;
-            } else if(type === 'profit') {
-                title = '2026 cı il ərzində Toplam Net Gəlir Detalları';
-                let grossProfit = 0;
-                sales.forEach(s => {
-                    let sDate = s.date ? String(s.date).substring(0, 4) : '';
-                    if(sDate === '2026' && s.type === 'MEXARIC') grossProfit += Number(s.profit || 0);
-                });
-                let totalExp = 0;
-                expenses.forEach(e => {
-                    if(String(e.expense_date).substring(0, 4) === '2026') totalExp += Number(e.amount || 0);
-                });
-                let net = grossProfit - totalExp;
-                contentHtml = `<div class="space-y-1"><div>Ümumi Qross Mənfəət: ${grossProfit.toFixed(2)} AZN</div><div>Toplam Xərclər: ${totalExp.toFixed(2)} AZN</div><div class="font-bold text-green-400 pt-1 border-t border-zinc-700">Net Gəlir: ${net.toFixed(2)} AZN</div></div>`;
-            } else if(type === 'expenses') {
-                title = '2026 cı il üzrə Toplam Xərclər Detalları';
-                let sum = 0;
-                let list = '';
-                expenses.forEach(e => {
-                    if(String(e.expense_date).substring(0, 4) === '2026') {
-                        sum += Number(e.amount || 0);
-                        list += `<div>• ${e.expense_date}: ${e.title} - ${Number(e.amount).toFixed(2)} AZN</div>`;
-                    }
-                });
-                contentHtml = `<div class="font-bold text-red-400 mb-2">Toplam Xərc: ${sum.toFixed(2)} AZN</div><div class="space-y-1 max-h-50 overflow-y-auto">${list || 'Xərc yoxdur'}</div>`;
+                document.getElementById('salesPeriodFilterBox').classList.remove('hidden-screen');
+                renderSalesDetailByPeriod('year');
+            } else {
+                document.getElementById('salesPeriodFilterBox').classList.add('hidden-screen');
+                let contentHtml = '';
+                if(type === 'profit') {
+                    title = '2026 cı il ərzində Toplam Net Gəlir Detalları';
+                    let grossProfit = 0;
+                    sales.forEach(s => {
+                        let sDate = s.date ? String(s.date).substring(0, 4) : '';
+                        if(sDate === '2026' && s.type === 'MEXARIC') grossProfit += Number(s.profit || 0);
+                    });
+                    let totalExp = 0;
+                    expenses.forEach(e => {
+                        if(String(e.expense_date).substring(0, 4) === '2026') totalExp += Number(e.amount || 0);
+                    });
+                    let net = grossProfit - totalExp;
+                    contentHtml = `<div class="space-y-1"><div>Ümumi Qross Mənfəət: ${grossProfit.toFixed(2)} AZN</div><div>Toplam Xərclər: ${totalExp.toFixed(2)} AZN</div><div class="font-bold text-green-400 pt-1 border-t border-zinc-700">Net Gəlir: ${net.toFixed(2)} AZN</div></div>`;
+                } else if(type === 'expenses') {
+                    title = '2026 cı il üzrə Toplam Xərclər Detalları';
+                    let sum = 0;
+                    let list = '';
+                    expenses.forEach(e => {
+                        if(String(e.expense_date).substring(0, 4) === '2026') {
+                            sum += Number(e.amount || 0);
+                            list += `<div>• ${e.expense_date}: ${e.title} - ${Number(e.amount).toFixed(2)} AZN</div>`;
+                        }
+                    });
+                    contentHtml = `<div class="font-bold text-red-400 mb-2">Toplam Xərc: ${sum.toFixed(2)} AZN</div><div class="space-y-1 max-h-50 overflow-y-auto">${list || 'Xərc yoxdur'}</div>`;
+                }
+                document.getElementById('yearlyDetailContent').innerHTML = contentHtml;
             }
 
             document.getElementById('yearlyDetailTitle').textContent = title;
-            document.getElementById('yearlyDetailContent').innerHTML = contentHtml;
             document.getElementById('yearlyDetailModal').classList.remove('hidden-screen');
+        }
+
+        function renderSalesDetailByPeriod(period = 'year') {
+            let now = new Date();
+            let startDateStr = '';
+            let endDateStr = getBakuDateString(now);
+
+            if (period === 'day') {
+                startDateStr = getBakuDateString(now);
+            } else if (period === 'week') {
+                let d = new Date(now);
+                d.setDate(d.getDate() - (d.getDay() || 7) + 1);
+                startDateStr = getBakuDateString(d);
+            } else if (period === 'month') {
+                let d = new Date(now.getFullYear(), now.getMonth(), 1);
+                startDateStr = getBakuDateString(d);
+            } else if (period === 'year') {
+                startDateStr = `${now.getFullYear()}-01-01`;
+            }
+
+            let filteredSales = sales.filter(s => {
+                let sDate = s.date ? getBakuDateString(s.date) : '';
+                return s.type === 'MEXARIC' && sDate >= startDateStr && sDate <= endDateStr;
+            });
+
+            let totalSalesAmount = 0;
+            let totalCostAmount = 0;
+            let perfumeSummaryMap = {};
+
+            filteredSales.forEach(s => {
+                let price = Number(s.total_price || 0);
+                let grams = Number(s.grams_sold || 0);
+                let p = products.find(x => x.id == s.product_id);
+                let buyPrice = p ? Number(p.buy_price || 0) : 0;
+                let cost = grams * buyPrice;
+
+                totalSalesAmount += price;
+                totalCostAmount += cost;
+
+                let pName = p ? p.name : 'Naməlum Ətir';
+                if(!perfumeSummaryMap[pName]) {
+                    perfumeSummaryMap[pName] = { grams: 0, totalPrice: 0, totalCost: 0 };
+                }
+                perfumeSummaryMap[pName].grams += grams;
+                perfumeSummaryMap[pName].totalPrice += price;
+                perfumeSummaryMap[pName].totalCost += cost;
+            });
+
+            let listHtml = '';
+            for(let pName in perfumeSummaryMap) {
+                let item = perfumeSummaryMap[pName];
+                listHtml += `
+                    <div class="bg-zinc-800/80 p-2.5 rounded-lg border border-zinc-700/70 flex justify-between items-center text-xs">
+                        <div>
+                            <strong class="gold-text text-sm">${pName}</strong>
+                            <div class="text-[11px] text-zinc-400">Satılan: ${item.grams} qr | Maya Dəyəri: <span class="text-amber-300 font-bold">${item.totalCost.toFixed(2)} AZN</span></div>
+                        </div>
+                        <div class="text-right font-extrabold text-green-400 text-sm">${item.totalPrice.toFixed(2)} AZN</div>
+                    </div>
+                `;
+            }
+
+            let periodTitleAz = period === 'day' ? 'Günlük' : (period === 'week' ? 'Həftəlik' : (period === 'month' ? 'Aylıq' : 'İllik'));
+
+            let summaryHeader = `
+                <div class="bg-zinc-800 p-3 rounded-xl border border-amber-500/40 space-y-1 mb-3">
+                    <div class="text-xs text-zinc-300">Dövr: <strong>${periodTitleAz} (${startDateStr} / ${endDateStr})</strong></div>
+                    <div class="text-sm font-bold text-white">Toplam Satış: <span class="gold-text">${totalSalesAmount.toFixed(2)} AZN</span></div>
+                    <div class="text-sm font-bold text-amber-400">Ətirlərin Ümumi Maya Dəyəri: ${totalCostAmount.toFixed(2)} AZN</div>
+                </div>
+                <div class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                    ${listHtml || '<div class="text-zinc-500 text-center py-2">Bu dövr üzrə satış yoxdur.</div>'}
+                </div>
+            `;
+
+            document.getElementById('yearlyDetailContent').innerHTML = summaryHeader;
         }
 
         function closeYearlyDetailModal() {
@@ -1519,20 +1590,20 @@
             let currentYr = new Date().getFullYear();
             let currentMo = new Date().getMonth() + 1;
             
-            ['archiveYearSelect', 'secArchiveYearSelect'].forEach(id => {
-                let yearSel = document.getElementById(id);
-                if(yearSel) {
-                    yearSel.innerHTML = '';
-                    for(let y = currentYr - 2; y <= currentYr + 2; y++) {
-                        yearSel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
-                    }
+            let yearSel = document.getElementById('archiveYearSelect');
+            if(yearSel) {
+                yearSel.innerHTML = '';
+                for(let y = currentYr - 2; y <= currentYr + 2; y++) {
+                    yearSel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
                 }
-            });
+            }
 
-            ['archiveMonthSelect', 'secArchiveMonthSelect'].forEach(id => {
-                let monthSel = document.getElementById(id);
-                if(monthSel) monthSel.value = currentMo;
-            });
+            let monthSel = document.getElementById('archiveMonthSelect');
+            if(monthSel) monthSel.value = currentMo;
+
+            let today = getBakuDateString();
+            if(document.getElementById('secArchiveStartDate')) document.getElementById('secArchiveStartDate').value = today;
+            if(document.getElementById('secArchiveEndDate')) document.getElementById('secArchiveEndDate').value = today;
         }
 
         function renderArchiveCalendar() {
@@ -1593,9 +1664,26 @@
             initArchiveSelectors();
             
             let titleStr = '';
-            if(sectionType === 'attendance') titleStr = '🕒 İşçinin İş Saatları Arxivi';
-            else if(sectionType === 'expenses') titleStr = '💸 Xərclər Arxivi';
-            else if(sectionType === 'reports') titleStr = '📊 Həftəlik / Aylıq / İllik Hesabatlar Arxivi';
+            let actionFooter = document.getElementById('archiveActionFooter');
+            let expBox = document.getElementById('archiveExpDownloadBox');
+            let attBox = document.getElementById('archiveAttDownloadBox');
+
+            actionFooter.classList.add('hidden-screen');
+            expBox.classList.add('hidden-screen');
+            attBox.classList.add('hidden-screen');
+
+            if(sectionType === 'attendance') {
+                titleStr = '🕒 İşçinin İş Saatları Arxivi';
+                actionFooter.classList.remove('hidden-screen');
+                attBox.classList.remove('hidden-screen');
+                initArchivePdfYearSelect();
+            } else if(sectionType === 'expenses') {
+                titleStr = '💸 Xərclər Arxivi';
+                actionFooter.classList.remove('hidden-screen');
+                expBox.classList.remove('hidden-screen');
+            } else if(sectionType === 'reports') {
+                titleStr = '📊 Həftəlik / Aylıq / İllik Hesabatlar Arxivi';
+            }
 
             document.getElementById('archiveSectionModalTitle').textContent = titleStr;
             document.getElementById('secArchiveDetailContainer').classList.add('hidden-screen');
@@ -1603,33 +1691,53 @@
             document.getElementById('archiveSectionModal').classList.remove('hidden-screen');
         }
 
+        function initArchivePdfYearSelect() {
+            let currentYr = new Date().getFullYear();
+            let currentMo = new Date().getMonth() + 1;
+            let yearSel = document.getElementById('archivePdfYear');
+            if(yearSel) {
+                yearSel.innerHTML = '';
+                for(let y = currentYr - 2; y <= currentYr + 2; y++) {
+                    yearSel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
+                }
+            }
+            if(document.getElementById('archivePdfMonth')) document.getElementById('archivePdfMonth').value = currentMo;
+        }
+
         function closeArchiveSectionModal() {
             document.getElementById('archiveSectionModal').classList.add('hidden-screen');
         }
 
         function renderArchiveSectionDays() {
-            let year = parseInt(document.getElementById('secArchiveYearSelect').value);
-            let month = parseInt(document.getElementById('secArchiveMonthSelect').value);
-            let daysInMonth = getDaysInMonth(year, month);
-            let monthName = monthNamesAz[month - 1];
-            let monthStr = String(month).padStart(2, '0');
+            let startStr = document.getElementById('secArchiveStartDate').value;
+            let endStr = document.getElementById('secArchiveEndDate').value;
 
             let container = document.getElementById('secArchiveDaysContainer');
             if(!container) return;
+            if(!startStr || !endStr) { container.innerHTML = '<div class="text-zinc-500 text-center py-2">Tarix aralığını seçin.</div>'; return; }
+
+            let startDate = new Date(startStr);
+            let endDate = new Date(endStr);
+            if(startDate > endDate) { container.innerHTML = '<div class="text-red-400 text-center py-2">Başlanğıc tarixi son tarixdən böyük ola bilməz!</div>'; return; }
 
             let html = '';
-            for(let d = 1; d <= daysInMonth; d++) {
-                let dayStr = String(d).padStart(2, '0');
-                let dateKey = `${year}-${monthStr}-${dayStr}`;
+            let cur = new Date(startDate);
+
+            while(cur <= endDate) {
+                let dateKey = cur.toISOString().split('T')[0];
+                let dNum = cur.getDate();
+                let mName = monthNamesAz[cur.getMonth()];
+                let yr = cur.getFullYear();
 
                 html += `
                     <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-700/60 hover:bg-zinc-800 transition-colors">
-                        <span onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək bax">${d} ${monthName} ${year}</span>
-                        <span class="text-[10px] text-amber-400">Göstər 👁️</span>
+                        <span onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək bax">${dNum} ${mName} ${yr}</span>
+                        <button onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-[11px] bg-blue-600/30 text-blue-300 hover:bg-blue-600/50 border border-blue-500/40 px-2 py-0.5 rounded font-bold">Göstər 👁️</button>
                     </div>
                 `;
+                cur.setDate(cur.getDate() + 1);
             }
-            container.innerHTML = html;
+            container.innerHTML = html || '<div class="text-zinc-500 text-center py-2">Günlər tapılmadı.</div>';
         }
 
         function openArchiveSectionDayDetail(dateKey) {
@@ -1638,7 +1746,7 @@
             let detailTitle = document.getElementById('secArchiveDetailTitle');
             detailContainer.classList.remove('hidden-screen');
 
-            detailTitle.textContent = `${dateKey} Tarixli Məlumat (${currentActiveArchiveSection === 'attendance' ? 'İş Saatları' : (currentActiveArchiveSection === 'expenses' ? 'Xərclər' : 'Hesabat')})`;
+            detailTitle.textContent = `${dateKey} Tarixli Məlumat (${currentActiveArchiveSection === 'attendance' ? 'İş Saatları' : (currentActiveArchiveSection === 'expenses' ? 'Xərclər' : 'Gün Sonu Hesabatı')})`;
             let html = '';
 
             if(currentActiveArchiveSection === 'attendance') {
@@ -1651,9 +1759,9 @@
                 let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
 
                 html = `
-                    <div class="space-y-1">
-                        <div><strong>Səhər Smeni:</strong> ${checkInS} - ${checkOutS} ${recSeher.note ? '(' + recSeher.note + ')' : ''}</div>
-                        <div><strong>Günorta Smeni:</strong> ${checkInG} - ${checkOutG} ${recGunorta.note ? '(' + recGunorta.note + ')' : ''}</div>
+                    <div class="space-y-1 text-xs">
+                        <div><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS} ${recSeher.note ? '(' + recSeher.note + ')' : ''}</div>
+                        <div><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG} ${recGunorta.note ? '(' + recGunorta.note + ')' : ''}</div>
                     </div>
                 `;
             } else if(currentActiveArchiveSection === 'expenses') {
@@ -1667,29 +1775,121 @@
                             imgHtml += `<div class="mt-3"><img src="${e.image_url}" class="w-full max-h-96 object-contain rounded border border-zinc-700"></div>`;
                         }
                     });
-                    html = `<div class="space-y-2"><div class="space-y-1">${itemsHtml}</div>${imgHtml}</div>`;
+                    html = `<div class="space-y-2 text-xs"><div class="space-y-1">${itemsHtml}</div>${imgHtml}</div>`;
                 } else {
-                    html = `<div class="text-zinc-500">Bu günə aid xərc qeydə alınmayıb.</div>`;
+                    html = `<div class="text-zinc-500 text-xs">Bu günə aid xərc qeydə alınmayıb.</div>`;
                 }
             } else if(currentActiveArchiveSection === 'reports') {
-                let daySales = sales.filter(s => s.date && getBakuDateString(s.date) === dateKey && s.type === 'MEXARIC');
-                let totalDaySales = 0;
-                daySales.forEach(s => totalDaySales += Number(s.total_price || 0));
+                let found = dayEndArchive.find(item => String(item.report_date) === dateKey);
+                if(found) {
+                    html = `<div class="bg-white text-black p-4 rounded text-xs leading-relaxed space-y-2">${found.content_summary}</div>`;
+                } else {
+                    let daySales = sales.filter(s => s.date && getBakuDateString(s.date) === dateKey && s.type === 'MEXARIC');
+                    let totalDaySales = 0;
+                    daySales.forEach(s => totalDaySales += Number(s.total_price || 0));
 
-                let dayExp = expenses.filter(e => String(e.expense_date) === dateKey);
-                let totalDayExp = 0;
-                dayExp.forEach(e => totalDayExp += Number(e.amount || 0));
+                    let dayExp = expenses.filter(e => String(e.expense_date) === dateKey);
+                    let totalDayExp = 0;
+                    dayExp.forEach(e => totalDayExp += Number(e.amount || 0));
 
-                html = `
-                    <div class="space-y-1">
-                        <div><strong>Ümumi Satış:</strong> ${totalDaySales.toFixed(2)} AZN</div>
-                        <div><strong>Xərclər:</strong> ${totalDayExp.toFixed(2)} AZN</div>
-                        <div><strong>Satış sayı:</strong> ${daySales.length} əməliyyat</div>
-                    </div>
-                `;
+                    html = `
+                        <div class="space-y-1 text-xs">
+                            <div><strong>Ümumi Satış:</strong> ${totalDaySales.toFixed(2)} AZN</div>
+                            <div><strong>Xərclər:</strong> ${totalDayExp.toFixed(2)} AZN</div>
+                            <div><strong>Satış əməliyyat sayısı:</strong> ${daySales.length} ədəd</div>
+                        </div>
+                    `;
+                }
             }
 
             detailContent.innerHTML = html;
+        }
+
+        function downloadArchiveExpensesAsImage() {
+            let startStr = document.getElementById('secArchiveStartDate').value;
+            let endStr = document.getElementById('secArchiveEndDate').value;
+            if(!startStr || !endStr) { alert('Zəhmət olmasa başlanğıc və son tarixi seçin!'); return; }
+
+            let filteredExp = expenses.filter(e => {
+                let eDate = String(e.expense_date);
+                return eDate >= startStr && eDate <= endStr;
+            });
+
+            let tempDiv = document.createElement('div');
+            tempDiv.style.backgroundColor = '#ffffff';
+            tempDiv.style.color = '#000000';
+            tempDiv.style.padding = '20px';
+            tempDiv.style.width = '600px';
+            tempDiv.style.fontFamily = 'Arial, sans-serif';
+
+            let itemsListHtml = '';
+            let totalAmount = 0;
+
+            filteredExp.forEach((e, idx) => {
+                let pAmt = Number(e.amount || 0);
+                totalAmount += pAmt;
+                itemsListHtml += `<div style="border-bottom: 1px solid #ddd; padding: 6px 0; font-size: 13px;">${idx + 1}. ${e.expense_date} — ${e.title} : <strong>${pAmt.toFixed(2)} AZN</strong></div>`;
+            });
+
+            tempDiv.innerHTML = `
+                <div style="text-align: center; font-weight: bold; font-size: 16px; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px;">
+                    MELODİKA PARFUM — XƏRCLƏR HESABATI
+                </div>
+                <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px;">Dövr: ${startStr} dən - ${endStr} dək</div>
+                <div style="margin-bottom: 15px;">${itemsListHtml || '<div style="color: #666; font-size: 12px;">Bu tarixlərdə xərc yoxdur.</div>'}</div>
+                <div style="border-top: 2px solid #000; padding-top: 8px; text-align: right; font-weight: bold; font-size: 14px;">
+                    TOPLAM XƏRC MƏBLƏĞİ: ${totalAmount.toFixed(2)} AZN
+                </div>
+            `;
+
+            document.body.appendChild(tempDiv);
+            html2canvas(tempDiv, { backgroundColor: '#ffffff', scale: 2 }).then(canvas => {
+                let link = document.createElement('a');
+                link.download = `Xercler_${startStr}_${endStr}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                document.body.removeChild(tempDiv);
+            });
+        }
+
+        function downloadAttendanceAsPDFFromArchive() {
+            let year = parseInt(document.getElementById('archivePdfYear').value);
+            let month = parseInt(document.getElementById('archivePdfMonth').value);
+
+            if(document.getElementById('attYearSelect')) document.getElementById('attYearSelect').value = year;
+            if(document.getElementById('attMonthSelect')) document.getElementById('attMonthSelect').value = month;
+
+            renderAttendanceSheet();
+
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF('p', 'mm', 'a4');
+            let element = document.getElementById('attendancePrintArea');
+
+            let clone = element.cloneNode(true);
+            let noPrintElems = clone.querySelectorAll('.no-print');
+            noPrintElems.forEach(b => b.remove());
+
+            function replaceTextNodes(node) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.nodeValue = replaceAzCharsForPDF(node.nodeValue);
+                } else {
+                    for (let child of node.childNodes) {
+                        replaceTextNodes(child);
+                    }
+                }
+            }
+            replaceTextNodes(clone);
+
+            doc.html(clone, {
+                callback: function (doc) {
+                    doc.save(`IsSaatlari_${year}_${month}.pdf`);
+                },
+                x: 10,
+                y: 10,
+                width: 190,
+                windowWidth: 700,
+                autoPaging: 'text'
+            });
         }
 
         function openSpecificDayArchive(dateKey) {
@@ -1722,14 +1922,14 @@
             let adminReset = document.getElementById('adminResetSection');
 
             if(userType === 'ADMIN') {
-                document.getElementById('cashSheetTitle').textContent = 'KASSA SHEET-İ (ADMIN)';
+                document.getElementById('cashSheetTitle').textContent = 'KASSA MƏRKƏZİ (ADMIN)';
                 adminControls.classList.remove('hidden-screen');
                 rasimControls.classList.add('hidden-screen');
                 adminReset.classList.remove('hidden-screen');
                 document.getElementById('adminHomeCashInput').value = cashState.home_cash || 0;
                 document.getElementById('adminStoreCashInput').value = cashState.store_cash || 0;
             } else {
-                document.getElementById('cashSheetTitle').textContent = 'KASSA SHEET-İ';
+                document.getElementById('cashSheetTitle').textContent = 'KASSA MƏRKƏZİ';
                 adminControls.classList.add('hidden-screen');
                 rasimControls.classList.remove('hidden-screen');
                 adminReset.classList.add('hidden-screen');
@@ -1897,15 +2097,13 @@
 
         function initYearOptions() {
             let currentYr = new Date().getFullYear();
-            ['expenseYearSelect', 'attYearSelect'].forEach(id => {
-                let sel = document.getElementById(id);
-                if(!sel) return;
+            let sel = document.getElementById('expenseYearSelect');
+            if(sel) {
                 sel.innerHTML = '';
                 for(let y = currentYr - 2; y <= currentYr + 3; y++) sel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
-            });
+            }
             let currentMo = new Date().getMonth() + 1;
             if(document.getElementById('expenseMonthSelect')) document.getElementById('expenseMonthSelect').value = currentMo;
-            if(document.getElementById('attMonthSelect')) document.getElementById('attMonthSelect').value = currentMo;
         }
 
         async function openChatModal() {
@@ -1993,26 +2191,21 @@
             renderChatMessages();
         }
 
-        function openAttendanceModal() {
-            if(role !== 'ADMIN') return;
-            renderAttendanceSheet();
-            document.getElementById('attendanceModal').classList.remove('hidden-screen');
-        }
-
-        function closeAttendanceModal() { document.getElementById('attendanceModal').classList.add('hidden-screen'); }
-
         function getDaysInMonth(year, month) { return new Date(year, month, 0).getDate(); }
 
         function renderAttendanceSheet() {
-            let year = parseInt(document.getElementById('attYearSelect').value);
-            let month = parseInt(document.getElementById('attMonthSelect').value);
+            let year = parseInt(document.getElementById('attYearSelect')?.value || document.getElementById('archivePdfYear')?.value || new Date().getFullYear());
+            let month = parseInt(document.getElementById('attMonthSelect')?.value || document.getElementById('archivePdfMonth')?.value || (new Date().getMonth() + 1));
             let daysCount = getDaysInMonth(year, month);
             let monthName = monthNamesAz[month - 1];
             let monthStr = String(month).padStart(2, '0');
 
-            document.getElementById('attendancePrintHeader').textContent = `${monthName} ayı üzrə işçinin gəlib-getmə vaxtları`;
+            if(document.getElementById('attendancePrintHeader')) {
+                document.getElementById('attendancePrintHeader').textContent = `${monthName} ayı üzrə işçinin gəlib-getmə vaxtları`;
+            }
 
             let tableBody = document.getElementById('attendanceTableBody');
+            if(!tableBody) return;
             let html = '';
 
             let firstDayIndex = new Date(year, month - 1, 1).getDay();
@@ -2109,40 +2302,6 @@
 
         function closeReasonModal() {
             document.getElementById('reasonModal').classList.add('hidden-screen');
-        }
-
-        function downloadAttendanceAsPDF() {
-            const { jsPDF } = window.jspdf;
-            let doc = new jsPDF('p', 'mm', 'a4');
-            let element = document.getElementById('attendancePrintArea');
-
-            let clone = element.cloneNode(true);
-            let noPrintElems = clone.querySelectorAll('.no-print');
-            noPrintElems.forEach(b => b.remove());
-
-            function replaceTextNodes(node) {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    node.nodeValue = replaceAzCharsForPDF(node.nodeValue);
-                } else {
-                    for (let child of node.childNodes) {
-                        replaceTextNodes(child);
-                    }
-                }
-            }
-            replaceTextNodes(clone);
-
-            doc.html(clone, {
-                callback: function (doc) {
-                    let year = document.getElementById('attYearSelect').value;
-                    let month = document.getElementById('attMonthSelect').value;
-                    doc.save(`IsSaatlari_${year}_${month}.pdf`);
-                },
-                x: 10,
-                y: 10,
-                width: 190,
-                windowWidth: 700,
-                autoPaging: 'text'
-            });
         }
 
         function openPeriodicReport(type) {
@@ -2867,14 +3026,18 @@
             let imageUrl = existing ? (existing.image_url || '') : '';
 
             if (fileInput && fileInput.files.length > 0) {
-                let file = fileInput.files[0];
-                let fileName = `exp_${Date.now()}_${file.name}`;
-                let { error: uploadError } = await _supabase.storage.from('perfume-images').upload(fileName, file);
-                if (uploadError) { alert('Şəkil yüklənmə xətası: ' + uploadError.message); return; }
-                imageUrl = _supabase.storage.from('perfume-images').getPublicUrl(fileName).data.publicUrl;
+                try {
+                    let file = fileInput.files[0];
+                    let fileName = `exp_${Date.now()}_${file.name}`;
+                    let { error: uploadError } = await _supabase.storage.from('perfume-images').upload(fileName, file);
+                    if (!uploadError) {
+                        imageUrl = _supabase.storage.from('perfume-images').getPublicUrl(fileName).data.publicUrl;
+                    }
+                } catch(e) {}
             }
 
-            let payload = { expense_date: dateKey, title, amount, image_url: imageUrl };
+            let payload = { expense_date: dateKey, title, amount };
+            if (imageUrl) payload.image_url = imageUrl;
 
             if(existing && existing.id) {
                 let { error } = await _supabase.from('expenses').update(payload).eq('id', existing.id);
