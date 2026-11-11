@@ -71,18 +71,24 @@
             </div>
         </div>
 
-        <!-- ADMIN AD SEÇİMİ MODALI -->
-        <div id="adminWhoAreYouModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
+        <!-- AD / KİM OLDUĞUNU YAZMA MODALI (HƏM ADMIN, HƏM SATICI ÜÇÜN) -->
+        <div id="whoAreYouModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex items-center justify-center z-50">
             <div class="max-w-sm w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
                 <h2 class="text-lg font-bold gold-text">Sən kimsən?</h2>
-                <div class="space-y-2 pt-2">
-                    <button onclick="selectAdminName('Sənan Abbas')" class="w-full bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/50 font-bold py-3 rounded-lg text-sm">
-                        Sənan Abbas 👑
-                    </button>
-                    <button onclick="selectAdminName('Rasim Əsgərzadə')" class="w-full bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/50 font-bold py-3 rounded-lg text-sm">
-                        Rasim Əsgərzadə 👑
-                    </button>
+                <input type="text" id="manualNameInput" placeholder="Adınızı daxil edin..." class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded text-white text-xs text-center">
+                
+                <div class="flex justify-center items-center space-x-6 text-xs pt-2">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="genderRadio" id="genderMale" value="Kişi" checked class="w-4 h-4 accent-amber-500">
+                        <span>Kişi 👨</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="genderRadio" id="genderFemale" value="Qadın" class="w-4 h-4 accent-amber-500">
+                        <span>Qadın 👩</span>
+                    </label>
                 </div>
+
+                <button onclick="submitWhoAreYou()" class="w-full gold-bg font-bold py-2.5 rounded-lg text-xs mt-2">Davam Et 🚀</button>
             </div>
         </div>
 
@@ -283,9 +289,7 @@
                     <button onclick="renderSalesDetailByPeriod('year')" class="px-2.5 py-1 rounded hover:bg-amber-500/25 active:bg-amber-500 text-zinc-300 font-medium">İllik</button>
                 </div>
 
-                <div id="yearlyDetailContent" class="space-y-2 text-xs text-zinc-300 max-h-[60vh] overflow-y-auto">
-                    <!-- Detallar bura yüklənəcək -->
-                </div>
+                <div id="yearlyDetailContent" class="space-y-2 text-xs text-zinc-300 max-h-[60vh] overflow-y-auto"></div>
             </div>
         </div>
 
@@ -336,7 +340,6 @@
                     <button onclick="closeOperationsLogModal()" class="text-xs bg-zinc-800 hover:bg-zinc-700 px-3 py-1 rounded text-white">Bağla</button>
                 </div>
 
-                <!-- BÜTÜN ƏMƏLİYYAT VƏ İDARƏETMƏ DÜYMƏLƏRİ -->
                 <div class="flex flex-wrap gap-2 pt-1 pb-2 border-b border-zinc-800">
                     <button onclick="openSalesFormModal()" class="gold-bg font-bold px-4 py-2 rounded text-xs shadow">Satış Et ➕</button>
                     <button onclick="openProductCatalogModal()" class="bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Məhsul Kataloqu 📦</button>
@@ -344,7 +347,6 @@
                     <button id="logCatalogDetailsBtn" onclick="openCatalogDetailsModal()" class="hidden-screen bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-600/50 font-bold px-4 py-2 rounded text-xs shadow">Kataloq Məlumatları (Şəkil və Notlar) 🖼️</button>
                 </div>
 
-                <!-- MƏHSUL ƏLƏVƏ / DÜZƏNLƏ FORM BLOKU -->
                 <div id="adminBox" class="bg-zinc-800/90 border border-amber-500/40 p-4 rounded-xl space-y-3 hidden-screen">
                     <h2 id="adminFormTitle" class="text-sm font-semibold gold-text">Yeni Məhsul / Ətir Əlavə Et</h2>
                     <input type="hidden" id="editingProductId">
@@ -361,7 +363,6 @@
                     </div>
                 </div>
 
-                <!-- BU GÜNÜN SATIŞLARI QUTUSU -->
                 <div class="bg-zinc-800/90 border border-amber-500/60 p-4 rounded-xl space-y-2 shadow-lg">
                     <div class="flex justify-between items-center border-b border-zinc-700 pb-2">
                         <h3 class="text-sm font-bold gold-text flex items-center space-x-1">
@@ -374,7 +375,6 @@
                     </div>
                 </div>
 
-                <!-- AXTARIŞ SAHƏSİ -->
                 <div class="pt-1">
                     <input type="text" id="logSearchInput" oninput="renderOperationsLogTable()" placeholder="Axtar (Ad, kod, tarix, smen, ödəniş, növ...)" class="w-full bg-zinc-800 border border-zinc-700 p-2.5 rounded-lg text-white text-xs focus:outline-none gold-border">
                 </div>
@@ -554,9 +554,7 @@
                             </div>
                         </div>
 
-                        <div id="archiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-700">
-                            <!-- Günlər bura yüklənəcək -->
-                        </div>
+                        <div id="archiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-700"></div>
                     </div>
 
                     <!-- AYLIQ / İLLİK ARXİVLƏR (GÖY RƏNGLİ DÜYMƏLƏR) -->
@@ -602,9 +600,7 @@
                         </div>
                     </div>
 
-                    <div id="secArchiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-700">
-                        <!-- Günlər göy rəngdə bura yüklənəcək -->
-                    </div>
+                    <div id="secArchiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-700"></div>
                 </div>
 
                 <!-- SEÇİLMİŞ GÜNÜN / TARİXİN MƏLUMATI -->
@@ -615,12 +611,10 @@
 
                 <!-- XƏRCLƏR ÜÇÜN PNG VƏ İŞ SAATLARI ÜÇÜN PDF DÜYMƏLƏRİ (BİRBAŞA ARXİVDƏ) -->
                 <div id="archiveActionFooter" class="space-y-3 pt-2 border-t border-zinc-800 hidden-screen">
-                    <!-- Xərclər Şəkil Kimi Yüklə -->
                     <div id="archiveExpDownloadBox" class="hidden-screen space-y-2">
                         <button onclick="downloadArchiveExpensesAsImage()" class="w-full gold-bg font-bold py-2.5 rounded text-xs shadow">Xərcləri Şəkil Kimi Yüklə (PNG) 📥</button>
                     </div>
 
-                    <!-- İş saatları PDF Yüklə -->
                     <div id="archiveAttDownloadBox" class="hidden-screen space-y-2 bg-zinc-800/60 p-3 rounded-lg border border-zinc-700">
                         <div class="text-xs font-bold gold-text mb-1">Aylıq İş Saatları Hesabatını PDF Kimi Yüklə:</div>
                         <div class="grid grid-cols-2 gap-2">
@@ -933,7 +927,6 @@
                     <button onclick="closeDayEndModal()" class="text-xs bg-zinc-800 px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <!-- TARİX SEÇİMİ -->
                 <div class="no-print bg-zinc-800/80 p-3 rounded-xl border border-zinc-700 flex items-center justify-between gap-2">
                     <label class="text-xs text-amber-400 font-bold">Hesabat Tarixi:</label>
                     <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
@@ -1047,7 +1040,8 @@
         let deliveryFee = 0;
         let role = localStorage.getItem('melodika_current_role') || '';
         let shiftType = localStorage.getItem('melodika_current_shift') || ''; 
-        let adminName = localStorage.getItem('melodika_admin_name') || '';
+        let currentUserName = localStorage.getItem('melodika_user_name') || '';
+        let currentUserGender = localStorage.getItem('melodika_user_gender') || 'Kişi';
 
         let currentDayEndSummaryHtml = '';
         let currentDayEndReportDate = '';
@@ -1102,6 +1096,8 @@
                 let adminYesterdayBtn = document.getElementById('adminYesterdayBtn');
                 let adminYearlySummarySection = document.getElementById('adminYearlySummarySection');
 
+                let titleSuffix = currentUserGender === 'Qadın' ? 'xanım' : 'bəy';
+
                 if(role === 'ADMIN') {
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
@@ -1112,8 +1108,7 @@
                     if(adminYearlySummarySection) adminYearlySummarySection.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
                     
-                    let shortName = adminName ? adminName.split(' ')[0] : 'Sənan';
-                    document.getElementById('roleTitle').textContent = `Salam, ${shortName} müəllim! 💥`;
+                    document.getElementById('roleTitle').textContent = `Salam, ${currentUserName || 'Sənan'} ${titleSuffix}! 💥`;
                     setOperationalState(true);
                     updateAdminYearlySummaryValues();
                 } else {
@@ -1125,8 +1120,8 @@
                     if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
                     if(adminYearlySummarySection) adminYearlySummarySection.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
-                    let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
-                    document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
+                    
+                    document.getElementById('roleTitle').textContent = `Salam, ${currentUserName || 'Satıcı'} ${titleSuffix}! 💥`;
                     checkTodayShiftStatus();
                 }
 
@@ -1758,10 +1753,19 @@
                 let checkInG = recGunorta.check_in ? new Date(recGunorta.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Gəlməyib';
                 let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
 
+                let noteTextS = recSeher.note || '';
+                let noteTextG = recGunorta.note || '';
+
                 html = `
-                    <div class="space-y-1 text-xs">
-                        <div><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS} ${recSeher.note ? '(' + recSeher.note + ')' : ''}</div>
-                        <div><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG} ${recGunorta.note ? '(' + recGunorta.note + ')' : ''}</div>
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-700">
+                            <div><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS} ${noteTextS ? '<br><span class="text-amber-400">Səbəb: ' + noteTextS + '</span>' : ''}</div>
+                            <button onclick="openReasonModalPopup('${dateKey}', 'SATICI_SEHER', '${noteTextS}')" class="bg-amber-500 hover:bg-amber-600 text-black font-bold px-2 py-1 rounded text-[10px]">Redaktə et / Səbəb yaz ✏️</button>
+                        </div>
+                        <div class="flex justify-between items-center bg-zinc-900 p-2 rounded border border-zinc-700">
+                            <div><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG} ${noteTextG ? '<br><span class="text-amber-400">Səbəb: ' + noteTextG + '</span>' : ''}</div>
+                            <button onclick="openReasonModalPopup('${dateKey}', 'SATICI_GUNORTA', '${noteTextG}')" class="bg-amber-500 hover:bg-amber-600 text-black font-bold px-2 py-1 rounded text-[10px]">Redaktə et / Səbəb yaz ✏️</button>
+                        </div>
                     </div>
                 `;
             } else if(currentActiveArchiveSection === 'expenses') {
@@ -2280,8 +2284,6 @@
             let roleName = document.getElementById('modalRoleName').value;
             let reason = document.getElementById('modalReasonInput').value.trim();
 
-            if(!reason) { alert('Zəhmət olmasa səbəbi qeyd edin!'); return; }
-
             let rec = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === roleName);
             let payload = { note: reason };
 
@@ -2298,6 +2300,9 @@
             closeReasonModal();
             await loadDataFromCloud();
             renderAttendanceSheet();
+            if(!document.getElementById('secArchiveDetailContainer').classList.contains('hidden-screen')) {
+                openArchiveSectionDayDetail(dateKey);
+            }
         }
 
         function closeReasonModal() {
@@ -2501,34 +2506,46 @@
         function login() {
             let pin = document.getElementById('pinInput').value;
             if(pin === '0810') {
-                document.getElementById('adminWhoAreYouModal').classList.remove('hidden-screen');
+                role = 'ADMIN';
+                shiftType = '';
+                document.getElementById('manualNameInput').value = 'Sənan';
+                document.getElementById('genderMale').checked = true;
+                document.getElementById('whoAreYouModal').classList.remove('hidden-screen');
             } else if(pin === '1') {
                 role = 'SATICI';
                 shiftType = 'SEHER';
-                finalizeLogin();
+                document.getElementById('manualNameInput').value = '';
+                document.getElementById('genderFemale').checked = true;
+                document.getElementById('whoAreYouModal').classList.remove('hidden-screen');
             } else if(pin === '2') {
                 role = 'SATICI';
                 shiftType = 'GUNORTA';
-                finalizeLogin();
+                document.getElementById('manualNameInput').value = '';
+                document.getElementById('genderFemale').checked = true;
+                document.getElementById('whoAreYouModal').classList.remove('hidden-screen');
             } else {
                 document.getElementById('loginError').classList.remove('hidden-screen');
                 return;
             }
         }
 
-        function selectAdminName(selectedName) {
-            adminName = selectedName;
-            localStorage.setItem('melodika_admin_name', adminName);
-            role = 'ADMIN';
-            shiftType = '';
-            document.getElementById('adminWhoAreYouModal').classList.add('hidden-screen');
+        function submitWhoAreYou() {
+            let nameVal = document.getElementById('manualNameInput').value.trim();
+            if(!nameVal) { alert('Zəhmət olmasa adınızı yazın!'); return; }
+
+            currentUserName = nameVal;
+            currentUserGender = document.getElementById('genderFemale').checked ? 'Qadın' : 'Kişi';
+
+            localStorage.setItem('melodika_user_name', currentUserName);
+            localStorage.setItem('melodika_user_gender', currentUserGender);
+
+            document.getElementById('whoAreYouModal').classList.add('hidden-screen');
             finalizeLogin();
         }
 
         function finalizeLogin() {
             localStorage.setItem('melodika_current_role', role);
             localStorage.setItem('melodika_current_shift', shiftType);
-            localStorage.setItem('melodika_admin_name', adminName);
 
             document.getElementById('loginScreen').classList.add('hidden-screen');
             document.getElementById('mainApp').classList.remove('hidden-screen');
@@ -2542,6 +2559,8 @@
             let adminYesterdayBtn = document.getElementById('adminYesterdayBtn');
             let adminYearlySummarySection = document.getElementById('adminYearlySummarySection');
 
+            let titleSuffix = currentUserGender === 'Qadın' ? 'xanım' : 'bəy';
+
             if(role === 'ADMIN') {
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
@@ -2552,8 +2571,7 @@
                 if(adminYearlySummarySection) adminYearlySummarySection.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 
-                let shortName = adminName ? adminName.split(' ')[0] : 'Sənan';
-                document.getElementById('roleTitle').textContent = `Salam, ${shortName} müəllim! 💥`;
+                document.getElementById('roleTitle').textContent = `Salam, ${currentUserName || 'Sənan'} ${titleSuffix}! 💥`;
                 setOperationalState(true);
                 updateAdminYearlySummaryValues();
             } else {
@@ -2565,8 +2583,8 @@
                 if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
                 if(adminYearlySummarySection) adminYearlySummarySection.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
-                let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
-                document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
+                
+                document.getElementById('roleTitle').textContent = `Salam, ${currentUserName || 'Satıcı'} ${titleSuffix}! 💥`;
                 checkTodayShiftStatus();
             }
 
@@ -2583,7 +2601,8 @@
         function logout() { 
             localStorage.removeItem('melodika_current_role'); 
             localStorage.removeItem('melodika_current_shift'); 
-            localStorage.removeItem('melodika_admin_name');
+            localStorage.removeItem('melodika_user_name');
+            localStorage.removeItem('melodika_user_gender');
             location.reload(); 
         }
 
