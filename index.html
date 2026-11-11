@@ -178,6 +178,22 @@
                 </div>
             </header>
 
+            <!-- 2026 İLLİK İCMAL (YALNIZ ADMIN ÜÇÜN) -->
+            <div id="adminYearlySummarySection" class="hidden-screen grid grid-cols-1 sm:grid-cols-3 gap-2 no-print">
+                <button onclick="openYearlyDetailModal('sales')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
+                    <div class="text-[10px] text-blue-200">2026 cı il üzrə toplam satış:</div>
+                    <div id="summarySalesVal" class="text-sm font-extrabold mt-0.5">0.00 AZN</div>
+                </button>
+                <button onclick="openYearlyDetailModal('profit')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
+                    <div class="text-[10px] text-blue-200">2026 cı il ərzində toplam net gəlir:</div>
+                    <div id="summaryProfitVal" class="text-sm font-extrabold mt-0.5">0.00 AZN</div>
+                </button>
+                <button onclick="openYearlyDetailModal('expenses')" class="bg-blue-600 hover:bg-blue-500 text-white p-3 rounded-xl text-xs font-bold text-center shadow transition-all">
+                    <div class="text-[10px] text-blue-200">2026 cı il üzrə toplam xərclər:</div>
+                    <div id="summaryExpensesVal" class="text-sm font-extrabold mt-0.5">0.00 AZN</div>
+                </button>
+            </div>
+
             <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ -->
             <div id="shiftControlBox" class="bg-zinc-900 border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print">
                 <div class="text-xs text-zinc-300">
@@ -248,6 +264,19 @@
                         <div class="bg-zinc-800/30 p-2 rounded">POS (Ayın 1-dən): <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
                         <div class="bg-zinc-800/30 p-2 rounded">Kassa (Ayın 1-dən): <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2026 İLLİK DETAL MODALI -->
+        <div id="yearlyDetailModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50 flex items-center justify-center">
+            <div class="max-w-md w-full bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                    <h2 id="yearlyDetailTitle" class="text-sm font-bold gold-text">2026 Detal</h2>
+                    <button onclick="closeYearlyDetailModal()" class="text-xs bg-zinc-800 px-2.5 py-1 rounded">X</button>
+                </div>
+                <div id="yearlyDetailContent" class="space-y-2 text-xs text-zinc-300 max-h-[60vh] overflow-y-auto">
+                    <!-- Detallar bura yüklənəcək -->
                 </div>
             </div>
         </div>
@@ -489,7 +518,7 @@
             </div>
         </div>
 
-        <!-- BÜTÜN ARXİVLƏRİN GÖSTƏRİLDİYİ MASTER ARXİV MODALI (SİL DÜYMƏSİ VƏ QUŞ QOYMA İLƏ) -->
+        <!-- BÜTÜN ARXİVLƏRİN GÖSTƏRİLDİYİ MASTER ARXİV MODALI -->
         <div id="globalMasterArchiveModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-3xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -549,7 +578,7 @@
             </div>
         </div>
 
-        <!-- ARXİV BÖLMƏSİ ÜÇÜN İL, AY VƏ GÜN SEÇİM MODALI (GÖY RƏNGLİ TARİXLƏR) -->
+        <!-- ARXİV BÖLMƏSİ ÜÇÜN İL, AY VƏ GÜN SEÇİM MODALI -->
         <div id="archiveSectionModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 overflow-y-auto z-50">
             <div class="max-w-2xl mx-auto bg-zinc-900 border border-amber-500/50 p-6 rounded-xl space-y-4 text-white">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
@@ -849,7 +878,7 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-zinc-800 pb-3 gap-2 no-print">
                     <div>
                         <h2 class="text-lg font-bold gold-text" id="expenseHeaderTitle">XƏRCLƏR SHEETİ</h2>
-                        <div class="text-xs text-zinc-400">İl və ay seçərək xərcləri günlər üzrə daxil edin.</div>
+                        <div class="text-xs text-zinc-400">İl və ay seçərək xərcləri günlər üzrə daxil edin və şəkil əlavə edin.</div>
                     </div>
                     <div class="flex items-center space-x-2">
                         <select id="expenseYearSelect" onchange="renderExpenseSheet()" class="bg-zinc-800 border border-zinc-700 p-1.5 rounded text-xs text-amber-400 font-bold"></select>
@@ -871,7 +900,10 @@
                         <input type="text" id="expInputTitle" placeholder="Xərcin Adı (Qeyd)" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs sm:col-span-2">
                         <input type="number" step="0.01" id="expInputAmount" placeholder="Məbləğ (AZN)" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
                     </div>
-                    <button onclick="saveNewOrUpdateExpense()" class="gold-bg font-bold px-3 py-1.5 rounded text-xs w-full">Yadda Saxla</button>
+                    <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
+                        <input type="file" id="expInputFile" accept="image/*" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black">
+                        <button onclick="saveNewOrUpdateExpense()" class="gold-bg font-bold px-4 py-2 rounded text-xs w-full sm:w-auto">Yadda Saxla</button>
+                    </div>
                 </div>
 
                 <div id="expensesPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 font-sans shadow-lg">
@@ -1068,6 +1100,7 @@
                 let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
                 let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
                 let adminYesterdayBtn = document.getElementById('adminYesterdayBtn');
+                let adminYearlySummarySection = document.getElementById('adminYearlySummarySection');
 
                 if(role === 'ADMIN') {
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
@@ -1076,11 +1109,13 @@
                     if(adminTopReportsBtn) adminTopReportsBtn.classList.remove('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
                     if(adminYesterdayBtn) adminYesterdayBtn.classList.remove('hidden-screen');
+                    if(adminYearlySummarySection) adminYearlySummarySection.classList.remove('hidden-screen');
                     if(shiftBox) shiftBox.classList.add('hidden-screen');
                     
                     let shortName = adminName ? adminName.split(' ')[0] : 'Sənan';
                     document.getElementById('roleTitle').textContent = `Salam, ${shortName} müəllim! 💥`;
                     setOperationalState(true);
+                    updateAdminYearlySummaryValues();
                 } else {
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
@@ -1088,6 +1123,7 @@
                     if(adminTopReportsBtn) adminTopReportsBtn.classList.add('hidden-screen');
                     if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                     if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
+                    if(adminYearlySummarySection) adminYearlySummarySection.classList.add('hidden-screen');
                     if(shiftBox) shiftBox.classList.remove('hidden-screen');
                     let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                     document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -1154,6 +1190,8 @@
                 document.getElementById('debugBox').textContent = "Status: Bulud bazasına uğurla qoşuldu (Canlı Sinxronizasiya)";
                 document.getElementById('debugBox').className = "bg-zinc-900 border border-green-600 p-3 rounded-xl text-xs text-green-400 font-mono no-print";
                 
+                if(role === 'ADMIN') updateAdminYearlySummaryValues();
+
                 if(role) {
                     if(role === 'SATICI') checkTodayShiftStatus();
                     checkNewOrdersBlinking();
@@ -1164,6 +1202,85 @@
                 document.getElementById('debugBox').textContent = "Status Xətası: " + err.message;
                 document.getElementById('debugBox').className = "bg-zinc-900 border border-red-600 p-3 rounded-xl text-xs text-red-400 font-mono no-print";
             }
+        }
+
+        function updateAdminYearlySummaryValues() {
+            let totalSales2026 = 0;
+            let totalProfit2026 = 0;
+            let totalExp2026 = 0;
+
+            sales.forEach(s => {
+                let sDate = s.date ? String(s.date).substring(0, 4) : '';
+                if(sDate === '2026' && s.type === 'MEXARIC') {
+                    totalSales2026 += Number(s.total_price || 0);
+                    totalProfit2026 += Number(s.profit || 0);
+                }
+            });
+
+            expenses.forEach(e => {
+                let eDate = e.expense_date ? String(e.expense_date).substring(0, 4) : '';
+                if(eDate === '2026') {
+                    totalExp2026 += Number(e.amount || 0);
+                }
+            });
+
+            let netProfit2026 = totalProfit2026 - totalExp2026;
+
+            if(document.getElementById('summarySalesVal')) document.getElementById('summarySalesVal').textContent = totalSales2026.toFixed(2) + ' AZN';
+            if(document.getElementById('summaryProfitVal')) document.getElementById('summaryProfitVal').textContent = netProfit2026.toFixed(2) + ' AZN';
+            if(document.getElementById('summaryExpensesVal')) document.getElementById('summaryExpensesVal').textContent = totalExp2026.toFixed(2) + ' AZN';
+        }
+
+        function openYearlyDetailModal(type) {
+            let title = '';
+            let contentHtml = '';
+
+            if(type === 'sales') {
+                title = '2026 cı il üzrə Toplam Satış Detalları';
+                let sum = 0;
+                let list = '';
+                sales.forEach(s => {
+                    let sDate = s.date ? String(s.date).substring(0, 4) : '';
+                    if(sDate === '2026' && s.type === 'MEXARIC') {
+                        sum += Number(s.total_price || 0);
+                        let p = products.find(x => x.id == s.product_id);
+                        list += `<div>• ${s.date ? s.date.substring(0, 10) : ''}: ${p ? p.name : ''} - ${s.total_price} AZN</div>`;
+                    }
+                });
+                contentHtml = `<div class="font-bold gold-text mb-2">Toplam: ${sum.toFixed(2)} AZN</div><div class="space-y-1 max-h-50 overflow-y-auto">${list || 'Satış yoxdur'}</div>`;
+            } else if(type === 'profit') {
+                title = '2026 cı il ərzində Toplam Net Gəlir Detalları';
+                let grossProfit = 0;
+                sales.forEach(s => {
+                    let sDate = s.date ? String(s.date).substring(0, 4) : '';
+                    if(sDate === '2026' && s.type === 'MEXARIC') grossProfit += Number(s.profit || 0);
+                });
+                let totalExp = 0;
+                expenses.forEach(e => {
+                    if(String(e.expense_date).substring(0, 4) === '2026') totalExp += Number(e.amount || 0);
+                });
+                let net = grossProfit - totalExp;
+                contentHtml = `<div class="space-y-1"><div>Ümumi Qross Mənfəət: ${grossProfit.toFixed(2)} AZN</div><div>Toplam Xərclər: ${totalExp.toFixed(2)} AZN</div><div class="font-bold text-green-400 pt-1 border-t border-zinc-700">Net Gəlir: ${net.toFixed(2)} AZN</div></div>`;
+            } else if(type === 'expenses') {
+                title = '2026 cı il üzrə Toplam Xərclər Detalları';
+                let sum = 0;
+                let list = '';
+                expenses.forEach(e => {
+                    if(String(e.expense_date).substring(0, 4) === '2026') {
+                        sum += Number(e.amount || 0);
+                        list += `<div>• ${e.expense_date}: ${e.title} - ${Number(e.amount).toFixed(2)} AZN</div>`;
+                    }
+                });
+                contentHtml = `<div class="font-bold text-red-400 mb-2">Toplam Xərc: ${sum.toFixed(2)} AZN</div><div class="space-y-1 max-h-50 overflow-y-auto">${list || 'Xərc yoxdur'}</div>`;
+            }
+
+            document.getElementById('yearlyDetailTitle').textContent = title;
+            document.getElementById('yearlyDetailContent').innerHTML = contentHtml;
+            document.getElementById('yearlyDetailModal').classList.remove('hidden-screen');
+        }
+
+        function closeYearlyDetailModal() {
+            document.getElementById('yearlyDetailModal').classList.add('hidden-screen');
         }
 
         function openOperationsLogModal() {
@@ -1361,7 +1478,7 @@
 
         async function verifyCashPin() {
             let pin = document.getElementById('cashPinInput').value;
-            if(pin === '000') { // Yalnız 000
+            if(pin === '000') {
                 closeCashPinModal();
                 openCashSheetModal('ADMIN');
             } else if(pin === '111') {
@@ -1383,7 +1500,7 @@
 
         async function verifyMasterArchivePin() {
             let pin = document.getElementById('masterArchivePinInput').value;
-            if(pin === '000') { // Yalnız 000
+            if(pin === '000') {
                 closeMasterArchivePinModal();
                 await loadDataFromCloud();
                 initArchiveSelectors();
@@ -1540,9 +1657,17 @@
                     </div>
                 `;
             } else if(currentActiveArchiveSection === 'expenses') {
-                let exp = expenses.find(e => String(e.expense_date) === dateKey);
-                if(exp) {
-                    html = `<div><strong>Xərc adı:</strong> ${exp.title || '-'}</div><div><strong>Məbləğ:</strong> ${Number(exp.amount || 0).toFixed(2)} AZN</div>`;
+                let expList = expenses.filter(e => String(e.expense_date) === dateKey);
+                if(expList.length > 0) {
+                    let itemsHtml = '';
+                    let imgHtml = '';
+                    expList.forEach((e, idx) => {
+                        itemsHtml += `<div>${idx + 1}. ${e.title || '-'} - ${Number(e.amount || 0).toFixed(2)} manat</div>`;
+                        if(e.image_url) {
+                            imgHtml += `<div class="mt-3"><img src="${e.image_url}" class="w-full max-h-96 object-contain rounded border border-zinc-700"></div>`;
+                        }
+                    });
+                    html = `<div class="space-y-2"><div class="space-y-1">${itemsHtml}</div>${imgHtml}</div>`;
                 } else {
                     html = `<div class="text-zinc-500">Bu günə aid xərc qeydə alınmayıb.</div>`;
                 }
@@ -2183,7 +2308,6 @@
         }
 
         async function downloadDayEndAsImage() {
-            // Şəkil yüklənərkən avtomatik arxivə də yazırıq
             try {
                 await _supabase.rpc('save_day_end_archive', {
                     p_report_date: currentDayEndReportDate,
@@ -2257,6 +2381,7 @@
             let logAdminAddProdBtn = document.getElementById('logAdminAddProdBtn');
             let logCatalogDetailsBtn = document.getElementById('logCatalogDetailsBtn');
             let adminYesterdayBtn = document.getElementById('adminYesterdayBtn');
+            let adminYearlySummarySection = document.getElementById('adminYearlySummarySection');
 
             if(role === 'ADMIN') {
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
@@ -2265,11 +2390,13 @@
                 if(adminTopReportsBtn) adminTopReportsBtn.classList.remove('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.remove('hidden-screen');
                 if(adminYesterdayBtn) adminYesterdayBtn.classList.remove('hidden-screen');
+                if(adminYearlySummarySection) adminYearlySummarySection.classList.remove('hidden-screen');
                 if(shiftBox) shiftBox.classList.add('hidden-screen');
                 
                 let shortName = adminName ? adminName.split(' ')[0] : 'Sənan';
                 document.getElementById('roleTitle').textContent = `Salam, ${shortName} müəllim! 💥`;
                 setOperationalState(true);
+                updateAdminYearlySummaryValues();
             } else {
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
@@ -2277,6 +2404,7 @@
                 if(adminTopReportsBtn) adminTopReportsBtn.classList.add('hidden-screen');
                 if(masterArchiveNavBtn) masterArchiveNavBtn.classList.add('hidden-screen');
                 if(adminYesterdayBtn) adminYesterdayBtn.classList.add('hidden-screen');
+                if(adminYearlySummarySection) adminYearlySummarySection.classList.add('hidden-screen');
                 if(shiftBox) shiftBox.classList.remove('hidden-screen');
                 let shiftNameStr = shiftType === 'GUNORTA' ? 'Günorta smeni (15:00 - 22:00)' : 'Səhər smeni (10:00 - 15:00)';
                 document.getElementById('roleTitle').textContent = `MELODİKA — Satıcı (${shiftNameStr})`;
@@ -2729,28 +2857,42 @@
             let day = document.getElementById('expInputDay').value;
             let title = document.getElementById('expInputTitle').value.trim();
             let amount = parseFloat(document.getElementById('expInputAmount').value) || 0;
+            let fileInput = document.getElementById('expInputFile');
 
             if(!day) { alert('Zəhmət olmasa günü seçin!'); return; }
             if(!title || amount <= 0) { alert('Zəhmət olmasa xərcin adını və düzgün məbləğ daxil edin!'); return; }
 
             let dateKey = `${year}-${month}-${String(day).padStart(2, '0')}`;
             let existing = expenses.find(e => e.expense_date === dateKey);
+            let imageUrl = existing ? (existing.image_url || '') : '';
+
+            if (fileInput && fileInput.files.length > 0) {
+                let file = fileInput.files[0];
+                let fileName = `exp_${Date.now()}_${file.name}`;
+                let { error: uploadError } = await _supabase.storage.from('perfume-images').upload(fileName, file);
+                if (uploadError) { alert('Şəkil yüklənmə xətası: ' + uploadError.message); return; }
+                imageUrl = _supabase.storage.from('perfume-images').getPublicUrl(fileName).data.publicUrl;
+            }
+
+            let payload = { expense_date: dateKey, title, amount, image_url: imageUrl };
 
             if(existing && existing.id) {
-                let { error } = await _supabase.from('expenses').update({ title, amount }).eq('id', existing.id);
+                let { error } = await _supabase.from('expenses').update(payload).eq('id', existing.id);
                 if(error) { alert('Xəta: ' + error.message); return; }
             } else {
-                let { error } = await _supabase.from('expenses').insert([{ expense_date: dateKey, title, amount }]);
+                let { error } = await _supabase.from('expenses').insert([payload]);
                 if(error) { alert('Xəta: ' + error.message); return; }
             }
 
             document.getElementById('expInputDay').value = '';
             document.getElementById('expInputTitle').value = '';
             document.getElementById('expInputAmount').value = '';
+            if(fileInput) fileInput.value = '';
 
             alert('Xərc uğurla yadda saxlanıldı!');
             await loadDataFromCloud();
             renderExpenseSheet();
+            if(role === 'ADMIN') updateAdminYearlySummaryValues();
         }
 
         async function deleteExpenseRecord(dateKey) {
@@ -2759,6 +2901,7 @@
                 if(error) { alert('Xəta: ' + error.message); return; }
                 await loadDataFromCloud();
                 renderExpenseSheet();
+                if(role === 'ADMIN') updateAdminYearlySummaryValues();
             }
         }
 
@@ -2919,7 +3062,7 @@
             let now = new Date();
             let todayStr = getBakuDateString(now);
             let weekStartStr = getBakuDateString(new Date(now.setDate(now.getDate() - (now.getDay() || 7) + 1)));
-            let currentMonthPrefix = todayStr.substring(0, 7); // YYYY-MM
+            let currentMonthPrefix = todayStr.substring(0, 7);
             let currentYearPrefix = String(new Date().getFullYear());
 
             let dailySum = 0, weeklySum = 0, monthlySum = 0, yearlySum = 0;
@@ -3157,6 +3300,7 @@
                 await loadDataFromCloud();
                 renderUI();
                 renderOperationsLogTable();
+                if(role === 'ADMIN') updateAdminYearlySummaryValues();
             }
         }
 
@@ -3214,6 +3358,7 @@
             closeSalesFormModal();
             await loadDataFromCloud();
             renderUI();
+            if(role === 'ADMIN') updateAdminYearlySummaryValues();
         }
     </script>
 </body>
