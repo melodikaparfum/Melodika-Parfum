@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { background-color: #ffffff; color: #111827; font-family: Arial, sans-serif; }
+        body { background-color: #ffffff; color: #111827; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
         .gold-border { border-color: #d4af37; }
         .gold-text { color: #b8860b; }
         .gold-bg { background-color: #d4af37; color: #000; }
@@ -20,6 +20,14 @@
             opacity: 0.2;
             pointer-events: none;
             filter: grayscale(100%);
+        }
+
+        /* NÖVBƏ BAĞLI OLDUQDA ÜST DÜYMƏLƏRİN BLOKLANMASI ÜÇÜN */
+        .disabled-nav-item {
+            opacity: 0.3 !important;
+            pointer-events: none !important;
+            filter: grayscale(100%);
+            cursor: not-allowed !important;
         }
 
         @keyframes pulse-glow {
@@ -39,7 +47,7 @@
         }
     </style>
 </head>
-<body class="p-4 bg-white text-zinc-900">
+<body id="appBody" class="p-4 bg-white text-zinc-900">
     <div class="max-w-4xl mx-auto space-y-4">
         
         <!-- STATUS QUTUSU -->
@@ -183,16 +191,19 @@
 
         <!-- ƏSAS PANEL (ADMIN / SATICI) -->
         <div id="mainApp" class="hidden-screen space-y-4">
-            <header class="flex flex-wrap justify-between items-center border-b border-zinc-200 pb-3 gap-2 no-print">
+            <header class="flex flex-wrap justify-between items-center border-b pb-3 gap-2 no-print" id="mainHeaderContainer">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
                     <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Mərkəzi 🗂️</button>
                     <button id="adminTopCashBtn" onclick="openCashPinModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Kassa Mərkəzi 💰</button>
                     <button id="adminTopReportsBtn" onclick="openTopReportsModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Hesabatlar Mərkəzi 📊</button>
-                    <button onclick="openOperationsLogModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
-                    <button onclick="openDayEndModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
+                    
+                    <!-- Satıcı üçün növbə bağlı olanda bloklanacaq naviqasiya düymələri -->
+                    <button id="navOpsLogBtn" onclick="openOperationsLogModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Əməliyyatlar Jurnalı 📋</button>
+                    <button id="navDayEndBtn" onclick="openDayEndModal()" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Gün Sonu Hesabatı 📝</button>
                     <button onclick="openChatModal()" id="chatBtn" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Çat / Qeydlər 💬</button>
                     <button onclick="openOrdersModal()" id="ordersBtn" class="bg-zinc-100 hover:bg-zinc-200 text-amber-800 border border-amber-600/50 font-bold px-2.5 py-1.5 rounded text-xs">Sifarişlər</button>
+                    
                     <button onclick="logout()" class="text-xs bg-red-800 text-white px-2.5 py-1.5 rounded font-bold">Çıxış</button>
                 </div>
             </header>
@@ -215,7 +226,7 @@
 
             <!-- NÖVBƏNİ BAŞLAT / BAĞLA PANELİ -->
             <div id="shiftControlBox" class="bg-white border border-amber-500/40 p-3 rounded-xl flex flex-col sm:flex-row justify-between items-center gap-3 no-print shadow-sm">
-                <div class="text-xs text-zinc-700">
+                <div class="text-xs text-zinc-700" id="shiftStatusContainer">
                     <span>Satıcı Növbə Statusu: </span>
                     <strong id="shiftStatusText" class="text-amber-700 font-mono">Yoxlanılır...</strong>
                 </div>
@@ -242,15 +253,15 @@
                     </div>
 
                     <div class="grid grid-cols-3 gap-3 text-center">
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                        <div class="analytics-card bg-zinc-50 p-3 rounded-lg border border-zinc-200">
                             <div class="text-xs text-zinc-500">👀 Baxış Sayı</div>
                             <div id="stat-visits" class="text-lg font-bold text-zinc-900 mt-1">0</div>
                         </div>
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                        <div class="analytics-card bg-zinc-50 p-3 rounded-lg border border-zinc-200">
                             <div class="text-xs text-zinc-500">🛒 Sifarişlər</div>
                             <div id="stat-orders" class="text-lg font-bold text-amber-700 mt-1">0</div>
                         </div>
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                        <div class="analytics-card bg-zinc-50 p-3 rounded-lg border border-zinc-200">
                             <div class="text-xs text-zinc-500">🎯 Sifariş %-i</div>
                             <div id="stat-conversion" class="text-lg font-bold text-green-700 mt-1">0%</div>
                         </div>
@@ -258,30 +269,30 @@
                 </div>
 
                 <!-- Satış İcmalı -->
-                <div class="bg-white border border-zinc-200 p-4 rounded-xl space-y-3 no-print shadow-sm">
+                <div class="sales-overview-card bg-white border border-zinc-200 p-4 rounded-xl space-y-3 no-print shadow-sm">
                     <h2 class="text-sm font-semibold gold-text">Satış İcmalı (Dövriyyə)</h2>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-100">
+                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
                             <div class="text-[11px] text-zinc-500">Günlük Satış</div>
                             <div id="salesDaily" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-100">
+                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
                             <div class="text-[11px] text-zinc-500">Həftəlik Satış</div>
                             <div id="salesWeekly" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-100">
+                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
                             <div class="text-[11px] text-zinc-500">Aylıq Satış</div>
                             <div id="salesMonthly" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
-                        <div class="bg-zinc-50 p-3 rounded-lg border border-zinc-100">
+                        <div class="sub-card bg-zinc-50 p-3 rounded-lg border border-zinc-100">
                             <div class="text-[11px] text-zinc-500">İllik Satış</div>
                             <div id="salesYearly" class="text-sm font-bold gold-text">0.00 AZN</div>
                         </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2 pt-2 text-center text-xs">
-                        <div class="bg-zinc-50 p-2 rounded border border-zinc-100">Nəğd (Ayın 1-dən): <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
-                        <div class="bg-zinc-50 p-2 rounded border border-zinc-100">POS (Ayın 1-dən): <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
-                        <div class="bg-zinc-50 p-2 rounded border border-zinc-100">Kassa (Ayın 1-dən): <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="sub-card bg-zinc-50 p-2 rounded border border-zinc-100">Nəğd (Ayın 1-dən): <span id="payNagd" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="sub-card bg-zinc-50 p-2 rounded border border-zinc-100">POS (Ayın 1-dən): <span id="payPos" class="font-bold gold-text">0 AZN</span></div>
+                        <div class="sub-card bg-zinc-50 p-2 rounded border border-zinc-100">Kassa (Ayın 1-dən): <span id="payCard" class="font-bold gold-text">0 AZN</span></div>
                     </div>
                 </div>
             </div>
@@ -1004,7 +1015,7 @@
         </div>
 
         <!-- MAĞAZA ŞƏKİLİ VƏ HAQQINDA BLOKU -->
-        <div class="bg-white border border-amber-500/40 p-4 rounded-xl space-y-3 text-center no-print text-zinc-900 shadow-sm">
+        <div class="info-block bg-white border border-amber-500/40 p-4 rounded-xl space-y-3 text-center no-print text-zinc-900 shadow-sm">
             <div class="flex justify-center">
                 <img src="https://jauzzzwqqxsxyuopapvl.supabase.co/storage/v1/object/public/perfume-images/Screenshot_20261110_005853_com_hihonor_photos_GalleryMain.jpg" alt="Melodika Parfum" class="w-24 h-24 object-cover rounded-full border-2 border-amber-500 shadow-md">
             </div>
@@ -1021,7 +1032,7 @@
         </div>
 
         <!-- WHATSAPP ƏLAQƏ BLOKU -->
-        <div class="bg-white border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print text-zinc-900 shadow-sm">
+        <div class="info-block bg-white border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print text-zinc-900 shadow-sm">
             <div class="text-xs text-zinc-600 font-medium">Suallarınız və ya əlavə sifarişlər üçün:</div>
             <a href="https://wa.me/994559703829" target="_blank" class="inline-flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition-all w-full shadow">
                 <span>💬 WhatsApp ilə yazın</span>
@@ -1030,7 +1041,7 @@
         </div>
 
         <!-- SOSİAL ŞƏBƏKƏLƏRƏ KEÇİD BLOKU -->
-        <div class="bg-white border border-amber-500/40 p-4 rounded-xl text-center space-y-3 no-print text-zinc-900 shadow-sm">
+        <div class="info-block bg-white border border-amber-500/40 p-4 rounded-xl text-center space-y-3 no-print text-zinc-900 shadow-sm">
             <div class="text-xs text-zinc-600 font-medium">Bizi sosial şəbəkələrdə izləyin:</div>
             <div class="grid grid-cols-2 gap-2">
                 <a href="https://www.instagram.com/melodikaparfum" target="_blank" class="flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 via-pink-600 to-amber-500 hover:opacity-90 text-white font-bold py-2 px-3 rounded-lg text-xs transition-all shadow">
@@ -1123,6 +1134,9 @@
                 let titleSuffix = currentUserGender === 'Qadın' ? 'xanım' : 'bəy';
 
                 if(role === 'ADMIN') {
+                    // ADMIN FONUNU QARA ET
+                    setAdminTheme(true);
+
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
                     if(adminTopCashBtn) adminTopCashBtn.classList.remove('hidden-screen');
@@ -1136,6 +1150,9 @@
                     setOperationalState(true);
                     updateAdminYearlySummaryValues();
                 } else {
+                    // SATICI FONUNU AĞ SAXLA
+                    setAdminTheme(false);
+
                     if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                     if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
                     if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
@@ -1159,6 +1176,31 @@
                 checkNewChatBlinking();
             }
         };
+
+        // ADMIN SƏHİFƏSİNİN ARXA FONUNU QARA EDƏN FUNKSİYA
+        function setAdminTheme(isAdmin) {
+            let body = document.getElementById('appBody');
+            let mainApp = document.getElementById('mainApp');
+            if(!body) return;
+
+            if(isAdmin) {
+                body.style.backgroundColor = '#000000';
+                body.style.color = '#ffffff';
+                
+                // Bütün kartları və konteynerləri qara dizayna uyğunlaşdır
+                document.querySelectorAll('#mainApp .bg-white, #mainApp .bg-zinc-50').forEach(el => {
+                    el.style.backgroundColor = '#121212';
+                    el.style.color = '#ffffff';
+                    el.style.borderColor = '#333333';
+                });
+                document.querySelectorAll('#mainApp .text-zinc-900, #mainApp .text-zinc-700, #mainApp .text-zinc-600').forEach(el => {
+                    el.style.color = '#e0e0e0';
+                });
+            } else {
+                body.style.backgroundColor = '#ffffff';
+                body.style.color = '#111827';
+            }
+        }
 
         async function loadDataFromCloud() {
             try {
@@ -1510,13 +1552,35 @@
             }
         }
 
+        // NÖVBƏ STATUSUNA GÖRƏ ƏMƏLİYYATLAR JURNALI, GÜN SONU, ÇAR VƏ SİFARİŞLƏR BÖLMƏSİNİN BLOKLANMASI VƏ YA AÇILMASI
         function setOperationalState(isActive) {
             let container = document.getElementById('operationalContainer');
-            if(!container) return;
+            let navOpsLogBtn = document.getElementById('navOpsLogBtn');
+            let navDayEndBtn = document.getElementById('navDayEndBtn');
+            let chatBtn = document.getElementById('chatBtn');
+            let ordersBtn = document.getElementById('ordersBtn');
+
+            if(role === 'ADMIN') {
+                if(container) container.classList.remove('disabled-section');
+                if(navOpsLogBtn) navOpsLogBtn.classList.remove('disabled-nav-item');
+                if(navDayEndBtn) navDayEndBtn.classList.remove('disabled-nav-item');
+                if(chatBtn) chatBtn.classList.remove('disabled-nav-item');
+                if(ordersBtn) ordersBtn.classList.remove('disabled-nav-item');
+                return;
+            }
+
             if(isActive) {
-                container.classList.remove('disabled-section');
+                if(container) container.classList.remove('disabled-section');
+                if(navOpsLogBtn) navOpsLogBtn.classList.remove('disabled-nav-item');
+                if(navDayEndBtn) navDayEndBtn.classList.remove('disabled-nav-item');
+                if(chatBtn) chatBtn.classList.remove('disabled-nav-item');
+                if(ordersBtn) ordersBtn.classList.remove('disabled-nav-item');
             } else {
-                container.classList.add('disabled-section');
+                if(container) container.classList.add('disabled-section');
+                if(navOpsLogBtn) navOpsLogBtn.classList.add('disabled-nav-item');
+                if(navDayEndBtn) navDayEndBtn.classList.add('disabled-nav-item');
+                if(chatBtn) chatBtn.classList.add('disabled-nav-item');
+                if(ordersBtn) ordersBtn.classList.add('disabled-nav-item');
             }
         }
 
@@ -2608,6 +2672,8 @@
             let titleSuffix = currentUserGender === 'Qadın' ? 'xanım' : 'bəy';
 
             if(role === 'ADMIN') {
+                setAdminTheme(true);
+
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.remove('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.remove('hidden-screen');
                 if(adminTopCashBtn) adminTopCashBtn.classList.remove('hidden-screen');
@@ -2621,6 +2687,8 @@
                 setOperationalState(true);
                 updateAdminYearlySummaryValues();
             } else {
+                setAdminTheme(false);
+
                 if(logAdminAddProdBtn) logAdminAddProdBtn.classList.add('hidden-screen');
                 if(logCatalogDetailsBtn) logCatalogDetailsBtn.classList.add('hidden-screen');
                 if(adminTopCashBtn) adminTopCashBtn.classList.add('hidden-screen');
