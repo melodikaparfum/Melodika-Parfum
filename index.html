@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        /* BÜTÜN SƏHİFƏLƏR ÜÇÜN QARA DİZAYN */
+        /* BÜTÜN SƏHİFƏ ÜÇÜN QARA DİZAYN */
         body { background-color: #000000 !important; color: #ffffff !important; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
         .gold-border { border-color: #d4af37 !important; }
         .gold-text { color: #d4af37 !important; }
@@ -45,6 +45,16 @@
 
         input::placeholder, textarea::placeholder {
             color: #888888 !important;
+        }
+
+        /* HESABATLAR ÜÇÜN AĞ FON VƏ QARA ŞRİFT MƏCBURİYYƏTİ */
+        #dayEndPrintArea, #dayEndPrintArea *, 
+        #periodicReportPrintArea, #periodicReportPrintArea *, 
+        #rangeReportPrintArea, #rangeReportPrintArea *, 
+        #expensesPrintArea, #expensesPrintArea *,
+        #attendancePrintArea, #attendancePrintArea * {
+            background-color: #ffffff !important;
+            color: #000000 !important;
         }
 
         @keyframes pulse-glow {
@@ -983,7 +993,7 @@
                     <input type="date" id="dayEndDatePicker" onchange="onDayEndDatePickerChange()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
                 </div>
 
-                <!-- BURA ŞƏKİLDƏ GÖSTƏRDİYİNİZ KİMİ AĞ FONA VƏ QARA HƏRflərə TƏNZİMLƏNDİ -->
+                <!-- BURA TOQLU ARXA FON AĞ, ŞRİFTLƏR QARA OLARAQ TƏNZİMLƏNDİ -->
                 <div id="dayEndPrintArea" class="bg-white text-black p-6 rounded-lg space-y-4 text-sm font-sans shadow-lg border border-zinc-200">
                     <div id="dayEndContent" class="space-y-4 text-sm font-sans text-black"></div>
                 </div>
@@ -3636,3 +3646,4 @@
         }
     </script>
 </html>
+ 
