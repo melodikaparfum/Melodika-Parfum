@@ -2651,7 +2651,7 @@
             }
 
             let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
-            let totalAmount = 0; // DÜZƏLİŞ: Başlanğıc 0 edildi ki, manualAmount iki dəfə toplanmasın
+            let totalAmount = 0;
             
             let seherTotal = 0, seherAd = 0, seherCash = 0, seherPos = 0;
             let gunortaTotal = 0, gunortaAd = 0, gunortaCash = 0, gunortaPos = 0;
@@ -2660,57 +2660,44 @@
 
             let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
-            if (targetDateStr === '2026-11-10' && targetSales.length === 0) {
-                listHtml += `
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">1. [Admin] Lattafa Teriaq Intense - 2.5 qr - 7 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">2. [Admin] Lattafa Kamrah - 2 qr - 6 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">3. [Admin] Molecule 02 (Black) - 5 qr - 15 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">4. [Admin] Lattafa Teriaq Intense - 1.5 qr - 4 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">5. [Admin] Ajmal Qafie 2 - 2 qr - 5 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">6. [Admin] Hermess - 2 qr - 3 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">7. [Admin] Louis Vuitton Imagination - 3.5 qr - 10 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                `;
-                totalAmount += 50; 
-                adminTotal += 50;
-                totalCashRegSum += 50;
-                adminCash += 50;
-            } else {
-                targetSales.forEach((s, idx) => {
-                    let p = products.find(x => x.id == s.product_id);
-                    let price = Number(s.total_price || 0);
-                    totalAmount += price;
+            targetSales.forEach((s, idx) => {
+                let p = products.find(x => x.id == s.product_id);
+                let price = Number(s.total_price || 0);
+                totalAmount += price;
 
-                    if(s.payType === 'POS Terminal') totalPosSum += price;
-                    if(s.toCashRegister) totalCashRegSum += price;
+                if(s.payType === 'POS Terminal') totalPosSum += price;
+                if(s.toCashRegister) totalCashRegSum += price;
 
-                    if(s.shift_name === 'SEHER') {
-                        seherTotal += price;
-                        if(s.fromAd) seherAd += price;
-                        if(s.toCashRegister) seherCash += price;
-                        if(s.payType === 'POS Terminal') seherPos += price;
-                    } else if(s.shift_name === 'GUNORTA') {
-                        gunortaTotal += price;
-                        if(s.fromAd) gunortaAd += price;
-                        if(s.toCashRegister) gunortaCash += price;
-                        if(s.payType === 'POS Terminal') gunortaPos += price;
-                    } else {
-                        adminTotal += price;
-                        if(s.fromAd) adminAd += price;
-                        if(s.toCashRegister) adminCash += price;
-                        if(s.payType === 'POS Terminal') adminPos += price;
-                    }
+                if(s.shift_name === 'SEHER') {
+                    seherTotal += price;
+                    if(s.fromAd) seherAd += price;
+                    if(s.toCashRegister) seherCash += price;
+                    if(s.payType === 'POS Terminal') seherPos += price;
+                } else if(s.shift_name === 'GUNORTA') {
+                    gunortaTotal += price;
+                    if(s.fromAd) gunortaAd += price;
+                    if(s.toCashRegister) gunortaCash += price;
+                    if(s.payType === 'POS Terminal') gunortaPos += price;
+                } else {
+                    adminTotal += price;
+                    if(s.fromAd) adminAd += price;
+                    if(s.toCashRegister) adminCash += price;
+                    if(s.payType === 'POS Terminal') adminPos += price;
+                }
 
-                    let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
-                    let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
-                    let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
+                let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
+                let adInfo = s.fromAd ? 'Reklamdan' : 'Reklamdan deyil';
+                let cashInfo = s.toCashRegister ? 'Kassaya vurulub' : 'Kassaya vurulmayıb';
 
-                    listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
-                });
-            }
+                listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adInfo}, ${cashInfo}</div>`;
+            });
 
-            // Əgər dəftərdən əlavə məbləğ yazılıbsa, yalnız bir dəfə əlavə olunur
             if (manualAmount > 0) {
                 totalAmount += manualAmount;
+            }
+
+            if(targetSales.length === 0 && manualAmount === 0) {
+                listHtml += `<div style="color: #666; padding: 10px 0;">Bu tarixə aid satış qeydə alınmayıb.</div>`;
             }
 
             if(imageUrl || manualAmount > 0) {
@@ -2746,7 +2733,7 @@
                         <div>• Ümumi satış: ${adminTotal.toFixed(2)} AZN</div>
                         <div>• POS Terminal: ${adminPos.toFixed(2)} AZN</div>
                         <div>• Kassa aparatına vurulan: ${adminCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: 18.00 AZN</div>
+                        <div>• Reklam: ${adminAd.toFixed(2)} AZN</div>
                     </div>
 
                     <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
@@ -2765,7 +2752,7 @@
                     report_date: targetDateStr, 
                     content_summary: currentDayEndSummaryHtml 
                 }], { onConflict: 'report_date' });
-                alert('Məlumatlar istədiyin kimi düzgün və təkrar olunmadan yadda saxlanıldı!');
+                alert('Məlumatlar uğurla yadda saxlanıldı!');
                 await loadDataFromCloud();
             } catch(err) {
                 alert('Yadda saxlama zamanı xəta: ' + err.message);
@@ -3660,21 +3647,7 @@
 
             let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
             
-            if (targetDateStr === '2026-11-10') {
-                listHtml += `
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">1. [Admin] Lattafa Teriaq Intense - 2.5 qr - 7 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">2. [Admin] Lattafa Kamrah - 2 qr - 6 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">3. [Admin] Molecule 02 (Black) - 5 qr - 15 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">4. [Admin] Lattafa Teriaq Intense - 1.5 qr - 4 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">5. [Admin] Ajmal Qafie 2 - 2 qr - 5 AZN (Nəğd) — Reklamdan, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">6. [Admin] Hermess - 2 qr - 3 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                    <div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">7. [Admin] Louis Vuitton Imagination - 3.5 qr - 10 AZN (Nəğd) — Reklamdan deyil, Kassaya vurulub</div>
-                `;
-                totalAmount += 50;
-                adminTotal += 50;
-                totalCashRegSum += 50;
-                adminCash += 50;
-            } else if(targetSales.length === 0) {
+            if(targetSales.length === 0) {
                 listHtml += `<div style="color: #666; padding: 10px 0;">Seçilmiş tarixə aid sistem satışı qeydə alınmayıb.</div>`;
             } else {
                 targetSales.forEach((s, idx) => {
@@ -3733,7 +3706,7 @@
                         <div>• Ümumi satış: ${adminTotal.toFixed(2)} AZN</div>
                         <div>• POS Terminal: ${adminPos.toFixed(2)} AZN</div>
                         <div>• Kassa aparatına vurulan: ${adminCash.toFixed(2)} AZN</div>
-                        <div>• Reklam: ${targetDateStr === '2026-11-10' ? '18.00' : adminAd.toFixed(2)} AZN</div>
+                        <div>• Reklam: ${adminAd.toFixed(2)} AZN</div>
                     </div>
 
                     <div style="border-top: 2px solid #000; padding-top: 6px; font-weight: bold; font-size: 13px; text-align: right; color: #000;">
