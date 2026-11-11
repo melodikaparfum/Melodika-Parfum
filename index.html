@@ -901,7 +901,7 @@
                 </div>
 
                 <div class="no-print space-y-2 bg-zinc-800 p-3 rounded-lg border border-zinc-700">
-                    <div class="text-xs text-amber-400 font-bold">Yeni Xərc Əlavə Et / Düzənlə:</div>
+                    <div class="text-xs text-amber-400 font-bold">Yeni Xərc Əlavə Et:</div>
                     <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
                         <select id="expInputDay" class="bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs">
                             <option value="">Gün seçin...</option>
@@ -911,7 +911,7 @@
                     </div>
                     <div class="flex flex-col sm:flex-row items-center gap-2 pt-1">
                         <input type="file" id="expInputFile" accept="image/*" class="w-full bg-zinc-900 border border-zinc-700 p-1.5 rounded text-white text-xs file:mr-2 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:bg-amber-500 file:text-black">
-                        <button onclick="saveNewOrUpdateExpense()" class="gold-bg font-bold px-4 py-2 rounded text-xs w-full sm:w-auto">Yadda Saxla</button>
+                        <button onclick="saveNewExpense()" class="gold-bg font-bold px-4 py-2 rounded text-xs w-full sm:w-auto">Yadda Saxla</button>
                     </div>
                 </div>
 
@@ -930,6 +930,19 @@
 
                 <div class="pt-4 border-t border-zinc-800 flex justify-end space-x-2 no-print">
                     <button onclick="downloadExpensesAsImage()" class="gold-bg font-bold px-4 py-2 rounded text-xs">Şəkil Kimi Yadda Saxla (PNG) 📥</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ÇEK / ŞƏKİL GÖSTƏRMƏ MODALI (LIGHTBOX) -->
+        <div id="receiptModal" class="hidden-screen fixed inset-0 bg-black/90 p-4 flex flex-col items-center justify-center z-50">
+            <div class="max-w-lg w-full bg-zinc-900 border border-amber-500/50 p-4 rounded-xl space-y-3 text-center shadow-2xl">
+                <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                    <h3 class="text-sm font-bold gold-text">Xərc Çeki / Sənədi</h3>
+                    <button onclick="closeReceiptModal()" class="text-xs bg-zinc-800 px-3 py-1 rounded text-white">Bağla</button>
+                </div>
+                <div class="flex justify-center items-center">
+                    <img id="receiptModalImg" src="" alt="Çek" class="max-h-[70vh] max-w-full object-contain rounded border border-zinc-700">
                 </div>
             </div>
         </div>
@@ -1787,14 +1800,14 @@
                 let expList = expenses.filter(e => String(e.expense_date) === dateKey);
                 if(expList.length > 0) {
                     let itemsHtml = '';
-                    let imgHtml = '';
                     expList.forEach((e, idx) => {
-                        itemsHtml += `<div>${idx + 1}. ${e.title || '-'} - ${Number(e.amount || 0).toFixed(2)} manat</div>`;
-                        if(e.image_url) {
-                            imgHtml += `<div class="mt-3"><img src="${e.image_url}" class="w-full max-h-96 object-contain rounded border border-zinc-700"></div>`;
-                        }
+                        let receiptBtn = e.image_url ? `<button onclick="showReceipt('${e.image_url}')" class="text-amber-400 font-bold underline ml-2 hover:text-amber-300">Çeki göstər 🧾</button>` : '';
+                        itemsHtml += `<div class="bg-zinc-900 p-2 rounded border border-zinc-700/60 mb-2">
+                            <div><strong>${idx + 1}. Xərcin adı - ${e.title || '-'}</strong></div>
+                            <div>Məbəği: ${Number(e.amount || 0).toFixed(2)} manat ${receiptBtn}</div>
+                        </div>`;
                     });
-                    html = `<div class="space-y-2 text-xs"><div class="space-y-1">${itemsHtml}</div>${imgHtml}</div>`;
+                    html = `<div class="space-y-2 text-xs">${itemsHtml}</div>`;
                 } else {
                     html = `<div class="text-zinc-500 text-xs">Bu günə aid xərc qeydə alınmayıb.</div>`;
                 }
@@ -1824,6 +1837,15 @@
             detailContent.innerHTML = html;
         }
 
+        function showReceipt(url) {
+            document.getElementById('receiptModalImg').src = url;
+            document.getElementById('receiptModal').classList.remove('hidden-screen');
+        }
+
+        function closeReceiptModal() {
+            document.getElementById('receiptModal').classList.add('hidden-screen');
+        }
+
         function downloadArchiveExpensesAsImage() {
             let startStr = document.getElementById('secArchiveStartDate').value;
             let endStr = document.getElementById('secArchiveEndDate').value;
@@ -1847,7 +1869,7 @@
             filteredExp.forEach((e, idx) => {
                 let pAmt = Number(e.amount || 0);
                 totalAmount += pAmt;
-                itemsListHtml += `<div style="border-bottom: 1px solid #ddd; padding: 6px 0; font-size: 13px;">${idx + 1}. ${e.expense_date} — ${e.title} : <strong>${pAmt.toFixed(2)} AZN</strong></div>`;
+                itemsListHtml += `<div style="border-bottom: 1px solid #ddd; padding: 6px 0; font-size: 13px;">${idx + 1}. ${e.expense_date} — Xərcin adı - ${e.title} : Məbəği: <strong>${pAmt.toFixed(2)} manat</strong></div>`;
             });
 
             tempDiv.innerHTML = `
@@ -3027,37 +3049,41 @@
             let activeCount = 0;
             let itemCounter = 1;
 
-            for(let day = 1; day <= daysCount; day++) {
-                let dateKey = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                let existing = expenses.find(e => e.expense_date === dateKey);
-                
-                if(existing && existing.amount > 0) {
+            let monthPrefix = `${year}-${String(month).padStart(2, '0')}`;
+            let filteredExpenses = expenses.filter(e => e.expense_date && String(e.expense_date).startsWith(monthPrefix));
+
+            if(filteredExpenses.length === 0) {
+                html = `<div style="padding: 15px; text-align: center; color: #666; font-size: 12px;">Bu ay üzrə qeydə alınmış xərc yoxdur.</div>`;
+            } else {
+                filteredExpenses.forEach(e => {
                     activeCount++;
-                    monthTotal += Number(existing.amount);
-                    let displayDate = `${day} ${monthName}`;
+                    let amt = Number(e.amount || 0);
+                    monthTotal += amt;
+                    let dayNum = e.expense_date.split('-')[2];
+
+                    let receiptBtn = e.image_url ? `<button onclick="showReceipt('${e.image_url}')" style="color: #b45309; font-weight: bold; margin-left: 10px; font-size: 12px;" class="no-print">Çeki göstər 🧾</button>` : '';
 
                     html += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">
-                            <div>${itemCounter}. ${displayDate} - ${existing.title || '-'}</div>
-                            <div style="display: flex; align-items: center; gap: 15px;">
-                                <span style="font-weight: bold;">${Number(existing.amount).toFixed(2)} AZN</span>
-                                <button onclick="deleteExpenseRecord('${dateKey}')" style="color: red; font-size: 11px;" class="no-print">Sil</button>
+                        <div style="border-bottom: 1px solid #ccc; padding: 8px 0; color: #000; font-size: 13px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div><strong>${itemCounter}. Xərcin adı - ${e.title || '-'}</strong> (${dayNum} ${monthName})</div>
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <span style="font-weight: bold;">Məbəği: ${amt.toFixed(2)} manat</span>
+                                    ${receiptBtn}
+                                    <button onclick="deleteExpenseRecord(${e.id})" style="color: red; font-size: 11px;" class="no-print">Sil</button>
+                                </div>
                             </div>
                         </div>
                     `;
                     itemCounter++;
-                }
-            }
-
-            if(activeCount === 0) {
-                html = `<div style="padding: 15px; text-align: center; color: #666; font-size: 12px;">Bu ay üzrə qeydə alınmış xərc yoxdur.</div>`;
+                });
             }
 
             container.innerHTML = html;
             document.getElementById('monthlyExpenseTotal').textContent = monthTotal.toFixed(2) + ' AZN';
         }
 
-        async function saveNewOrUpdateExpense() {
+        async function saveNewExpense() {
             let year = document.getElementById('expenseYearSelect').value;
             let month = String(document.getElementById('expenseMonthSelect').value).padStart(2, '0');
             let day = document.getElementById('expInputDay').value;
@@ -3069,8 +3095,7 @@
             if(!title || amount <= 0) { alert('Zəhmət olmasa xərcin adını və düzgün məbləğ daxil edin!'); return; }
 
             let dateKey = `${year}-${month}-${String(day).padStart(2, '0')}`;
-            let existing = expenses.find(e => e.expense_date === dateKey);
-            let imageUrl = existing ? (existing.image_url || '') : '';
+            let imageUrl = '';
 
             if (fileInput && fileInput.files.length > 0) {
                 try {
@@ -3083,31 +3108,25 @@
                 } catch(e) {}
             }
 
-            let payload = { expense_date: dateKey, title, amount };
-            if (imageUrl) payload.image_url = imageUrl;
+            let payload = { expense_date: dateKey, title, amount, image_url: imageUrl };
 
-            if(existing && existing.id) {
-                let { error } = await _supabase.from('expenses').update(payload).eq('id', existing.id);
-                if(error) { alert('Xəta: ' + error.message); return; }
-            } else {
-                let { error } = await _supabase.from('expenses').insert([payload]);
-                if(error) { alert('Xəta: ' + error.message); return; }
-            }
+            let { error } = await _supabase.from('expenses').insert([payload]);
+            if(error) { alert('Xəta: ' + error.message); return; }
 
             document.getElementById('expInputDay').value = '';
             document.getElementById('expInputTitle').value = '';
             document.getElementById('expInputAmount').value = '';
             if(fileInput) fileInput.value = '';
 
-            alert('Xərc uğurla yadda saxlanıldı!');
+            alert('Xərc uğurla əlavə olundu!');
             await loadDataFromCloud();
             renderExpenseSheet();
             if(role === 'ADMIN') updateAdminYearlySummaryValues();
         }
 
-        async function deleteExpenseRecord(dateKey) {
+        async function deleteExpenseRecord(expenseId) {
             if(confirm('Bu xərc qeydini silmək istədiyinizə əminsiniz?')) {
-                let { error } = await _supabase.from('expenses').delete().eq('expense_date', dateKey);
+                let { error } = await _supabase.from('expenses').delete().eq('id', expenseId);
                 if(error) { alert('Xəta: ' + error.message); return; }
                 await loadDataFromCloud();
                 renderExpenseSheet();
@@ -3121,7 +3140,7 @@
             if(aProducts.length === 0) listHtml = '<div class="text-zinc-500 text-xs">A kodu ilə başlayan məhsul tapılmadı.</div>';
             else {
                 aProducts.forEach(p => {
-                    let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-700">` : '<div class="w-12 h-12 bg-zinc-800 rounded border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
+                    let imgPreview = p.image_url ? `<img src="${p.image_url}" class="w-12 h-12 object-cover rounded border border-zinc-700 cursor-pointer" onclick="showReceipt('${p.image_url}')">` : '<div class="w-12 h-12 bg-zinc-800 rounded border border-zinc-700 flex items-center justify-center text-[10px] text-zinc-500">Şəkil yoxdur</div>';
                     listHtml += `
                         <div class="bg-zinc-800/50 p-3 rounded-lg space-y-2 border border-zinc-700">
                             <div class="font-bold gold-text text-sm">${p.name} (${p.code})</div>
