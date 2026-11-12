@@ -2587,7 +2587,7 @@
             alert('Səbəb/qeyd uğurla yadda saxlanıldı!');
             closeEditAttendanceModal();
             await loadDataFromCloud();
-            renderArchiveSectionDayDetail(dateKey);
+            openArchiveSectionDayDetail(dateKey);
         }
 
         function openArchiveSectionDayDetail(dateKey) {
@@ -2616,7 +2616,10 @@
                             <div><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS}</div>
                             <button onclick="openEditAttendanceModal('${dateKey}')" class="text-[10px] bg-amber-600/20 text-amber-300 border border-amber-500/50 px-2 py-1 rounded font-bold">Düzənlə ✍️</button>
                         </div>
-                        <div class="bg-[#1a1a1a] p-2 rounded border border-zinc-800"><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG}</div>
+                        <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800">
+                            <div><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG}</div>
+                            <button onclick="openEditAttendanceModal('${dateKey}')" class="text-[10px] bg-amber-600/20 text-amber-300 border border-amber-500/50 px-2 py-1 rounded font-bold">Düzənlə ✍️</button>
+                        </div>
                         <div class="bg-[#1a1a1a] p-2 rounded border border-zinc-800 text-amber-400"><strong>Səbəb / Qeyd:</strong> ${reason}</div>
                     </div>
                 `;
@@ -2735,9 +2738,9 @@
             doc.setFontSize(10);
             doc.setFont('Roboto', 'bold');
             doc.text(fixAz("Tarix"), 14, startY);
-            doc.text(fixAz("Seher Smeni"), 60, startY);
-            doc.text(fixAz("Gunorta Smeni"), 105, startY);
-            doc.text(fixAz("Qeyd / Sebeb"), 150, startY);
+            doc.text(fixAz("Seher Smeni"), 55, startY);
+            doc.text(fixAz("Gunorta Smeni"), 95, startY);
+            doc.text(fixAz("Sebeb / Qeyd"), 135, startY);
 
             doc.setLineWidth(0.5);
             doc.line(14, startY + 2, 195, startY + 2);
@@ -2768,9 +2771,9 @@
                 }
 
                 doc.text(fixAz(formattedFullDate), 14, currentY);
-                doc.text(fixAz(seherStr), 60, currentY);
-                doc.text(fixAz(gunortaStr), 105, currentY);
-                doc.text(fixAz(reasonStr), 150, currentY);
+                doc.text(fixAz(seherStr), 55, currentY);
+                doc.text(fixAz(gunortaStr), 95, currentY);
+                doc.text(fixAz(reasonStr), 135, currentY);
 
                 currentY += 8;
                 cur.setDate(cur.getDate() + 1);
