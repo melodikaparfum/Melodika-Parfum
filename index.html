@@ -2763,9 +2763,9 @@
 
                 let seherStr = `${checkInS} - ${checkOutS}`;
                 let gunortaStr = `${checkInG} - ${checkOutG}`;
-                let reasonStr = recSeher.reason || recGunorta.reason || 'Qeyd yoxdur';
+                let reasonStr = recSeher.reason || recGunorta.reason || '';
 
-                if(currentY > 280) {
+                if(currentY > 275) {
                     doc.addPage();
                     currentY = 20;
                 }
@@ -2774,10 +2774,14 @@
                 doc.text(fixAz(seherStr), 48, currentY);
                 doc.text(fixAz(gunortaStr), 82, currentY);
                 
-                let splitReason = doc.splitTextToSize(fixAz(reasonStr), 80);
-                doc.text(splitReason, 116, currentY);
+                if (reasonStr) {
+                    let splitReason = doc.splitTextToSize(fixAz(reasonStr), 80);
+                    doc.text(splitReason, 116, currentY);
+                    currentY += Math.max(8, splitReason.length * 5);
+                } else {
+                    currentY += 8;
+                }
 
-                currentY += Math.max(8, splitReason.length * 5);
                 cur.setDate(cur.getDate() + 1);
             }
 
@@ -3785,7 +3789,7 @@
             let grams_sold = parseFloat(document.getElementById('opGram').value);
             let total_price = parseFloat(document.getElementById('opPrice').value);
             let payType = document.getElementById('payType').value;
-            let fromAd = document.getElementById('fromAd').checked;
+            let fromAd = document.getElementById('fromAd'].checked;
             let toCashRegister = document.getElementById('toCashRegister').checked;
 
             if(!product_id || !grams_sold || isNaN(total_price)) return alert('Məlumatları tam doldurun!');
