@@ -2735,12 +2735,12 @@
             doc.text(fixAz(`Dövr: ${formatAzeriDateString(startStr)} - ${formatAzeriDateString(endStr)}`), 14, 28);
 
             let startY = 38;
-            doc.setFontSize(10);
+            doc.setFontSize(9);
             doc.setFont('Roboto', 'bold');
             doc.text(fixAz("Tarix"), 14, startY);
-            doc.text(fixAz("Seher Smeni"), 55, startY);
-            doc.text(fixAz("Gunorta Smeni"), 95, startY);
-            doc.text(fixAz("Sebeb / Qeyd"), 135, startY);
+            doc.text(fixAz("Seher Smeni"), 48, startY);
+            doc.text(fixAz("Gunorta Smeni"), 82, startY);
+            doc.text(fixAz("Sebeb / Qeyd"), 116, startY);
 
             doc.setLineWidth(0.5);
             doc.line(14, startY + 2, 195, startY + 2);
@@ -2763,7 +2763,7 @@
 
                 let seherStr = `${checkInS} - ${checkOutS}`;
                 let gunortaStr = `${checkInG} - ${checkOutG}`;
-                let reasonStr = recSeher.reason || recGunorta.reason || '';
+                let reasonStr = recSeher.reason || recGunorta.reason || 'Qeyd yoxdur';
 
                 if(currentY > 280) {
                     doc.addPage();
@@ -2771,11 +2771,13 @@
                 }
 
                 doc.text(fixAz(formattedFullDate), 14, currentY);
-                doc.text(fixAz(seherStr), 55, currentY);
-                doc.text(fixAz(gunortaStr), 95, currentY);
-                doc.text(fixAz(reasonStr), 135, currentY);
+                doc.text(fixAz(seherStr), 48, currentY);
+                doc.text(fixAz(gunortaStr), 82, currentY);
+                
+                let splitReason = doc.splitTextToSize(fixAz(reasonStr), 80);
+                doc.text(splitReason, 116, currentY);
 
-                currentY += 8;
+                currentY += Math.max(8, splitReason.length * 5);
                 cur.setDate(cur.getDate() + 1);
             }
 
