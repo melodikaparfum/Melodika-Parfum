@@ -84,7 +84,6 @@
         <div id="loginScreen" class="bg-[#121212] border border-amber-500/40 p-6 rounded-xl max-w-sm mx-auto mt-6 text-center shadow-xl no-print space-y-4 text-white">
             <h1 class="text-2xl font-bold gold-text">MELODİKA PARFUM</h1>
             
-            <!-- SARI BANNER (GİRİŞ EKRANI ÜÇÜN) -->
             <div class="bg-[#f0ad4e] text-black p-5 rounded-2xl relative overflow-hidden shadow-lg space-y-3 text-left">
                 <div class="relative z-10 pr-16">
                     <h2 class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-none text-black">
@@ -180,8 +179,6 @@
 
         <!-- MÜŞTƏRİ KATALOQ VƏ SİFARİŞ EKRANI -->
         <div id="customerScreen" class="hidden-screen space-y-4 bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-white shadow-xl">
-            
-            <!-- SARI BANNER VƏ İŞLƏK MENYU HİSSƏSİ -->
             <div class="bg-[#f0ad4e] text-black p-5 rounded-2xl relative overflow-hidden shadow-lg space-y-4">
                 <div class="flex justify-between items-center text-xs font-bold text-black/90">
                     <div class="tracking-wider">Melodika Parfum</div>
@@ -202,7 +199,6 @@
                     </p>
                 </div>
 
-                <!-- 40% ENDİRİM DAMĞASI -->
                 <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-[#e65c00] text-white rounded-full flex flex-col items-center justify-center shadow-xl transform rotate-12 border-2 border-white/40">
                     <span class="text-xl font-extrabold leading-none">-40%</span>
                     <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5">1 yaşımız</span>
@@ -781,16 +777,8 @@
                     </div>
 
                     <div id="archiveAttDownloadBox" class="hidden-screen space-y-2 bg-[#1a1a1a] p-3 rounded-lg border border-zinc-800">
-                        <div class="text-xs font-bold gold-text mb-1">Aylıq İş Saatları Hesabatını PDF Kimi Yüklə:</div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <select id="archivePdfMonth" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs">
-                                <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
-                                <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
-                                <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
-                            </select>
-                            <select id="archivePdfYear" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs"></select>
-                        </div>
-                        <button onclick="downloadAttendanceAsPDFFromArchive()" class="w-full gold-bg font-bold py-2 rounded text-xs mt-1">Aylıq Hesabatı PDF Kimi Yüklə 📄</button>
+                        <div class="text-xs font-bold gold-text mb-1">İş Saatları Hesabatını Aralıq Üzrə PDF Kimi Yüklə:</div>
+                        <button onclick="downloadAttendanceAsPDFFromArchive()" class="w-full gold-bg font-bold py-2.5 rounded text-xs mt-1 shadow">Aralıq Hesabatını PDF Kimi Yüklə 📄</button>
                     </div>
                 </div>
             </div>
@@ -1195,6 +1183,17 @@
             if(isNaN(d.getTime())) return '';
             d.setHours(d.getHours() + 4);
             return d.toISOString().replace('T', ' ').substring(0, 16);
+        }
+
+        function formatAzeriDateString(dateStr) {
+            if(!dateStr) return '';
+            let parts = dateStr.split('-');
+            if(parts.length !== 3) return dateStr;
+            let y = parts[0];
+            let m = parseInt(parts[1], 10);
+            let d = parseInt(parts[2], 10);
+            let mName = monthNamesAz[m - 1] || '';
+            return `${d} ${mName} ${y}`;
         }
 
         window.onload = async function() {
@@ -2481,7 +2480,6 @@
                 titleStr = '🕒 İşçinin İş Saatları Arxivi';
                 actionFooter.classList.remove('hidden-screen');
                 attBox.classList.remove('hidden-screen');
-                initArchivePdfYearSelect();
             } else if(sectionType === 'expenses') {
                 titleStr = '💸 Xərclər Arxivi';
                 actionFooter.classList.remove('hidden-screen');
@@ -2494,19 +2492,6 @@
             document.getElementById('secArchiveDetailContainer').classList.add('hidden-screen');
             renderArchiveSectionDays();
             document.getElementById('archiveSectionModal').classList.remove('hidden-screen');
-        }
-
-        function initArchivePdfYearSelect() {
-            let currentYr = new Date().getFullYear();
-            let currentMo = new Date().getMonth() + 1;
-            let yearSel = document.getElementById('archivePdfYear');
-            if(yearSel) {
-                yearSel.innerHTML = '';
-                for(let y = currentYr - 2; y <= currentYr + 2; y++) {
-                    yearSel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y}</option>`;
-                }
-            }
-            if(document.getElementById('archivePdfMonth')) document.getElementById('archivePdfMonth').value = currentMo;
         }
 
         function closeArchiveSectionModal() {
@@ -2530,13 +2515,11 @@
 
             while(cur <= endDate) {
                 let dateKey = cur.toISOString().split('T')[0];
-                let dNum = cur.getDate();
-                let mName = monthNamesAz[cur.getMonth()];
-                let yr = cur.getFullYear();
+                let formattedFullDate = formatAzeriDateString(dateKey);
 
                 html += `
                     <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800 hover:bg-zinc-900 transition-colors">
-                        <span onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək bax">${dNum} ${mName} ${yr}</span>
+                        <span onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək bax">${formattedFullDate}</span>
                         <button onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-[11px] bg-blue-950 text-blue-300 hover:bg-blue-900 border border-blue-800 px-2 py-0.5 rounded font-bold">Göstər 👁️</button>
                     </div>
                 `;
@@ -2551,7 +2534,8 @@
             let detailTitle = document.getElementById('secArchiveDetailTitle');
             detailContainer.classList.remove('hidden-screen');
 
-            detailTitle.textContent = `${dateKey} Tarixli Məlumat`;
+            let formattedFullDate = formatAzeriDateString(dateKey);
+            detailTitle.textContent = `${formattedFullDate} Tarixli Məlumat`;
             let html = '';
 
             if(currentActiveArchiveSection === 'attendance') {
@@ -2619,14 +2603,15 @@
             filteredExp.forEach((e, idx) => {
                 let pAmt = Number(e.amount || 0);
                 totalAmount += pAmt;
-                itemsListHtml += `<div style="border-bottom: 1px solid #ddd; padding: 6px 0; font-size: 13px; color: #000;">${idx + 1}. ${e.expense_date} — Xərcin adı - ${e.title} : Məbəği: <strong>${pAmt.toFixed(2)} manat</strong></div>`;
+                let formattedD = formatAzeriDateString(e.expense_date);
+                itemsListHtml += `<div style="border-bottom: 1px solid #ddd; padding: 6px 0; font-size: 13px; color: #000;">${idx + 1}. ${formattedD} — Xərcin adı - ${e.title} : Məbəği: <strong>${pAmt.toFixed(2)} manat</strong></div>`;
             });
 
             tempDiv.innerHTML = `
                 <div style="text-align: center; font-weight: bold; font-size: 16px; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 12px; color: #000;">
                     MELODİKA PARFUM — XƏRCLƏR HESABATI
                 </div>
-                <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; color: #000;">Dövr: ${startStr} dən - ${endStr} dək</div>
+                <div style="font-size: 12px; font-weight: bold; margin-bottom: 10px; color: #000;">Dövr: ${formatAzeriDateString(startStr)} - ${formatAzeriDateString(endStr)}</div>
                 <div style="margin-bottom: 15px;">${itemsListHtml || '<div style="color: #666; font-size: 12px;">Bu tarixlərdə xərc yoxdur.</div>'}</div>
                 <div style="border-top: 2px solid #000; padding-top: 8px; text-align: right; font-weight: bold; font-size: 14px; color: #000;">
                     TOPLAM XƏRC MƏBLƏĞİ: ${totalAmount.toFixed(2)} AZN
@@ -2641,6 +2626,87 @@
                 link.click();
                 document.body.removeChild(tempDiv);
             });
+        }
+
+        async function downloadAttendanceAsPDFFromArchive() {
+            let startStr = document.getElementById('secArchiveStartDate').value;
+            let endStr = document.getElementById('secArchiveEndDate').value;
+            if(!startStr || !endStr) { alert('Zəhmət olmasa başlanğıc və son tarixi seçin!'); return; }
+
+            let startDate = new Date(startStr);
+            let endDate = new Date(endStr);
+            if(startDate > endDate) { alert('Başlanğıc tarixi son tarixdən böyük ola bilməz!'); return; }
+
+            let { jsPDF } = window.jspdf;
+            let doc = new jsPDF();
+
+            doc.addFont('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf', 'Roboto', 'normal');
+            doc.addFont('https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf', 'Roboto', 'bold');
+            doc.setFont('Roboto');
+
+            function fixAz(text) {
+                if(!text) return '';
+                return String(text)
+                    .replace(/ə/g, 'e').replace(/Ə/g, 'E')
+                    .replace(/ş/g, 's').replace(/Ş/g, 'S')
+                    .replace(/ç/g, 'c').replace(/Ç/g, 'C')
+                    .replace(/ö/g, 'o').replace(/Ö/g, 'O')
+                    .replace(/ü/g, 'u').replace(/Ü/g, 'U')
+                    .replace(/ı/g, 'i').replace(/İ/g, 'I')
+                    .replace(/ğ/g, 'g').replace(/Ğ/g, 'G');
+            }
+
+            doc.setFontSize(16);
+            doc.setFont('Roboto', 'bold');
+            doc.text(fixAz("MELODİKA PARFUM - İŞÇİNİN İŞ SAATLARI"), 14, 20);
+
+            doc.setFontSize(11);
+            doc.setFont('Roboto', 'normal');
+            doc.text(fixAz(`Dövr: ${formatAzeriDateString(startStr)} - ${formatAzeriDateString(endStr)}`), 14, 28);
+
+            let startY = 38;
+            doc.setFontSize(10);
+            doc.setFont('Roboto', 'bold');
+            doc.text(fixAz("Tarix"), 14, startY);
+            doc.text(fixAz("Seher Smeni"), 70, startY);
+            doc.text(fixAz("Gunorta Smeni"), 130, startY);
+
+            doc.setLineWidth(0.5);
+            doc.line(14, startY + 2, 195, startY + 2);
+
+            let currentY = startY + 10;
+            doc.setFont('Roboto', 'normal');
+
+            let cur = new Date(startDate);
+            while(cur <= endDate) {
+                let dateKey = cur.toISOString().split('T')[0];
+                let formattedFullDate = formatAzeriDateString(dateKey);
+
+                let recSeher = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_SEHER') || {};
+                let recGunorta = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_GUNORTA') || {};
+                
+                let checkInS = recSeher.check_in ? new Date(recSeher.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Gəlməyib';
+                let checkOutS = recSeher.check_out ? new Date(recSeher.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let checkInG = recGunorta.check_in ? new Date(recGunorta.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Gəlməyib';
+                let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+
+                let seherStr = `${checkInS} - ${checkOutS}`;
+                let gunortaStr = `${checkInG} - ${checkOutG}`;
+
+                if(currentY > 280) {
+                    doc.addPage();
+                    currentY = 20;
+                }
+
+                doc.text(fixAz(formattedFullDate), 14, currentY);
+                doc.text(fixAz(seherStr), 70, currentY);
+                doc.text(fixAz(gunortaStr), 130, currentY);
+
+                currentY += 8;
+                cur.setDate(cur.getDate() + 1);
+            }
+
+            doc.save(`Is_Saatlari_${startStr}_${endStr}.pdf`);
         }
 
         function openSpecificDayArchive(dateKey) {
@@ -3532,7 +3598,7 @@
             let totalCashReg = 0;
             let totalAd = 0;
             
-            let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${targetDateStr}</div>`;
+            let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${formatAzeriDateString(targetDateStr)}</div>`;
             
             targetSales.forEach((s, idx) => {
                 let p = products.find(x => x.id == s.product_id);
