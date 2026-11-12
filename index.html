@@ -3387,7 +3387,7 @@
                 }
 
                 let actionCellHtml = `<button onclick="editSale(${s.id})" class="text-amber-400 hover:text-amber-300 font-bold mr-2">Redaktə et</button>`;
-                if(role === 'ADMIN') actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-300 font-bold">Sil</button>`;
+                actionCellHtml += `<button onclick="deleteSale(${s.id})" class="text-red-400 hover:text-red-300 font-bold">Sil</button>`;
 
                 logHtml += `
                     <tr class="border-b border-zinc-800">
@@ -3617,7 +3617,7 @@
 
         async function deleteSale(id) {
             if(confirm('Bu əməliyyatı jurnaldan silmək istəyirsiniz?')) {
-                let { error } = await _supabase.sales.delete().eq('id', id);
+                let { error } = await _supabase.from('sales').delete().eq('id', id);
                 if(error) { alert('Xəta: ' + error.message); return; }
                 await loadDataFromCloud();
                 renderUI();
