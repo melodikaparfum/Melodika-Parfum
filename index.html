@@ -784,6 +784,24 @@
             </div>
         </div>
 
+        <!-- İŞ SAATI DÜZƏNLƏMƏ / SƏBƏB YAZMA MODALI -->
+        <div id="editAttendanceModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 flex items-center justify-center z-50">
+            <div class="max-w-sm w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+                <h3 id="editAttModalTitle" class="text-sm font-bold gold-text">Günün Qeydi / Səbəbi</h3>
+                <input type="hidden" id="editAttDateKey">
+                
+                <div class="space-y-2 text-xs">
+                    <label class="text-zinc-400 font-medium">Səbəb və ya qeyd daxil edin (Məs: Gəlməyib - İcazəli və s.):</label>
+                    <textarea id="editAttReasonInput" placeholder="Səbəbi bura yazın..." class="w-full bg-[#1a1a1a] border border-zinc-700 p-2.5 rounded text-white text-xs h-24 focus:outline-none focus:border-amber-600"></textarea>
+                </div>
+                
+                <div class="flex space-x-2 pt-2">
+                    <button onclick="closeEditAttendanceModal()" class="w-1/2 bg-[#1a1a1a] hover:bg-zinc-800 text-zinc-300 font-bold py-2 rounded text-xs">İmtina</button>
+                    <button onclick="saveAttendanceReason()" class="w-1/2 gold-bg font-bold py-2 rounded text-xs shadow">Yadda Saxla</button>
+                </div>
+            </div>
+        </div>
+
         <!-- KASSA PIN MODALI -->
         <div id="cashPinModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 flex items-center justify-center z-50">
             <div class="max-w-sm w-full bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-center shadow-2xl">
@@ -2520,12 +2538,56 @@
                 html += `
                     <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800 hover:bg-zinc-900 transition-colors">
                         <span onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-blue-400 hover:text-blue-300 font-bold cursor-pointer underline decoration-blue-500/50" title="Klikləyərək bax">${formattedFullDate}</span>
-                        <button onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-[11px] bg-blue-950 text-blue-300 hover:bg-blue-900 border border-blue-800 px-2 py-0.5 rounded font-bold">Göstər 👁️</button>
+                        <div class="flex items-center space-x-1">
+                            ${currentActiveArchiveSection === 'attendance' ? `<button onclick="openEditAttendanceModal('${dateKey}')" class="text-[11px] bg-amber-600/20 text-amber-300 border border-amber-500/50 hover:bg-amber-600/30 px-2 py-0.5 rounded font-bold">Düzənlə ✍️</button>` : ''}
+                            <button onclick="openArchiveSectionDayDetail('${dateKey}')" class="text-[11px] bg-blue-950 text-blue-300 hover:bg-blue-900 border border-blue-800 px-2 py-0.5 rounded font-bold">Göstər 👁️</button>
+                        </div>
                     </div>
                 `;
                 cur.setDate(cur.getDate() + 1);
             }
             container.innerHTML = html || '<div class="text-zinc-500 text-center py-2">Günlər tapılmadı.</div>';
+        }
+
+        function openEditAttendanceModal(dateKey) {
+            document.getElementById('editAttDateKey').value = dateKey;
+            document.getElementById('editAttModalTitle').textContent = `${formatAzeriDateString(dateKey)} - Günün Qeydi / Səbəbi`;
+            
+            let recSeher = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_SEHER') || {};
+            let recGunorta = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_GUNORTA') || {};
+            
+            let existingReason = recSeher.reason || recGunorta.reason || '';
+            document.getElementById('editAttReasonInput').value = existingReason;
+            document.getElementById('editAttendanceModal').classList.remove('hidden-screen');
+        }
+
+        function closeEditAttendanceModal() {
+            document.getElementById('editAttendanceModal').classList.add('hidden-screen');
+        }
+
+        async function saveAttendanceReason() {
+            let dateKey = document.getElementById('editAttDateKey').value;
+            let reason = document.getElementById('editAttReasonInput').value.trim();
+
+            let recSeher = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_SEHER');
+            let recGunorta = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_GUNORTA');
+
+            if(recSeher) {
+                await _supabase.from('attendance').update({ reason }).eq('id', recSeher.id);
+            } else {
+                await _supabase.from('attendance').insert([{ work_date: dateKey, role_name: 'SATICI_SEHER', reason }]);
+            }
+
+            if(recGunorta) {
+                await _supabase.from('attendance').update({ reason }).eq('id', recGunorta.id);
+            } else {
+                await _supabase.from('attendance').insert([{ work_date: dateKey, role_name: 'SATICI_GUNORTA', reason }]);
+            }
+
+            alert('Səbəb/qeyd uğurla yadda saxlanıldı!');
+            closeEditAttendanceModal();
+            await loadDataFromCloud();
+            renderArchiveSectionDayDetail(dateKey);
         }
 
         function openArchiveSectionDayDetail(dateKey) {
@@ -2546,11 +2608,16 @@
                 let checkOutS = recSeher.check_out ? new Date(recSeher.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
                 let checkInG = recGunorta.check_in ? new Date(recGunorta.check_in).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : 'Gəlməyib';
                 let checkOutG = recGunorta.check_out ? new Date(recGunorta.check_out).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '--:--';
+                let reason = recSeher.reason || recGunorta.reason || 'Qeyd yoxdur';
 
                 html = `
                     <div class="space-y-2 text-xs">
-                        <div class="bg-[#1a1a1a] p-2 rounded border border-zinc-800"><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS}</div>
+                        <div class="flex justify-between items-center bg-[#1a1a1a] p-2 rounded border border-zinc-800">
+                            <div><strong>☀️ Səhər Smeni:</strong> ${checkInS} - ${checkOutS}</div>
+                            <button onclick="openEditAttendanceModal('${dateKey}')" class="text-[10px] bg-amber-600/20 text-amber-300 border border-amber-500/50 px-2 py-1 rounded font-bold">Düzənlə ✍️</button>
+                        </div>
                         <div class="bg-[#1a1a1a] p-2 rounded border border-zinc-800"><strong>🌙 Günorta Smeni:</strong> ${checkInG} - ${checkOutG}</div>
+                        <div class="bg-[#1a1a1a] p-2 rounded border border-zinc-800 text-amber-400"><strong>Səbəb / Qeyd:</strong> ${reason}</div>
                     </div>
                 `;
             } else if(currentActiveArchiveSection === 'expenses') {
@@ -2668,8 +2735,9 @@
             doc.setFontSize(10);
             doc.setFont('Roboto', 'bold');
             doc.text(fixAz("Tarix"), 14, startY);
-            doc.text(fixAz("Seher Smeni"), 70, startY);
-            doc.text(fixAz("Gunorta Smeni"), 130, startY);
+            doc.text(fixAz("Seher Smeni"), 60, startY);
+            doc.text(fixAz("Gunorta Smeni"), 105, startY);
+            doc.text(fixAz("Qeyd / Sebeb"), 150, startY);
 
             doc.setLineWidth(0.5);
             doc.line(14, startY + 2, 195, startY + 2);
@@ -2692,6 +2760,7 @@
 
                 let seherStr = `${checkInS} - ${checkOutS}`;
                 let gunortaStr = `${checkInG} - ${checkOutG}`;
+                let reasonStr = recSeher.reason || recGunorta.reason || '';
 
                 if(currentY > 280) {
                     doc.addPage();
@@ -2699,8 +2768,9 @@
                 }
 
                 doc.text(fixAz(formattedFullDate), 14, currentY);
-                doc.text(fixAz(seherStr), 70, currentY);
-                doc.text(fixAz(gunortaStr), 130, currentY);
+                doc.text(fixAz(seherStr), 60, currentY);
+                doc.text(fixAz(gunortaStr), 105, currentY);
+                doc.text(fixAz(reasonStr), 150, currentY);
 
                 currentY += 8;
                 cur.setDate(cur.getDate() + 1);
