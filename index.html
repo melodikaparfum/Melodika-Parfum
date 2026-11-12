@@ -667,14 +667,14 @@
                     <div id="archiveDaysContainer" class="space-y-1.5 max-h-48 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-800"></div>
                 </div>
 
-                <!-- 2. İLLİK ARXİV BÖLMƏSİ (BƏRPA OLUNDU) -->
+                <!-- 2. İLLİK ARXİV BÖLMƏSİ (BƏRPA OLUNDU: XƏRCLƏR, NET GƏLİR VƏ İŞ VAHTLARI) -->
                 <div class="space-y-3 bg-[#1a1a1a] p-4 rounded-xl border border-zinc-800">
                     <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
-                        <h3 class="text-sm font-bold gold-text">📈 İllik Arxiv Bölməsi (İllər Üzrə İcmal):</h3>
+                        <h3 class="text-sm font-bold gold-text">📈 İllik Arxiv Bölməsi (İcmal, Xərclər və İş Vaxtları):</h3>
                         <select id="masterYearlySelect" onchange="renderMasterYearlyArchive()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs font-bold"></select>
                     </div>
-                    <div id="masterYearlyArchiveContent" class="space-y-2 text-xs text-zinc-300">
-                        <!-- İllik məlumatlar burada göstəriləcək -->
+                    <div id="masterYearlyArchiveContent" class="space-y-3 text-xs text-zinc-300">
+                        <!-- İllik məlumatlar, xərclər və iş saatları burada göstəriləcək -->
                     </div>
                 </div>
             </div>
@@ -1687,14 +1687,30 @@
 
             if(selYear === '2026') totalSales += 618, totalProfit += 618;
 
+            let expensesListHtml = '';
             expenses.forEach(e => {
                 let eYr = e.expense_date ? String(e.expense_date).substring(0, 4) : '';
                 if(eYr === selYear) {
-                    totalExpenses += Number(e.amount || 0);
+                    let expVal = Number(e.amount || 0);
+                    totalExpenses += expVal;
+                    expensesListHtml += `<div class="flex justify-between border-b border-zinc-800 py-1"><span>• ${e.expense_date}: ${e.title}</span><span class="text-red-400 font-bold">${expVal.toFixed(2)} AZN</span></div>`;
                 }
             });
 
             let netProfit = totalProfit - totalExpenses;
+
+            let yearAttendances = attendances.filter(a => String(a.work_date).startsWith(selYear));
+            let attendanceCountMap = {};
+            yearAttendances.forEach(a => {
+                let rName = a.role_name || 'Satıcı';
+                attendanceCountMap[rName] = (attendanceCountMap[rName] || 0) + 1;
+            });
+
+            let attendanceHtml = '';
+            for(let rName in attendanceCountMap) {
+                let label = rName === 'SATICI_SEHER' ? 'Səhər Smeni' : (rName === 'SATICI_GUNORTA' ? 'Günorta Smeni' : rName);
+                attendanceHtml += `<div class="flex justify-between bg-[#121212] p-2 rounded border border-zinc-800"><span>👤 ${label}</span><strong class="text-amber-400">${attendanceCountMap[rName]} növbə</strong></div>`;
+            }
 
             container.innerHTML = `
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center pt-1">
@@ -1709,6 +1725,20 @@
                     <div class="bg-[#121212] p-2.5 rounded border border-zinc-800">
                         <div class="text-[10px] text-zinc-400">Toplam Xərclər (${selYear}):</div>
                         <div class="text-sm font-bold text-red-400 mt-0.5">${totalExpenses.toFixed(2)} AZN</div>
+                    </div>
+                </div>
+
+                <div class="space-y-1 pt-2 border-t border-zinc-800">
+                    <div class="font-bold text-amber-400 text-xs">💸 Xərclərin Detallı Siyahısı:</div>
+                    <div class="max-h-28 overflow-y-auto bg-[#121212] p-2 rounded border border-zinc-800 space-y-1">
+                        ${expensesListHtml || '<div class="text-zinc-500 text-center">Bu il üzrə xərc qeydə alınmayıb.</div>'}
+                    </div>
+                </div>
+
+                <div class="space-y-1 pt-1">
+                    <div class="font-bold text-amber-400 text-xs">🕒 İşçilərin İş Vaxtları və Növbə Sayı (${selYear}):</div>
+                    <div class="space-y-1 max-h-28 overflow-y-auto">
+                        ${attendanceHtml || '<div class="text-zinc-500 text-center bg-[#121212] p-2 rounded border border-zinc-800">İş vaxtı qeydi yoxdur.</div>'}
                     </div>
                 </div>
             `;
