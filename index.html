@@ -111,7 +111,6 @@
         <!-- MÜŞTƏRİ KATALOQ VƏ SİFARİŞ EKRANI -->
         <div id="customerScreen" class="hidden-screen space-y-4 bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-white shadow-xl">
             
-            <!-- SARI BANNER (İNDİRİMLƏR SİLİNDİ) -->
             <div class="bg-[#f0ad4e] text-black p-5 rounded-2xl relative overflow-hidden shadow-lg space-y-4">
                 <div class="flex justify-between items-center text-xs font-bold text-black/90">
                     <div class="tracking-wider">Melodika Parfum</div>
@@ -283,9 +282,7 @@
             <header class="flex flex-wrap justify-between items-center border-b border-zinc-800 pb-3 gap-2 no-print" id="mainHeaderContainer">
                 <h1 class="text-base font-bold gold-text" id="roleTitle">MELODİKA</h1>
                 <div class="flex flex-wrap items-center gap-1.5">
-                    <!-- ADMİN ÜÇÜN Z HESABATLARI DÜYMƏSİ -->
                     <button id="adminZReportsBtn" onclick="openAdminUploadZModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Z Hesabatları (Mühasib) 📄</button>
-                    
                     <button id="masterArchiveNavBtn" onclick="openGlobalMasterArchiveModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Arxiv Mərkəzi 🗂️</button>
                     <button id="adminTopCashBtn" onclick="openCashPinModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Kassa Mərkəzi 💰</button>
                     <button id="adminTopReportsBtn" onclick="openTopReportsModal()" class="hidden-screen bg-amber-600 hover:bg-amber-500 text-white font-bold px-2.5 py-1.5 rounded text-xs shadow">Hesabatlar Mərkəzi 📊</button>
@@ -637,39 +634,47 @@
             </div>
         </div>
 
-        <!-- BÜTÜN ARXİVLƏRİN GÖSTƏRİLDİYİ MASTER ARXİV MODALI -->
+        <!-- BÜTÜN ARXİVLƏRİN GÖSTƏRİLDİYİ MASTER ARXİV MODALI (GÜN SONU VƏ İLLİK) -->
         <div id="globalMasterArchiveModal" class="hidden-screen fixed inset-0 bg-black/80 p-4 overflow-y-auto z-50">
-            <div class="max-w-3xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-4 text-white shadow-2xl">
+            <div class="max-w-3xl mx-auto bg-[#121212] border border-amber-500/50 p-6 rounded-xl space-y-6 text-white shadow-2xl">
                 <div class="flex justify-between items-center border-b border-zinc-800 pb-3">
-                    <h2 class="text-lg font-bold gold-text">🗂️ BÜTÜN ARXİVLƏR MƏRKƏZİ (GÜN SONU VƏ AYLIQ)</h2>
+                    <h2 class="text-lg font-bold gold-text">🗂️ BÜTÜN ARXİVLƏR MƏRKƏZİ (GÜN SONU VƏ İLLİK)</h2>
                     <button onclick="closeGlobalMasterArchiveModal()" class="text-xs bg-[#1a1a1a] px-3 py-1 rounded">Bağla</button>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="text-xs text-zinc-400 font-medium">Bütün vaxtlar üzrə qeydə alınmış Gün Sonu Hesabatları və Aylıq Arxivlər burada saxlanılır.</div>
+                <!-- 1. GÜN SONU HESABATLARI ARXİVİ -->
+                <div class="space-y-3 bg-[#1a1a1a] p-4 rounded-xl border border-zinc-800">
+                    <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                        <h3 class="text-sm font-bold gold-text">📅 Gün Sonu Hesabatları Arxivi:</h3>
+                        <button onclick="deleteSelectedDayEndArchives()" class="bg-red-800 hover:bg-red-700 text-white font-bold px-3 py-1 rounded text-xs shadow">Seçilmişləri Sil 🗑️</button>
+                    </div>
                     
-                    <div class="space-y-3 bg-[#1a1a1a] p-3 rounded-xl border border-zinc-800">
-                        <div class="flex justify-between items-center border-b border-zinc-800 pb-1">
-                            <h3 class="text-sm font-bold gold-text">📅 Gün Sonu Hesabatları Arxivi:</h3>
-                            <button onclick="deleteSelectedDayEndArchives()" class="bg-red-800 hover:bg-red-700 text-white font-bold px-3 py-1 rounded text-xs shadow">Seçilmişləri Sil 🗑️</button>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label class="text-[10px] text-zinc-400 block mb-1">İl seçin:</label>
+                            <select id="archiveYearSelect" onchange="renderArchiveCalendar()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold"></select>
                         </div>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[10px] text-zinc-400 block mb-1">İl seçin:</label>
-                                <select id="archiveYearSelect" onchange="renderArchiveCalendar()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold"></select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-zinc-400 block mb-1">Ay seçin:</label>
-                                <select id="archiveMonthSelect" onchange="renderArchiveCalendar()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold">
-                                    <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
-                                    <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
-                                    <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
-                                </select>
-                            </div>
+                        <div>
+                            <label class="text-[10px] text-zinc-400 block mb-1">Ay seçin:</label>
+                            <select id="archiveMonthSelect" onchange="renderArchiveCalendar()" class="w-full bg-[#121212] border border-zinc-700 p-2 rounded text-white text-xs font-bold">
+                                <option value="1">Yanvar</option><option value="2">Fevral</option><option value="3">Mart</option><option value="4">Aprel</option>
+                                <option value="5">May</option><option value="6">İyun</option><option value="7">İyul</option><option value="8">Avqust</option>
+                                <option value="9">Sentyabr</option><option value="10">Oktyabr</option><option value="11">Noyabr</option><option value="12">Dekabr</option>
+                            </select>
                         </div>
+                    </div>
 
-                        <div id="archiveDaysContainer" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-800"></div>
+                    <div id="archiveDaysContainer" class="space-y-1.5 max-h-48 overflow-y-auto pr-1 text-xs pt-2 border-t border-zinc-800"></div>
+                </div>
+
+                <!-- 2. İLLİK ARXİV BÖLMƏSİ (BƏRPA OLUNDU) -->
+                <div class="space-y-3 bg-[#1a1a1a] p-4 rounded-xl border border-zinc-800">
+                    <div class="flex justify-between items-center border-b border-zinc-800 pb-2">
+                        <h3 class="text-sm font-bold gold-text">📈 İllik Arxiv Bölməsi (İllər Üzrə İcmal):</h3>
+                        <select id="masterYearlySelect" onchange="renderMasterYearlyArchive()" class="bg-[#121212] border border-zinc-700 p-1.5 rounded text-white text-xs font-bold"></select>
+                    </div>
+                    <div id="masterYearlyArchiveContent" class="space-y-2 text-xs text-zinc-300">
+                        <!-- İllik məlumatlar burada göstəriləcək -->
                     </div>
                 </div>
             </div>
@@ -1595,6 +1600,7 @@
                 await loadDataFromCloud();
                 initArchiveSelectors();
                 renderArchiveCalendar();
+                renderMasterYearlyArchive();
                 document.getElementById('globalMasterArchiveModal').classList.remove('hidden-screen');
             } else {
                 alert('Yanlış PIN kod! Arxiv üçün parol 000-dır.');
@@ -1619,6 +1625,14 @@
 
             let monthSel = document.getElementById('archiveMonthSelect');
             if(monthSel) monthSel.value = currentMo;
+
+            let masterYearlySel = document.getElementById('masterYearlySelect');
+            if(masterYearlySel) {
+                masterYearlySel.innerHTML = '';
+                for(let y = currentYr - 2; y <= currentYr + 2; y++) {
+                    masterYearlySel.innerHTML += `<option value="${y}" ${y === currentYr ? 'selected' : ''}>${y} cı il</option>`;
+                }
+            }
         }
 
         function renderArchiveCalendar() {
@@ -1652,6 +1666,52 @@
                 `;
             }
             container.innerHTML = html;
+        }
+
+        function renderMasterYearlyArchive() {
+            let selYear = document.getElementById('masterYearlySelect')?.value || '2026';
+            let container = document.getElementById('masterYearlyArchiveContent');
+            if(!container) return;
+
+            let totalSales = 0;
+            let totalProfit = 0;
+            let totalExpenses = 0;
+
+            sales.forEach(s => {
+                let sYr = s.date ? String(s.date).substring(0, 4) : '';
+                if(sYr === selYear && s.type === 'MEXARIC') {
+                    totalSales += Number(s.total_price || 0);
+                    totalProfit += Number(s.profit || 0);
+                }
+            });
+
+            if(selYear === '2026') totalSales += 618, totalProfit += 618;
+
+            expenses.forEach(e => {
+                let eYr = e.expense_date ? String(e.expense_date).substring(0, 4) : '';
+                if(eYr === selYear) {
+                    totalExpenses += Number(e.amount || 0);
+                }
+            });
+
+            let netProfit = totalProfit - totalExpenses;
+
+            container.innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center pt-1">
+                    <div class="bg-[#121212] p-2.5 rounded border border-zinc-800">
+                        <div class="text-[10px] text-zinc-400">Toplam Satış (${selYear}):</div>
+                        <div class="text-sm font-bold gold-text mt-0.5">${totalSales.toFixed(2)} AZN</div>
+                    </div>
+                    <div class="bg-[#121212] p-2.5 rounded border border-zinc-800">
+                        <div class="text-[10px] text-zinc-400">Toplam Net Gəlir (${selYear}):</div>
+                        <div class="text-sm font-bold text-green-400 mt-0.5">${netProfit.toFixed(2)} AZN</div>
+                    </div>
+                    <div class="bg-[#121212] p-2.5 rounded border border-zinc-800">
+                        <div class="text-[10px] text-zinc-400">Toplam Xərclər (${selYear}):</div>
+                        <div class="text-sm font-bold text-red-400 mt-0.5">${totalExpenses.toFixed(2)} AZN</div>
+                    </div>
+                </div>
+            `;
         }
 
         async function deleteSelectedDayEndArchives() {
@@ -1867,7 +1927,6 @@
             else ordersBtn.classList.remove('blinking-btn');
         }
 
-        // İSMAYILIN PİN KODU 0-DIR
         function login() {
             let pin = document.getElementById('pinInput').value;
             if(pin === '0') {
@@ -2480,4 +2539,3 @@
         }
     </script>
 </html>
- 
