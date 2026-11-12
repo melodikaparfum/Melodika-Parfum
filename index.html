@@ -9,7 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { background-color: #000000 !important; color: #ffffff !important; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; }
+        body { background-color: #000000 !important; color: #ffffff !important; font-family: Arial, sans-serif; transition: background-color 0.3s, color 0.3s; scroll-behavior: smooth; }
         .gold-border { border-color: #d4af37 !important; }
         .gold-text { color: #d4af37 !important; }
         .gold-bg { background-color: #d4af37 !important; color: #000 !important; }
@@ -141,15 +141,15 @@
         <!-- MÜŞTƏRİ KATALOQ VƏ SİFARİŞ EKRANI -->
         <div id="customerScreen" class="hidden-screen space-y-4 bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-white shadow-xl">
             
-            <!-- SKRİNŞOTDAKI KİMİ SARI BANNER VƏ MENYU HİSSƏSİ -->
+            <!-- SARI BANNER VƏ İŞLƏK MENYU HİSSƏSİ -->
             <div class="bg-[#f0ad4e] text-black p-5 rounded-2xl relative overflow-hidden shadow-lg space-y-4">
-                <div class="flex justify-between items-center text-xs font-bold text-black/80">
+                <div class="flex justify-between items-center text-xs font-bold text-black/90">
                     <div class="tracking-wider">Melodika Parfum</div>
-                    <div class="flex items-center space-x-4">
-                        <span>Kataloq</span>
-                        <span>Səbət (0)</span>
-                        <span>Əlaqə</span>
-                        <button onclick="closeCustomerCatalog()" class="bg-black text-[#f0ad4e] px-2.5 py-1 rounded text-[11px]">Girişə Qayıt</button>
+                    <div class="flex items-center space-x-3 sm:space-x-4">
+                        <button onclick="scrollToCatalog()" class="hover:underline cursor-pointer bg-black/10 px-2 py-1 rounded transition-all">Kataloq</button>
+                        <button onclick="scrollToCart()" id="cartNavBtn" class="hover:underline cursor-pointer bg-black/10 px-2 py-1 rounded transition-all">Səbət (0)</button>
+                        <button onclick="scrollToContact()" class="hover:underline cursor-pointer bg-black/10 px-2 py-1 rounded transition-all">Əlaqə</button>
+                        <button onclick="closeCustomerCatalog()" class="bg-black text-[#f0ad4e] px-2.5 py-1 rounded text-[11px] shadow">Girişə Qayıt</button>
                     </div>
                 </div>
 
@@ -162,7 +162,7 @@
                     </p>
                 </div>
 
-                <!-- 40% ENDİRİM DAMĞASI (Skrinşotdakı kimi sağda dairəvi) -->
+                <!-- 40% ENDİRİM DAMĞASI -->
                 <div class="absolute -right-4 -bottom-4 w-28 h-28 bg-[#e65c00] text-white rounded-full flex flex-col items-center justify-center shadow-xl transform rotate-12 border-2 border-white/40">
                     <span class="text-xl font-extrabold leading-none">-40%</span>
                     <span class="text-[10px] font-bold uppercase tracking-wider mt-0.5">1 yaşımız</span>
@@ -187,13 +187,13 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="md:col-span-2 space-y-3">
+                <div id="catalogSectionAnchor" class="md:col-span-2 space-y-3">
                     <h2 class="text-sm font-semibold gold-text">Ətirlər və Notlar</h2>
                     <input type="text" id="customerSearch" oninput="renderCustomerCatalog()" placeholder="Ətir axtar..." class="w-full bg-[#1a1a1a] border border-zinc-700 p-2 rounded text-white text-xs mb-2 focus:outline-none focus:border-amber-600">
                     <div id="customerProductsList" class="space-y-3 max-h-[600px] overflow-y-auto pr-2"></div>
                 </div>
 
-                <div class="bg-[#121212] border border-zinc-700 p-4 rounded-xl space-y-3 h-fit sticky top-4 shadow-sm">
+                <div id="cartSectionAnchor" class="bg-[#121212] border border-zinc-700 p-4 rounded-xl space-y-3 h-fit sticky top-4 shadow-sm">
                     <h2 class="text-sm font-semibold gold-text">Səbətiniz 🛒</h2>
                     <div id="cartItemsList" class="space-y-2 text-xs text-zinc-300 max-h-40 overflow-y-auto border-b border-zinc-800 pb-2">
                         <span class="text-zinc-500">Səbətiniz boşdur.</span>
@@ -1084,7 +1084,7 @@
         </div>
 
         <!-- WHATSAPP ƏLAQƏ BLOKU -->
-        <div class="info-block bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print text-white shadow-sm">
+        <div id="contactSectionAnchor" class="info-block bg-[#121212] border border-amber-500/40 p-4 rounded-xl text-center space-y-2 no-print text-white shadow-sm">
             <div class="text-xs text-zinc-400 font-medium">Suallarınız və ya əlavə sifarişlər üçün:</div>
             <a href="https://wa.me/994559703829" target="_blank" class="inline-flex items-center justify-center space-x-2 bg-green-600 hover:bg-green-500 text-white font-bold py-2 px-4 rounded-lg text-xs transition-all w-full shadow">
                 <span>💬 WhatsApp ilə yazın</span>
@@ -2785,6 +2785,22 @@
             document.getElementById('loginScreen').classList.remove('hidden-screen');
         }
 
+        // MENYU DÜYMƏLƏRİNİN NAVİQASİYA FUNKSİYALARI
+        function scrollToCatalog() {
+            let el = document.getElementById('catalogSectionAnchor');
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToCart() {
+            let el = document.getElementById('cartSectionAnchor');
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollToContact() {
+            let el = document.getElementById('contactSectionAnchor');
+            if(el) el.scrollIntoView({ behavior: 'smooth' });
+        }
+
         function openFeaturedModal(id, name, pricePerGram) {
             document.getElementById('featuredPerfumeId').value = id;
             document.getElementById('featuredPerfumeName').value = name;
@@ -2952,6 +2968,13 @@
 
         function renderCart() {
             let container = document.getElementById('cartItemsList');
+            let cartNavBtn = document.getElementById('cartNavBtn');
+            let totalCartCount = cart.length;
+
+            if (cartNavBtn) {
+                cartNavBtn.textContent = `Səbət (${totalCartCount})`;
+            }
+
             if(cart.length === 0) {
                 container.innerHTML = '<span class="text-zinc-500">Səbətiniz boşdur.</span>';
                 deliveryFee = 0;
