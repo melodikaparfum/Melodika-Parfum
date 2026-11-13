@@ -4080,5 +4080,35 @@ async function downloadExcelReport() {
     XLSX.writeFile(wb, `Melodika_Hesabat_${start}_${end}.xlsx`);
     closeExcelExportModal();
 }
-</script
+</script>
+
+<script>
+/* ===== EXCEL DİAQNOSTİKA + BOŞ SƏTİR DÜZƏLİŞİ ===== */
+excelMakeSheet = function(rows, widths) {
+    let safeRows = rows.map(r => (r && r.length) ? r : ['']);
+    let ws = XLSX.utils.aoa_to_sheet(safeRows);
+    ws['!cols'] = widths.map(w => ({ wch: w }));
+    return ws;
+};
+
+let _origDownloadExcel = downloadExcelReport;
+downloadExcelReport = async function() {
+    let start = document.getElementById('excelStartDate').value;
+    let end = document.getElementById('excelEndDate').value;
+    try { await loadDataFromCloud(); } catch(e) {}
+    let d10 = v => String(v || '').substring(0, 10);
+    let cSales = sales.filter(s => s.date && getBakuDateString(s.date) >= start && getBakuDateString(s.date) <= end).length;
+    let cExp = expenses.filter(e => e.expense_date && d10(e.expense_date) >= start && d10(e.expense_date) <= end).length;
+    let cAtt = attendances.filter(a => a.work_date && d10(a.work_date) >= start && d10(a.work_date) <= end).length;
+    alert(
+        'Bazadan gələn qeydlər (' + start + ' / ' + end + '):\n' +
+        'Satışlar: ' + cSales + '\n' +
+        'Xərclər: ' + cExp + ' (bütün bazada: ' + expenses.length + ')\n' +
+        'İş saatı qeydləri: ' + cAtt + ' (bütün bazada: ' + attendances.length + ')\n' +
+        'Aylıq arxiv: ' + yearlyArchive.length + '\n' +
+        'Gün sonu arxivi: ' + dayEndArchive.length
+    );
+    return _origDownloadExcel();
+};
+</script>
 </html>
