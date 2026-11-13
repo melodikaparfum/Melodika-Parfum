@@ -4110,5 +4110,16 @@ downloadExcelReport = async function() {
     );
     return _origDownloadExcel();
 };
+    </script>
+
+<script>
+/* Hər sətrin hündürlüyünü açıq yazır, boş sətirləri boş qoymur */
+excelMakeSheet = function(rows, widths) {
+    let safe = rows.map(r => (r && r.length) ? r : [' ']);
+    let ws = XLSX.utils.aoa_to_sheet(safe);
+    ws['!cols'] = widths.map(w => ({ wch: w }));
+    ws['!rows'] = safe.map(() => ({ hpt: 20 }));
+    return ws;
+};
 </script>
 </html>
