@@ -4122,4 +4122,60 @@ excelMakeSheet = function(rows, widths) {
     return ws;
 };
 </script>
+<script>
+/* ===== GÜN SONU HESABATINA REKLAM MƏLUMATI ===== */
+buildDayEndReportForDate = function(targetDateStr) {
+    currentDayEndReportDate = targetDateStr;
+    let targetSales = sales.filter(s => s.date && getBakuDateString(s.date) === targetDateStr && s.type === 'MEXARIC');
+
+    let totalSalesSum = 0;
+    let totalPos = 0;
+    let totalCashReg = 0;
+    let totalAd = 0;
+
+    let listHtml = `<div style="font-weight: bold; margin-bottom: 12px; color: #000; font-size: 14px;">Tarix (Bakı vaxtı): ${formatAzeriDateString(targetDateStr)}</div>`;
+
+    targetSales.forEach((s, idx) => {
+        let p = products.find(x => x.id == s.product_id);
+        let price = Number(s.total_price || 0);
+        totalSalesSum += price;
+
+        if(s.payType === 'POS Terminal') totalPos += price;
+        if(s.toCashRegister) totalCashReg += price;
+        if(s.fromAd) totalAd += price;
+
+        let shiftLbl = s.shift_name === 'SEHER' ? '[Səhər smeni]' : (s.shift_name === 'GUNORTA' ? '[Günorta smeni]' : '[Admin]');
+        let adLbl = s.fromAd
+            ? '<strong style="color:#b45309;">Reklamdan: Hə</strong>'
+            : '<span style="color:#555;">Reklamdan: Yox</span>';
+
+        listHtml += `<div style="border-bottom: 1px solid #ccc; padding: 6px 0; color: #000;">${idx + 1}. ${shiftLbl} ${p ? p.name : 'Naməlum'} - ${s.grams_sold} qr - ${price} AZN (${s.payType || 'Nəğd'}) — ${adLbl}</div>`;
+    });
+
+    if(targetSales.length === 0) {
+        listHtml += `<div style="color: #666; padding: 10px 0;">Bu tarixə aid satış qeydə alınmayıb.</div>`;
+    } else {
+        listHtml += `
+            <div style="margin-top: 15px; border-top: 2px solid #000; padding-top: 10px; font-size: 13px; color: #000;">
+                <div><strong>Ümumi mağaza satışı:</strong> ${totalSalesSum.toFixed(2)} AZN</div>
+                <div><strong>Cəmi POS Terminal:</strong> ${totalPos.toFixed(2)} AZN</div>
+                <div><strong>Cəmi Kassa Aparatına Vurulan:</strong> ${totalCashReg.toFixed(2)} AZN</div>
+                <div><strong>Ümumi reklamdan gələn:</strong> ${totalAd.toFixed(2)} AZN</div>
+            </div>
+        `;
+    }
+
+    currentDayEndSummaryHtml = listHtml;
+    document.getElementById('dayEndContent').innerHTML = currentDayEndSummaryHtml;
+};
+
+/* Excel: sətirlərin görünməsi üçün hündürlük */
+excelMakeSheet = function(rows, widths) {
+    let safe = rows.map(r => (r && r.length) ? r : [' ']);
+    let ws = XLSX.utils.aoa_to_sheet(safe);
+    ws['!cols'] = widths.map(w => ({ wch: w }));
+    ws['!rows'] = safe.map(() => ({ hpt: 20 }));
+    return ws;
+};
+</script>
 </html>
