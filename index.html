@@ -3883,7 +3883,13 @@
 
 function openExcelExportModal() {
     let today = getBakuDateString();
-    document.getElementById('excelStartDate').value = today.substring(0, 8) + '01';
+    // Başlanğıc tarix: bazadakı ən köhnə qeyd (bütün arxiv görünsün)
+    let dates = [];
+    sales.forEach(s => { if(s.date) dates.push(getBakuDateString(s.date)); });
+    expenses.forEach(e => { if(e.expense_date) dates.push(String(e.expense_date).substring(0, 10)); });
+    attendances.forEach(a => { if(a.work_date) dates.push(String(a.work_date).substring(0, 10)); });
+    dates = dates.filter(d => d && d.length === 10).sort();
+    document.getElementById('excelStartDate').value = dates.length ? dates[0] : today.substring(0, 8) + '01';
     document.getElementById('excelEndDate').value = today;
     document.getElementById('excelExportModal').classList.remove('hidden-screen');
 }
@@ -3898,6 +3904,25 @@ function excelMakeSheet(rows, widths) {
     return ws;
 }
 
+function excelHtmlToText(html) {
+    return String(html || '')
+        .replace(/<\/div>/gi, '\n')
+        .replace(/<br\s*\/?>/gi, '\n')
+        .replace(/<[^>]+>/g, '')
+        .replace(/&nbsp;/g, ' ')
+        .replace(/\n\s*\n+/g, '\n')
+        .trim();
+}
+
+function excelHours(inV, outV) {
+    if(!inV || !outV) return '';
+    let diff = (new Date(outV) - new Date(inV)) / 3600000;
+    if(isNaN(diff) || diff < 0) return '';
+    let h = Math.floor(diff);
+    let m = Math.round((diff - h) * 60);
+    return `${h} saat ${m} dəq`;
+}
+
 async function downloadExcelReport() {
     let start = document.getElementById('excelStartDate').value;
     let end = document.getElementById('excelEndDate').value;
@@ -3908,8 +3933,9 @@ async function downloadExcelReport() {
     try { await loadDataFromCloud(); } catch(e) {}
 
     let timeFmt = v => v ? new Date(v).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    let dOnly = v => String(v || '').substring(0, 10);
 
-    // 1) SATIŞLAR
+    // ===== 1) SATIŞLAR =====
     let salesRows = [['S/S', 'Tarix', 'Smen', 'Növ', 'Kod', 'Məhsul', 'Miqdar (qr/ədəd)', 'Ödəniş üsulu', 'Məbləğ (AZN)', 'Maya dəyəri (AZN)', 'Mənfəət (AZN)', 'Reklamdan', 'Kassa aparatına vuruldu']];
     let salesTotal = 0, grossProfit = 0, rNagd = 0, rPos = 0, rCard = 0, rCashReg = 0, rAd = 0;
 
@@ -3940,10 +3966,11 @@ async function downloadExcelReport() {
             s.fromAd ? 'Hə' : 'Yox', s.toCashRegister ? 'Vurulub' : 'Vurulmayıb'
         ]);
     });
+    if(filteredSales.length === 0) salesRows.push(['', 'Bu tarix aralığında satış yoxdur']);
     salesRows.push([]);
     salesRows.push(['', '', '', '', '', 'CƏMİ SATIŞ (Məxaric):', '', '', salesTotal]);
 
-    // 2) MƏHSUL KATALOQU
+    // ===== 2) MƏHSUL KATALOQU =====
     let stockMap = {};
     products.forEach(p => { stockMap[p.id] = Number(p.initial_stock || 0); });
     sales.forEach(s => {
@@ -3959,24 +3986,25 @@ async function downloadExcelReport() {
         prodRows.push([p.code, p.name, `${Number(st.toFixed(2))} qr`, Number(p.buy_price || 0), Number(p.sell_price || 0)]);
     });
 
-    // 3) XƏRCLƏR
+    // ===== 3) XƏRCLƏR (Arxiv → Xərclər) =====
     let expRows = [['S/S', 'Tarix', 'Xərcin adı', 'Məbləğ (AZN)', 'Çek (şəkil linki)']];
     let expTotal = 0;
-    expenses
-        .filter(e => e.expense_date && String(e.expense_date).substring(0, 10) >= start && String(e.expense_date).substring(0, 10) <= end)
-        .sort((a, b) => String(a.expense_date).localeCompare(String(b.expense_date)))
-        .forEach((e, i) => {
-            let amt = Number(e.amount || 0);
-            expTotal += amt;
-            expRows.push([i + 1, formatAzeriDateString(String(e.expense_date).substring(0, 10)), e.title || '', amt, e.image_url || '']);
-        });
+    let expList = expenses
+        .filter(e => e.expense_date && dOnly(e.expense_date) >= start && dOnly(e.expense_date) <= end)
+        .sort((a, b) => dOnly(a.expense_date).localeCompare(dOnly(b.expense_date)));
+    expList.forEach((e, i) => {
+        let amt = Number(e.amount || 0);
+        expTotal += amt;
+        expRows.push([i + 1, formatAzeriDateString(dOnly(e.expense_date)), e.title || '', amt, e.image_url || '']);
+    });
+    if(expList.length === 0) expRows.push(['', 'Bu tarix aralığında xərc qeydə alınmayıb']);
     expRows.push([]);
     expRows.push(['', '', 'TOPLAM XƏRC:', expTotal]);
 
-    // 4) İŞÇİNİN İŞ SAATLARI
-    let attRows = [['Tarix', 'Səhər gəliş', 'Səhər çıxış', 'Günorta gəliş', 'Günorta çıxış', 'Səbəb / Qeyd']];
-    let cur = new Date(start);
-    let endD = new Date(end);
+    // ===== 4) İŞÇİNİN İŞ SAATLARI (Arxiv → İşçinin iş saatları) =====
+    let attRows = [['Tarix', 'Səhər gəliş', 'Səhər çıxış', 'Səhər işlədi', 'Günorta gəliş', 'Günorta çıxış', 'Günorta işlədi', 'Səbəb / Qeyd']];
+    let cur = new Date(start + 'T00:00:00Z');
+    let endD = new Date(end + 'T00:00:00Z');
     while(cur <= endD) {
         let dateKey = cur.toISOString().split('T')[0];
         let recS = attendances.find(a => String(a.work_date).startsWith(dateKey) && a.role_name === 'SATICI_SEHER') || {};
@@ -3985,17 +4013,19 @@ async function downloadExcelReport() {
             formatAzeriDateString(dateKey),
             recS.check_in ? timeFmt(recS.check_in) : 'Gəlməyib',
             recS.check_out ? timeFmt(recS.check_out) : '--:--',
+            excelHours(recS.check_in, recS.check_out),
             recG.check_in ? timeFmt(recG.check_in) : 'Gəlməyib',
             recG.check_out ? timeFmt(recG.check_out) : '--:--',
+            excelHours(recG.check_in, recG.check_out),
             recS.reason || recG.reason || ''
         ]);
-        cur.setDate(cur.getDate() + 1);
+        cur.setUTCDate(cur.getUTCDate() + 1);
     }
 
-    // 5) NET GƏLİR
+    // ===== 5) NET GƏLİR (Arxiv → Hesabatlar) =====
     let totalSalesFinal = salesTotal;
     let totalProfitFinal = grossProfit;
-    let netRows = [['Dövr', `${start} / ${end}`], [], ['Ümumi satış (Məxaric)', salesTotal]];
+    let netRows = [['SEÇİLMİŞ DÖVR ÜZRƏ HESABAT'], ['Dövr', `${start} / ${end}`], [], ['Ümumi satış (Məxaric)', salesTotal]];
     if(start <= '2026-11-09' && end >= '2026-11-01') {
         totalSalesFinal += 618;
         totalProfitFinal += 618;
@@ -4004,7 +4034,6 @@ async function downloadExcelReport() {
     netRows.push(['Toplam satış', totalSalesFinal]);
     netRows.push(['Qross mənfəət', totalProfitFinal]);
     netRows.push(['Xərclər', expTotal]);
-    netRows.push([]);
     netRows.push(['NET GƏLİR', totalProfitFinal - expTotal]);
     netRows.push([]);
     netRows.push(['Nəğd', rNagd]);
@@ -4013,15 +4042,43 @@ async function downloadExcelReport() {
     netRows.push(['Kassa aparatına vurulan', rCashReg]);
     netRows.push(['Reklamdan', rAd]);
 
+    // Aylıq / İllik arxiv (Kassa sıfırlananda yazılan qeydlər)
+    netRows.push([]);
+    netRows.push(['AYLIQ / İLLİK ARXİV (Kassa)']);
+    netRows.push(['Ay', 'Ay sonu yekun kassa (AZN)', 'Xərc (AZN)', 'Net gəlir (AZN)']);
+    if(yearlyArchive.length === 0) {
+        netRows.push(['Aylıq arxiv qeydi yoxdur']);
+    } else {
+        yearlyArchive.forEach(item => {
+            netRows.push([item.month_name || '', Number(item.total_gain || 0), Number(item.total_expense || 0), Number(item.net_profit || 0)]);
+        });
+    }
+
+    // Gün sonu hesabatları arxivi (seçilmiş dövr)
+    netRows.push([]);
+    netRows.push(['GÜN SONU HESABATLARI ARXİVİ']);
+    netRows.push(['Tarix', 'Hesabat']);
+    let dayArc = dayEndArchive
+        .filter(d => d.report_date && dOnly(d.report_date) >= start && dOnly(d.report_date) <= end)
+        .sort((a, b) => dOnly(a.report_date).localeCompare(dOnly(b.report_date)));
+    if(dayArc.length === 0) {
+        netRows.push(['Bu dövrdə arxivlənmiş gün sonu hesabatı yoxdur']);
+    } else {
+        dayArc.forEach(d => {
+            netRows.push([formatAzeriDateString(dOnly(d.report_date)), excelHtmlToText(d.content_summary)]);
+        });
+    }
+
+    // ===== FAYLI YARAT =====
     let wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, excelMakeSheet(salesRows, [6, 18, 10, 11, 9, 24, 16, 16, 14, 18, 14, 12, 22]), 'Satışlar');
     XLSX.utils.book_append_sheet(wb, excelMakeSheet(prodRows, [10, 28, 14, 12, 12]), 'Məhsul kataloqu');
     XLSX.utils.book_append_sheet(wb, excelMakeSheet(expRows, [6, 18, 32, 14, 50]), 'Xərclər');
-    XLSX.utils.book_append_sheet(wb, excelMakeSheet(attRows, [18, 14, 14, 14, 14, 40]), 'İşçinin iş saatları');
-    XLSX.utils.book_append_sheet(wb, excelMakeSheet(netRows, [36, 22]), 'Net gəlir');
+    XLSX.utils.book_append_sheet(wb, excelMakeSheet(attRows, [18, 14, 14, 16, 14, 14, 16, 40]), 'İşçinin iş saatları');
+    XLSX.utils.book_append_sheet(wb, excelMakeSheet(netRows, [38, 26, 18, 18]), 'Net gəlir');
 
     XLSX.writeFile(wb, `Melodika_Hesabat_${start}_${end}.xlsx`);
     closeExcelExportModal();
 }
-</script>
+</script
 </html>
