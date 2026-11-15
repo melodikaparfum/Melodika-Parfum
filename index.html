@@ -4277,4 +4277,58 @@ resetMonthlyCash = async function() {
     alert(`${monthName} ${selYear} üzrə kassa sıfırlandı!`);
 };
         </script>
+    <script>
+/* ===== 2026 NET GƏLİR = (EVDƏKİ + MAĞAZADAKI KASSA) - SATILAN MALLARIN MAYA DƏYƏRİ ===== */
+function getYearCogs(year) {
+    let sum = 0;
+    sales.forEach(s => {
+        if(s.type !== 'MEXARIC' || !s.date) return;
+        if(String(s.date).substring(0, 4) !== String(year)) return;
+        let cost = Number(s.total_cost);
+        if(!cost) {
+            let p = products.find(x => x.id == s.product_id);
+            cost = Number(s.grams_sold || 0) * Number(p ? p.buy_price || 0 : 0);
+        }
+        sum += cost;
+    });
+    return sum;
+}
+
+function getYearlyNetData() {
+    let home = Number(cashState.home_cash || 0);
+    let store = Number(cashState.store_cash || 0);
+    let cash = home + store;
+    let cogs = getYearCogs(2026);
+    return { home, store, cash, cogs, net: cash - cogs };
+}
+
+updateAdminYearlySummaryValues = function() {
+    let totalSales2026 = 0;
+    let totalExp2026 = 0;
+
+    sales.forEach(s => {
+        let sDate = s.date ? String(s.date).substring(0, 4) : '';
+        if(sDate === '2026' && s.type === 'MEXARIC') totalSales2026 += Number(s.total_price || 0);
+    });
+    totalSales2026 += 618;
+
+    expenses.forEach(e => {
+        let eDate = e.expense_date ? String(e.expense_date).substring(0, 4) : '';
+        if(eDate === '2026') totalExp2026 += Number(e.amount || 0);
+    });
+
+    let d = getYearlyNetData();
+
+    if(document.getElementById('summarySalesVal')) document.getElementById('summarySalesVal').textContent = totalSales2026.toFixed(2) + ' AZN';
+    if(document.getElementById('summaryProfitVal')) document.getElementById('summaryProfitVal').textContent = d.net.toFixed(2) + ' AZN';
+    if(document.getElementById('summaryExpensesVal')) document.getElementById('summaryExpensesVal').textContent = totalExp2026.toFixed(2) + ' AZN';
+};
+
+let _origOpenYearlyDetailModal = openYearlyDetailModal;
+openYearlyDetailModal = function(type) {
+    _origOpenYearlyDetailModal(type);
+    if(type === 'profit') {
+        let d = getYearlyNetData();
+        let netColor = d.net >= 0 ? 'text-green-400' : 'text-red-400';
+        document.getElementById('yearlyDetailContent').inner
 </html>
