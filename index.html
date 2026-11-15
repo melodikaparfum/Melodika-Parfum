@@ -4276,7 +4276,7 @@ resetMonthlyCash = async function() {
     closeCashSheetModal();
     alert(`${monthName} ${selYear} üzrə kassa sıfırlandı!`);
 };
-        </script>
+</script>
     <script>
 /* ===== 2026 NET GƏLİR = (EVDƏKİ + MAĞAZADAKI KASSA) - SATILAN MALLARIN MAYA DƏYƏRİ ===== */
 function getYearCogs(year) {
@@ -4320,7 +4320,11 @@ updateAdminYearlySummaryValues = function() {
     let d = getYearlyNetData();
 
     if(document.getElementById('summarySalesVal')) document.getElementById('summarySalesVal').textContent = totalSales2026.toFixed(2) + ' AZN';
-    if(document.getElementById('summaryProfitVal')) document.getElementById('summaryProfitVal').textContent = d.net.toFixed(2) + ' AZN';
+    if(document.getElementById('summaryProfitVal')) {
+        document.getElementById('summaryProfitVal').textContent = d.net.toFixed(2) + ' AZN';
+        let lbl = document.getElementById('summaryProfitVal').previousElementSibling;
+        if(lbl) lbl.textContent = '2026 cı il ərzində toplam net gəlir (Kassa − Maya):';
+    }
     if(document.getElementById('summaryExpensesVal')) document.getElementById('summaryExpensesVal').textContent = totalExp2026.toFixed(2) + ' AZN';
 };
 
@@ -4330,5 +4334,17 @@ openYearlyDetailModal = function(type) {
     if(type === 'profit') {
         let d = getYearlyNetData();
         let netColor = d.net >= 0 ? 'text-green-400' : 'text-red-400';
-        document.getElementById('yearlyDetailContent').inner
+        document.getElementById('yearlyDetailContent').innerHTML = `
+            <div class="space-y-1">
+                <div>Evdəki kassa: ${d.home.toFixed(2)} AZN</div>
+                <div>Mağazadakı kassa: ${d.store.toFixed(2)} AZN</div>
+                <div class="font-bold text-amber-300 pt-1 border-t border-zinc-800">Evdəki + Mağazadakı Kassa: ${d.cash.toFixed(2)} AZN</div>
+                <div class="text-red-400">Satılan malların maya dəyəri: ${d.cogs.toFixed(2)} AZN</div>
+                <div class="font-bold ${netColor} pt-1 border-t border-zinc-800">Net Gəlir: ${d.net.toFixed(2)} AZN</div>
+            </div>`;
+    }
+};
+
+try { updateAdminYearlySummaryValues(); } catch(e) {}
+    </script>
 </html>
