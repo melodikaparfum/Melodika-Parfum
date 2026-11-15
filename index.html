@@ -4404,4 +4404,136 @@ try { updateAdminYearlySummaryValues(); } catch(e) {}
             cogsRow.id = 'kassaCogsRow';
             cogsRow.className = 'flex justify-between';
             cogsRow.innerHTML = '<span class="text-zinc-300">Satılan malların maya dəyəri:</span><strong id="kassaCogsVal" class="text-red-400">0.00 AZN
+    </script>
+    <script>
+/* ===== KASSA MƏRKƏZİ: AY SEÇƏNDƏ RƏQƏMLƏR DƏYİŞSİN (v2) ===== */
+(function() {
+    function fmt(n) { return Number(n || 0).toFixed(2) + ' AZN'; }
+
+    function cogsFor(y, m) {
+        let prefix = y + '-' + String(m).padStart(2, '0');
+        let sum = 0;
+        sales.forEach(function(s) {
+            if(s.type !== 'MEXARIC' || !s.date) return;
+            if(getBakuDateString(s.date).substring(0, 7) !== prefix) return;
+            let cost = Number(s.total_cost);
+            if(!cost) {
+                let p = products.find(function(x) { return x.id == s.product_id; });
+                cost = Number(s.grams_sold || 0) * Number(p ? p.buy_price || 0 : 0);
+            }
+            sum += cost;
+        });
+        return sum;
+    }
+
+    function findArchive(y, m) {
+        let key = monthNamesAz[m - 1] + ' ' + y;
+        let list = yearlyArchive.filter(function(i) { return String(i.month_name || '').trim() === key; });
+        return list.length ? list[list.length - 1] : null;
+    }
+
+    function myUpdate() {
+        let y = parseInt(document.getElementById('cashSheetYearSelect').value);
+        let m = parseInt(document.getElementById('cashSheetMonthSelect').value);
+        let isCurrent = (getBakuDateString().substring(0, 7) === y + '-' + String(m).padStart(2, '0'));
+        let arc = findArchive(y, m);
+
+        let combined = 0, homeTxt = fmt(0), storeTxt = fmt(0), note = '';
+        if(isCurrent) {
+            let h = Number(cashState.home_cash || 0), s = Number(cashState.store_cash || 0);
+            combined = h + s; homeTxt = fmt(h); storeTxt = fmt(s);
+        } else if(arc) {
+            combined = Number(arc.total_gain || 0);
+            homeTxt = (arc.home_cash != null) ? fmt(arc.home_cash) : '—';
+            storeTxt = (arc.store_cash != null) ? fmt(arc.store_cash) : '—';
+            note = ' (arxiv)';
+        } else {
+            note = ' (arxiv yoxdur)';
+        }
+
+        document.getElementById('selectedMonthSalesTitle').textContent = 'Cari Kassa Vəziyyəti (' + monthNamesAz[m - 1] + ' ' + y + ')' + note + ':';
+        document.getElementById('kassaCombinedTotal').textContent = fmt(combined);
+        document.getElementById('kassaHomeBalance').textContent = homeTxt;
+        document.getElementById('kassaStoreBalance').textContent = storeTxt;
+
+        let prefix = y + '-' + String(m).padStart(2, '0');
+        let totalExp = 0;
+        expenses.forEach(function(e) {
+            let d = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+            if(d.startsWith(prefix)) totalExp += Number(e.amount || 0);
+        });
+
+        let cogs = cogsFor(y, m);
+        let net = combined - cogs;
+
+        let netEl = document.getElementById('kassaNetProfit');
+        let cogsRow = document.getElementById('kassaCogsRow');
+        if(!cogsRow && netEl && netEl.parentElement) {
+            cogsRow = document.createElement('div');
+            cogsRow.id = 'kassaCogsRow';
+            cogsRow.className = 'flex justify-between';
+            cogsRow.innerHTML = '<span class="text-zinc-300">Satılan malların maya dəyəri:</span><strong id="kassaCogsVal" class="text-red-400">0.00 AZN</strong>';
+            netEl.parentElement.parentElement.insertBefore(cogsRow, netEl.parentElement);
+        }
+        if(document.getElementById('kassaCogsVal')) document.getElementById('kassaCogsVal').textContent = fmt(cogs);
+
+        document.getElementById('kassaAySonuYekun').textContent = fmt(combined);
+        document.getElementById('kassaTotalExpenses').textContent = fmt(totalExp);
+        netEl.textContent = fmt(net);
+        netEl.className = (net >= 0 ? 'text-green-400' : 'text-red-400') + ' font-extrabold';
+    }
+
+    async function myReset() {
+        let y = parseInt(document.getElementById('cashSheetYearSelect').value);
+        let m = parseInt(document.getElementById('cashSheetMonthSelect').value);
+        let monthName = monthNamesAz[m - 1];
+        if(!confirm(monthName + ' ' + y + ' ayı üzrə kassanı sıfırlamaq və arxivə yazmaq istədiyinizə əminsiniz?')) return;
+
+        let prefix = y + '-' + String(m).padStart(2, '0');
+        let home = Number(cashState.home_cash || 0), store = Number(cashState.store_cash || 0);
+        let combined = home + store;
+
+        let totalExp = 0;
+        expenses.forEach(function(e) {
+            let d = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+            if(d.startsWith(prefix)) totalExp += Number(e.amount || 0);
+        });
+
+        let payload = {
+            year: y,
+            month_name: monthName + ' ' + y,
+            total_gain: combined,
+            total_expense: totalExp,
+            net_profit: combined - cogsFor(y, m),
+            created_at: new Date().toISOString()
+        };
+
+        let res = await _supabase.from('yearly_archive').insert([Object.assign({ home_cash: home, store_cash: store }, payload)]);
+        if(res.error) res = await _supabase.from('yearly_archive').insert([payload]);
+        if(res.error) { alert('Arxiv xətası: ' + res.error.message); return; }
+
+        let zero = { home_cash: 0, store_cash: 0, updated_at: new Date().toISOString() };
+        if(cashState.id) await _supabase.from('cash_state').update(zero).eq('id', cashState.id);
+        else await _supabase.from('cash_state').insert([zero]);
+
+        await loadDataFromCloud();
+        closeCashSheetModal();
+        alert(monthName + ' ' + y + ' üzrə kassa sıfırlandı!');
+    }
+
+    // Başqa blok üstünə yazsa, geri qaytarır
+    function install() {
+        if(window.updateCashSheetView !== myUpdate) window.updateCashSheetView = myUpdate;
+        if(window.resetMonthlyCash !== myReset) window.resetMonthlyCash = myReset;
+    }
+    install();
+    setInterval(install, 300);
+
+    // Ay və il dəyişəndə dərhal yenilə
+    ['cashSheetMonthSelect', 'cashSheetYearSelect'].forEach(function(id) {
+        let el = document.getElementById(id);
+        if(el) el.addEventListener('change', function() { myUpdate(); });
+    });
+})();
+</script>
 </html>
