@@ -4178,4 +4178,103 @@ excelMakeSheet = function(rows, widths) {
     return ws;
 };
 </script>
+    <script>
+/* ===== KASSA: NET GƏLİR = YEKUN KASSA - SATILAN MALIN MAYA DƏYƏRİ ===== */
+function getMonthCogs(year, month) {
+    let prefix = `${year}-${String(month).padStart(2, '0')}`;
+    let sum = 0;
+    sales.forEach(s => {
+        if(s.type !== 'MEXARIC' || !s.date) return;
+        if(!getBakuDateString(s.date).startsWith(prefix)) return;
+        let cost = Number(s.total_cost);
+        if(!cost) {
+            let p = products.find(x => x.id == s.product_id);
+            cost = Number(s.grams_sold || 0) * Number(p ? p.buy_price || 0 : 0);
+        }
+        sum += cost;
+    });
+    return sum;
+}
+
+updateCashSheetView = function() {
+    let selYear = parseInt(document.getElementById('cashSheetYearSelect').value);
+    let selMonth = parseInt(document.getElementById('cashSheetMonthSelect').value);
+    let monthName = monthNamesAz[selMonth - 1];
+
+    document.getElementById('selectedMonthSalesTitle').textContent = `Cari Kassa Vəziyyəti (${monthName} ${selYear}):`;
+
+    let homeVal = Number(cashState.home_cash || 0);
+    let storeVal = Number(cashState.store_cash || 0);
+    let combinedVal = homeVal + storeVal;
+
+    document.getElementById('kassaCombinedTotal').textContent = combinedVal.toFixed(2) + ' AZN';
+    document.getElementById('kassaHomeBalance').textContent = homeVal.toFixed(2) + ' AZN';
+    document.getElementById('kassaStoreBalance').textContent = storeVal.toFixed(2) + ' AZN';
+
+    let monthPrefix = `${selYear}-${String(selMonth).padStart(2, '0')}`;
+    let totalExpFromMonth = 0;
+    expenses.forEach(e => {
+        let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+        if(eDate.startsWith(monthPrefix)) totalExpFromMonth += Number(e.amount || 0);
+    });
+
+    let cogs = getMonthCogs(selYear, selMonth);
+    let netProfitFromMonth = combinedVal - cogs;
+
+    let netEl = document.getElementById('kassaNetProfit');
+    let cogsRow = document.getElementById('kassaCogsRow');
+    if(!cogsRow && netEl && netEl.parentElement) {
+        cogsRow = document.createElement('div');
+        cogsRow.id = 'kassaCogsRow';
+        cogsRow.className = 'flex justify-between';
+        cogsRow.innerHTML = '<span class="text-zinc-300">Satılan malların maya dəyəri:</span><strong id="kassaCogsVal" class="text-red-400">0.00 AZN</strong>';
+        netEl.parentElement.parentElement.insertBefore(cogsRow, netEl.parentElement);
+    }
+    if(document.getElementById('kassaCogsVal')) document.getElementById('kassaCogsVal').textContent = cogs.toFixed(2) + ' AZN';
+
+    document.getElementById('kassaAySonuYekun').textContent = combinedVal.toFixed(2) + ' AZN';
+    document.getElementById('kassaTotalExpenses').textContent = totalExpFromMonth.toFixed(2) + ' AZN';
+    netEl.textContent = netProfitFromMonth.toFixed(2) + ' AZN';
+    netEl.className = (netProfitFromMonth >= 0 ? 'text-green-400' : 'text-red-400') + ' font-extrabold';
+};
+
+resetMonthlyCash = async function() {
+    let selYear = parseInt(document.getElementById('cashSheetYearSelect').value);
+    let selMonth = parseInt(document.getElementById('cashSheetMonthSelect').value);
+    let monthName = monthNamesAz[selMonth - 1];
+
+    if(!confirm(`${monthName} ${selYear} ayı üzrə kassanı sıfırlamaq və arxivə yazmaq istədiyinizə əminsiniz?`)) return;
+
+    let monthPrefix = `${selYear}-${String(selMonth).padStart(2, '0')}`;
+    let aySonuYekun = Number(cashState.home_cash || 0) + Number(cashState.store_cash || 0);
+
+    let totalExp = 0;
+    expenses.forEach(e => {
+        let eDate = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+        if(eDate.startsWith(monthPrefix)) totalExp += Number(e.amount || 0);
+    });
+
+    let netProfit = aySonuYekun - getMonthCogs(selYear, selMonth);
+
+    let archivePayload = {
+        year: selYear,
+        month_name: `${monthName} ${selYear}`,
+        total_gain: aySonuYekun,
+        total_expense: totalExp,
+        net_profit: netProfit,
+        created_at: new Date().toISOString()
+    };
+
+    let { error: arcErr } = await _supabase.from('yearly_archive').insert([archivePayload]);
+    if(arcErr) { alert('Arxiv xətası: ' + arcErr.message); return; }
+
+    let cashPayload = { home_cash: 0, store_cash: 0, updated_at: new Date().toISOString() };
+    if(cashState.id) await _supabase.from('cash_state').update(cashPayload).eq('id', cashState.id);
+    else await _supabase.from('cash_state').insert([cashPayload]);
+
+    await loadDataFromCloud();
+    closeCashSheetModal();
+    alert(`${monthName} ${selYear} üzrə kassa sıfırlandı!`);
+};
+        </script>
 </html>
