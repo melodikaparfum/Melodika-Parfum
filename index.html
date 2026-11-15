@@ -4347,4 +4347,61 @@ openYearlyDetailModal = function(type) {
 
 try { updateAdminYearlySummaryValues(); } catch(e) {}
     </script>
+    <script>
+/* ===== KASSA MƏRKƏZİ: AY SEÇƏNDƏ KASSA RƏQƏMLƏRİ DƏYİŞSİN ===== */
+(function() {
+    if(window.__cashMonthPatched) return;
+    window.__cashMonthPatched = true;
+
+    function fmt(n) { return Number(n || 0).toFixed(2) + ' AZN'; }
+    function cogsFor(y, m) { return (typeof getMonthCogs === 'function') ? getMonthCogs(y, m) : 0; }
+
+    function findArchive(y, m) {
+        let key = monthNamesAz[m - 1] + ' ' + y;
+        let list = yearlyArchive.filter(function(i) { return String(i.month_name || '').trim() === key; });
+        return list.length ? list[list.length - 1] : null;
+    }
+
+    window.updateCashSheetView = function() {
+        let y = parseInt(document.getElementById('cashSheetYearSelect').value);
+        let m = parseInt(document.getElementById('cashSheetMonthSelect').value);
+        let monthName = monthNamesAz[m - 1];
+        let isCurrent = (getBakuDateString().substring(0, 7) === y + '-' + String(m).padStart(2, '0'));
+        let arc = findArchive(y, m);
+
+        let combined = 0, homeTxt = fmt(0), storeTxt = fmt(0), note = '';
+        if(isCurrent) {
+            let h = Number(cashState.home_cash || 0), s = Number(cashState.store_cash || 0);
+            combined = h + s; homeTxt = fmt(h); storeTxt = fmt(s);
+        } else if(arc) {
+            combined = Number(arc.total_gain || 0);
+            homeTxt = (arc.home_cash != null) ? fmt(arc.home_cash) : '—';
+            storeTxt = (arc.store_cash != null) ? fmt(arc.store_cash) : '—';
+            note = ' (arxiv)';
+        } else {
+            note = ' (arxiv yoxdur)';
+        }
+
+        document.getElementById('selectedMonthSalesTitle').textContent = 'Cari Kassa Vəziyyəti (' + monthName + ' ' + y + ')' + note + ':';
+        document.getElementById('kassaCombinedTotal').textContent = fmt(combined);
+        document.getElementById('kassaHomeBalance').textContent = homeTxt;
+        document.getElementById('kassaStoreBalance').textContent = storeTxt;
+
+        let prefix = y + '-' + String(m).padStart(2, '0');
+        let totalExp = 0;
+        expenses.forEach(function(e) {
+            let d = e.expense_date ? String(e.expense_date).substring(0, 10) : '';
+            if(d.startsWith(prefix)) totalExp += Number(e.amount || 0);
+        });
+
+        let cogs = cogsFor(y, m);
+        let net = combined - cogs;
+
+        let netEl = document.getElementById('kassaNetProfit');
+        let cogsRow = document.getElementById('kassaCogsRow');
+        if(!cogsRow && netEl && netEl.parentElement) {
+            cogsRow = document.createElement('div');
+            cogsRow.id = 'kassaCogsRow';
+            cogsRow.className = 'flex justify-between';
+            cogsRow.innerHTML = '<span class="text-zinc-300">Satılan malların maya dəyəri:</span><strong id="kassaCogsVal" class="text-red-400">0.00 AZN
 </html>
